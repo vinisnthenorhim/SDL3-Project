@@ -81,7 +81,7 @@ class StorageBuffer
       ti.size  = sizeof(data) * data.size();
       transfer = SDL_CreateGPUTransferBuffer(device, &ti);
 
-      void* mapped = SDL_MapGPUTransferBuffer(device, transfer, false);
+      uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, transfer, false);
       SDL_memcpy(mapped, data.data(), sizeof(T) * data.size());
       SDL_UnmapGPUTransferBuffer(device, transfer);
 
@@ -102,12 +102,6 @@ class StorageBuffer
       SDL_ReleaseGPUTransferBuffer(device, transfer);  
     }
     SDL_GPUBuffer* buffer() {return buff;}
-  private:
-    SDL_GPUDevice*         device   = nullptr;
-    SDL_GPUBuffer*         buff     = nullptr;
-    SDL_GPUTransferBuffer* transfer = nullptr;
-    SDL_GPUCopyPass* copy = nullptr;
-
     void deleteBuff()
     {
       if(buff)
@@ -116,4 +110,11 @@ class StorageBuffer
         buff = nullptr;
       }
     }
+  private:
+    SDL_GPUDevice*         device   = nullptr;
+    SDL_GPUBuffer*         buff     = nullptr;
+    SDL_GPUTransferBuffer* transfer = nullptr;
+    SDL_GPUCopyPass* copy = nullptr;
+
+
 };

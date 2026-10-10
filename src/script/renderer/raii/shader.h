@@ -84,33 +84,15 @@ class Shader
 class ComputeShader 
 {
   public:
-    ComputeShader(SDL_GPUDevice* device, const char* base, Uint32 uniBuffer = 0,  Uint32 storageBuff = 0)
+    ComputeShader(SDL_GPUDevice* device, const char* base)
     {
-      this->device = device;
-      shad = loadShader( device, base, uniBuffer, storageBuff);
+      shadInfo = loadShader(device, base );
     }
-    ~ComputeShader()
-    {
-      release();
-    }
-    SDL_GPUShader* shader() { return shad; }
-    bool valid() const { return shad != nullptr; }
-    ComputeShader(const ComputeShader&) = delete;
-    ComputeShader& operator=(const ComputeShader&) = delete;
-    ComputeShader(ComputeShader&& o) noexcept : device(o.device), shad(o.shad) { o.shad = nullptr; }
-    ComputeShader& operator=(ComputeShader&& o) noexcept {
-        if (this != &o) {
-            release();
-            device = o.device; 
-            shad = o.shad;
-            o.shad = nullptr;
-        }
-        return *this;
-    }
+
+    SDL_GPUShaderCreateInfo compInfo() { return shadInfo; }
   private:
-    SDL_GPUDevice* device = nullptr;
-    SDL_GPUShader* shad   = nullptr;
-    SDL_GPUShader* loadShader(SDL_GPUDevice* device, const char* base, Uint32 uniBuffer, Uint32 storageBuff)
+    SDL_GPUShaderCreateInfo shadInfo;
+    SDL_GPUShaderCreateInfo loadShader(SDL_GPUDevice* device, const char* base)
     {
         // 1. ask the backend which format it accepts
         SDL_GPUShaderFormat supported = SDL_GetGPUShaderFormats(device);
@@ -122,7 +104,7 @@ class ComputeShader
         if (supported & SDL_GPU_SHADERFORMAT_SPIRV)     { format = SDL_GPU_SHADERFORMAT_SPIRV; ext = ".spv"; }
         else if (supported & SDL_GPU_SHADERFORMAT_DXIL) { format = SDL_GPU_SHADERFORMAT_DXIL;  ext = ".dxil"; }
         else if (supported & SDL_GPU_SHADERFORMAT_MSL)  { format = SDL_GPU_SHADERFORMAT_MSL;   ext = ".msl"; entry = "main0"; }
-        else { SDL_Log("No supported shader format"); return nullptr; }
+        else { SDL_Log("No supported shader format"); return {}; }
 
         // 2. build the file name: "tri.vert" -> "tri.vert.spv"
         char path[256];
@@ -133,7 +115,7 @@ class ComputeShader
         void* code = SDL_LoadFile(path, &size);
         if (!code) {
             SDL_Log("Load %s failed: %s", path, SDL_GetError());
-            return nullptr;
+            return {};
         }
 
         // 4. create the shader
@@ -142,17 +124,9 @@ class ComputeShader
         info.code_size  = size;
         info.entrypoint = entry;
         info.format     = format;
-        info.num_uniform_buffers = uniBuffer;
-        info.num_storage_buffers = storageBuff;
 
-        SDL_GPUShader* shader = SDL_CreateGPUShader(device, &info);
-        SDL_free(code);
 
-        CHECK(shader);
-        return shader;
+        return info;
     }
-    void release() {
-        if (shad) SDL_ReleaseGPUShader(device, shad);
-        shad = nullptr;
-    }
+
 };

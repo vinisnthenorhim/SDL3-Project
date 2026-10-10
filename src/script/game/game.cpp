@@ -2,8 +2,8 @@
 
 Game::Game(Renderer& renderer)
 {
-  renderer.resourceDataLoad(world.readData(), world.savePosition(), world.getVelocity());
   world.createObject(Type::Player);
+  renderer.resourceDataLoad(world.readData(), world.savePosition(), world.getVelocity());
 }
 
 void Game::render(Renderer& renderer)

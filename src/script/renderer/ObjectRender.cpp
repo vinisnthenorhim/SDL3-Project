@@ -22,12 +22,12 @@ struct DefaultMeshObject
 
 
 
-void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device, SDL_GPUCommandBuffer* cmd)
+void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 {
   this->device = device;
 
-  Shader vert(device, "tri.vert", SDL_GPU_SHADERSTAGE_VERTEX, 1);
-  Shader frag(device, "tri.frag", SDL_GPU_SHADERSTAGE_FRAGMENT);
+  Shader vert(device, "vertex.vert", SDL_GPU_SHADERSTAGE_VERTEX, 1, 1);
+  Shader frag(device, "fragment.frag", SDL_GPU_SHADERSTAGE_FRAGMENT);
 
   vertBuff.createBuffer(device, sizeof(Vertex) * DefaultMeshObject::vertex.size(), SDL_GPU_BUFFERUSAGE_VERTEX);
   indexBuff.createBuffer(device, sizeof(uint32_t) * DefaultMeshObject::indices.size(), SDL_GPU_BUFFERUSAGE_INDEX);
@@ -62,7 +62,6 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device,
 
 
   gPipeline.createGraphicPipeline(device, window, vert.shader(), frag.shader(), state);
-  uploadData();
 
   std::cout << "[OPENGL]"  << " Buffer created " << '\n'; 
 }
@@ -85,32 +84,23 @@ void ObjectRender::resourceLoad(const RenderStoreResource resource)
 
 }
 
-void ObjectRender::uploadData()
+void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
 {
-  SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
 
-  SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
   vertBuff.startSetData(copy, DefaultMeshObject::vertex);
   indexBuff.startSetData(copy, DefaultMeshObject::indices);
 
-  SDL_EndGPUCopyPass(copy);
-  SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
 
-  SDL_WaitForGPUFences(device, true, &fence, 1);
-
-  endUpdate();
-  SDL_ReleaseGPUFence(device, fence);
-  std::cout << "[OPENGL]"  << " Buffer data updated " << '\n'; 
-
+  std::cout << "[SDLGPU]"  << " Buffer data updated " << '\n'; 
 }
 
 void ObjectRender::endUpdate()
 {
-  vertBuff.endSetData();
+  vertBuff .endSetData();
   indexBuff.endSetData();
 }
 
-void ObjectRender::bind(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* pass)
+void ObjectRender::bind(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* pass, SDL_GPUBuffer* model)
 {
   gPipeline.bind(pass);
 
@@ -126,6 +116,9 @@ void ObjectRender::bind(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* pass)
   indexBinding.offset = 0;
   SDL_BindGPUIndexBuffer(pass, &indexBinding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
-  SDL_DrawGPUIndexedPrimitives( pass, 6, 1, 0, 0, 0 );
+  SDL_GPUBuffer* bufs[] = { model };
+  SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 1);
+
+  SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
 
 }

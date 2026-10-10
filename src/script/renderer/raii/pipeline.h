@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include "shader.h"
 #include "check.h"
 class GraphicPipeline
 {
@@ -45,15 +46,25 @@ class GraphicPipeline
 class ComputePipeline
 {
   public:
-    void createComputePipeline(SDL_GPUDevice* device)
+    void createComputePipeline(SDL_GPUDevice* device,  SDL_GPUComputePipelineCreateInfo &pipelineInfo)
     {
-      SDL_GPUComputePipelineCreateInfo info {};
-      info.threadcount_x = 64;
-      info.threadcount_y = 1 ;
-      info.threadcount_z = 1 ;
-      pipeline = SDL_CreateGPUComputePipeline(device, &info);
+      this->device = device;
+      compPipeline = SDL_CreateGPUComputePipeline(device, &pipelineInfo); 
+      CHECK(compPipeline);
     }
+    ~ComputePipeline()
+    {
+      destroy();
+    }
+    void destroy()
+    {
+      if (!compPipeline) return;
+      SDL_ReleaseGPUComputePipeline(device, compPipeline);
+      compPipeline = nullptr;
+    }
+    SDL_GPUComputePipeline* pipeline() {return compPipeline;}
 
   private:
-    SDL_GPUComputePipeline* pipeline = nullptr;
+    SDL_GPUComputePipeline* compPipeline = nullptr;
+    SDL_GPUDevice* device = nullptr;
 };
