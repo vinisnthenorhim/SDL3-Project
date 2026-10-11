@@ -1,0 +1,50 @@
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct UniFormBuffer
+{
+    float deltaTime;
+    uint entityCount;
+};
+
+struct PositionBuffer
+{
+    float3 positions[1];
+};
+
+struct VelocityBuffer
+{
+    float velocity[1];
+};
+
+struct ModelMatrixBuffer
+{
+    float4x4 modelMat[1];
+};
+
+constant uint3 gl_WorkGroupSize [[maybe_unused]] = uint3(64u, 1u, 1u);
+
+static inline __attribute__((always_inline))
+float4x4 translationMatrix(thread const float3& offset)
+{
+    return float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(offset.x, offset.y, offset.z, 1.0));
+}
+
+kernel void main0(constant UniFormBuffer& _46 [[buffer(0)]], device VelocityBuffer& _66 [[buffer(1)]], device ModelMatrixBuffer& _112 [[buffer(2)]], device PositionBuffer& _60 [[buffer(3)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+{
+    uint entityIndex = gl_GlobalInvocationID.x;
+    if (entityIndex >= _46.entityCount)
+    {
+        return;
+    }
+    ((device float*)&_60.positions[entityIndex])[0u] += (_66.velocity[entityIndex] * _46.deltaTime);
+    ((device float*)&_60.positions[entityIndex])[1u] += (_66.velocity[entityIndex + _46.entityCount] * _46.deltaTime);
+    ((device float*)&_60.positions[entityIndex])[2u] += (_66.velocity[(entityIndex + _46.entityCount) + _46.entityCount] * _46.deltaTime);
+    float3 param = _60.positions[entityIndex];
+    _112.modelMat[entityIndex] = translationMatrix(param);
+}
+
