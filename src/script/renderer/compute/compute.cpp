@@ -32,33 +32,71 @@ void Compute::resourceLoad(RenderVelocity& renderVelocity)
   this->velocityY = renderVelocity.velocityY;
   this->velocityZ = renderVelocity.velocityZ;
 
-  entityCount = velocityX->size();
-
 }
 
 
 void Compute::updateStorageBuffer()
 {
+ 
   Uint32 veloXSize = sizeof(float) * velocityX->size();
   Uint32 veloYSize = sizeof(float) * velocityY->size();
   Uint32 veloZSize = sizeof(float) * velocityZ->size();
   Uint32 totalVeloSize = veloXSize + veloYSize + veloZSize;
 
   int currentEntityCount = velocityX->size();
+  if (currentEntityCount == 0) return;                       // CHANGED: guard zero entities
+
+  bool resized = false;                                      // CHANGED: new flag
 
   if (currentEntityCount > entityCount || modelBuffer.buffer() == nullptr || velocityBuffer.buffer() == nullptr) 
   {
-    modelBuffer.createBuffer(device, sizeof(glm::mat4) * (*velocityX).size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
+    modelBuffer.createBuffer(device, sizeof(glm::mat4) * (*velocityX).size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ);
+
     velocityBuffer.createBuffer(device, totalVeloSize, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ );
-    positionBuffer.createBuffer(device, sizeof(glm::vec3) * currentEntityCount, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+    positionBuffer.createBuffer(device, sizeof(glm::vec4) * currentEntityCount, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);   // CHANGED: vec3 -> vec4
+
+    resized = true;                                          // CHANGED
+
     std::cout << "[SDLGPU]"  << " Storage Buffer resized" << '\n'; 
   }
   entityCount = currentEntityCount;
 
+    if (resized && positionBuffer.buffer() && entityCount !=0 )   // CHANGED: only zero when the buffers are new
+    {
+
+      std::vector<glm::vec4> zeros(entityCount, glm::vec4(0.0f));
+      const Uint32 bytes = sizeof(glm::vec4) * entityCount;
+
+      SDL_GPUTransferBufferCreateInfo ti = {};
+      ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+      ti.size  = bytes;
+      SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device, &ti);
+
+      void* mapped = SDL_MapGPUTransferBuffer(device, tb, false);
+      SDL_memcpy(mapped, zeros.data(), bytes);
+      SDL_UnmapGPUTransferBuffer(device, tb);
+
+      SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
+      SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+
+      SDL_GPUTransferBufferLocation src = {};
+      src.transfer_buffer = tb;
+
+      SDL_GPUBufferRegion dst = {};
+      dst.buffer = positionBuffer.buffer();
+      dst.size   = bytes;
+
+      SDL_UploadToGPUBuffer(copy, &src, &dst, false);
+      SDL_EndGPUCopyPass(copy);
+      SDL_SubmitGPUCommandBuffer(cmd);
+
+      SDL_ReleaseGPUTransferBuffer(device, tb);   // safe after submit
+    std::cout << "[SDLGPU]"  << " Storage Buffer resized" << '\n'; 
+
+    }
   SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
 
   SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
-  
 
   SDL_GPUTransferBufferCreateInfo ti = {};
   ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
@@ -100,7 +138,7 @@ void Compute::updateStorageBuffer()
 struct UniformData
 {
   float deltaTime;
-  int entityCount;
+  Uint32 entityCount;
 };
 
 void Compute::bindComp(SDL_GPUCommandBuffer* cmd)
@@ -109,7 +147,7 @@ void Compute::bindComp(SDL_GPUCommandBuffer* cmd)
   Uint32 groupCount = (entityCount + 64 - 1) / 64;
   UniformData uniformData = {*deltaTime, entityCount};
 
-  SDL_GPUStorageBufferReadWriteBinding rw[2];
+  SDL_GPUStorageBufferReadWriteBinding rw[2] = {};
   rw[0].buffer = modelBuffer.buffer();
   rw[0].cycle = false;
 
@@ -128,16 +166,55 @@ void Compute::bindComp(SDL_GPUCommandBuffer* cmd)
 
   SDL_PushGPUComputeUniformData(cmd, 0, &uniformData, sizeof(uniformData));
 
-SDL_DispatchGPUCompute(pass, groupCount, 1, 1);
+  SDL_DispatchGPUCompute(pass, groupCount, 1, 1);
 
   SDL_EndGPUComputePass(pass);
 }
 
 
 void Compute::calculate()
-{
+{ 
+  // std::cout << (*velocityX)[0] << '\n';
+  if ((*velocityX).size() == 0) return;
 
-  entityCount = velocityX->size();
+  SDL_GPUTransferBufferCreateInfo ti = {};
+  ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD;
+  ti.size  = sizeof(glm::vec4) * (*velocityX).size();
+
+  SDL_GPUTransferBuffer* download = SDL_CreateGPUTransferBuffer(device, &ti);
+
+  SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
+  SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+
+  SDL_GPUBufferRegion src = {};
+  src.buffer = positionBuffer.buffer();
+  src.offset = 0;
+  src.size   = sizeof(glm::vec4) * (*velocityX).size();
+
+  SDL_GPUTransferBufferLocation dst = {};
+  dst.transfer_buffer = download;
+  dst.offset = 0;
+  SDL_DownloadFromGPUBuffer(copy, &src, &dst);   // the source comes first here
+
+  SDL_EndGPUCopyPass(copy);
+  
+
+  SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
+
+  SDL_WaitForGPUFences(device, true, &fence, 1);
 
 
+  SDL_ReleaseGPUFence(device, fence);
+
+    glm::vec4* mats = (glm::vec4*)SDL_MapGPUTransferBuffer(device, download, false);
+      if (mats) {
+          for (Uint32 i = 0; i < (*velocityX).size(); i++) {
+              const glm::vec4& m = mats[i];
+              SDL_Log("model[%u]  translation = %.2f %.2f %.2f", i, m[0], m[1], m[2]);
+          }
+      }
+  SDL_UnmapGPUTransferBuffer(device, download);
+
+  SDL_ReleaseGPUTransferBuffer(device, download);
+  
 }

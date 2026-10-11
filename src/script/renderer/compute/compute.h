@@ -25,7 +25,7 @@ class Compute
     Buffer modelBuffer;
     Buffer velocityBuffer;
 
-    int entityCount = 0;
+    Uint32 entityCount = 0;
 
 
     float* deltaTime;

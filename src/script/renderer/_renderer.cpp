@@ -65,6 +65,7 @@ void Renderer::transfer()
 bool Renderer::copy()
 {
   compute.updateStorageBuffer();
+  compute.calculate();
   cmdBuffer = SDL_AcquireGPUCommandBuffer(device); 
   if(!cmdBuffer) return false;
   SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);

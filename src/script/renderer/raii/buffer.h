@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <vector>
+#include "check.h"
 
 class Buffer
 {
@@ -13,6 +14,7 @@ class Buffer
       info.usage = usage;
       info.size = size;
       buff = SDL_CreateGPUBuffer(device, &info);
+      CHECK(buff);
     }
     ~Buffer()
     {
@@ -68,6 +70,7 @@ class StorageBuffer
       info.usage = usage;
       info.size = size;
       buff = SDL_CreateGPUBuffer(device, &info);
+      CHECK(buff);
     }
     ~StorageBuffer()
     {
