@@ -16,7 +16,7 @@ void Compute::createCompute(SDL_GPUDevice* device)
   pipelineInfo.num_readonly_storage_textures = 0;
   pipelineInfo.num_readonly_storage_buffers = 1;
   pipelineInfo.num_readwrite_storage_textures = 0;
-  pipelineInfo.num_readwrite_storage_buffers = 2;
+  pipelineInfo.num_readwrite_storage_buffers = 4;
   pipelineInfo.num_uniform_buffers = 1;
   pipelineInfo.threadcount_x = 64;
   pipelineInfo.threadcount_y = 1;
@@ -24,13 +24,13 @@ void Compute::createCompute(SDL_GPUDevice* device)
 
   compPipeline.createComputePipeline(device, pipelineInfo);
 }
-void Compute::resourceLoad(RenderVelocity& renderVelocity)
+void Compute::resourceLoad(ObjectData objectData, ObjectTransformData objectTransformData)
 {
 
-  this->deltaTime = renderVelocity.secondFrame;
-  this->velocityX = renderVelocity.velocityX;
-  this->velocityY = renderVelocity.velocityY;
-  this->velocityZ = renderVelocity.velocityZ;
+  this->deltaTime = objectTransformData.secondPerFrame;
+  this->velocityX = objectTransformData.velocityX;
+  this->velocityY = objectTransformData.velocityY;
+  this->velocityZ = objectTransformData.velocityZ;
 
 }
 

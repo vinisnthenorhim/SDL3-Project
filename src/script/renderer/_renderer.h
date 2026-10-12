@@ -6,33 +6,39 @@
 #include <game/renderObject/enum/struct.h>
 #include <renderer/raii/_raii.h>
 #include <renderer/compute/compute.h>
-#include "ObjectRender.h"
-#include "projection.h"
+#include <renderer/core/ObjectRender.h>
+#include <renderer/core/projection.h>
+#include <renderer/core/ObjectTransform.h>
+
 
 class Renderer
 {
     public:
         Renderer(SDL_Window* window);
         ~Renderer();
-        void resourceDataLoad(const RenderStoreResource& resource, RenderObjectPosition objectPosition, RenderVelocity objectVelocity);
+        void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData);
 
         void screenUpdate(const SDL_Event* event);
-        void transfer();
-        bool copy();
-        bool render();
+        // void transfer();
+        // bool copypass();
+        // bool r();
+
+        void render();
 
     private:
       SDL_Window*           window    = nullptr;
       SDL_GPUDevice*        device    = nullptr;
       SDL_GPUCommandBuffer* cmdBuffer = nullptr;
       SDL_GPUTexture*       swap      = nullptr;
+      SDL_GPUCopyPass* copy = nullptr;
 
       Device          objectDevice;
-      GraphicPipeline pipeline;
-      Compute         compute;
-      Buffer          vertexBuffer;
+      ObjectTransform objectTransform;
       ObjectRender    objectRender;
       Projection      projection;
+
+      // Compute         compute;
+      // Buffer          vertexBuffer;
 
 
 };

@@ -5,7 +5,7 @@ Engine::Engine()
   window = new Window();
   renderer = new Renderer(window->getWindowFirst());
   game = new Game(*renderer);
-  renderer->transfer();
+  // renderer->transfer();
 }
 
 
@@ -25,7 +25,8 @@ bool Engine::event(const SDL_Event* event)
 bool Engine::render()
 {
   game->render(*renderer);
-  if(renderer->copy()) renderer->render();
+  // if(renderer->copypass()) renderer->render();
+  renderer->render();
   return true;
 }
 

@@ -3,7 +3,7 @@
 Game::Game(Renderer& renderer)
 {
   world.createObject(Type::Player);
-  renderer.resourceDataLoad(world.readData(), world.savePosition(), world.getVelocity());
+  renderer.dataLoad(world.readData(), world.getObjectTranform());
 }
 
 void Game::render(Renderer& renderer)

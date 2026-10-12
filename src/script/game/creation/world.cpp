@@ -9,50 +9,43 @@ World::World()
   std::cout << std::fixed << std::setprecision(6);
 }
 
-const RenderStoreResource World::readData() const 
+ObjectData World::readData()  
 { 
   return 
   { 
-    &type, 
     &visible,
     &speedX, 
     &speedY,
     &positionX,
     &positionY,
     &positionZ,
-    &scaleX,
-    &scaleY,
-    &scaleZ,    
+    &scalingX,
+    &scalingY,
+    &scalingZ,    
     &rotationX,
     &rotationY,
     &rotationZ,
   }; 
 }; 
 
-RenderObjectPosition World::savePosition()
-{
-  return 
-  { 
-    &positionX,
-    &positionY,
-    &positionZ,
-    &scaleX,
-    &scaleY,
-    &scaleZ,    
-    &rotationX,
-    &rotationY,
-    &rotationZ,
-  }; 
-}
-RenderVelocity World::getVelocity()
+
+ObjectTransformData World::getObjectTranform()
 {
   return
   {
     &secondFrame,
-    &dirty,
+    &dirtyVelocity,
     &velocityX,
     &velocityY,
-    &velocityZ
+    &velocityZ,
+    &dirtyScale,
+    &scaleY,
+    &scaleZ,
+    &scaleX,
+    &dirtyRotate,
+    &rotateX,
+    &rotateY,
+    &rotateZ
   };
 }
 
@@ -61,28 +54,27 @@ void World::createObject(Type objectType)
 
   type.push_back(objectType);
   dirty.push_back(false)    ;
+  dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
 
-  positionX.push_back(0.0f);
-  positionY.push_back(0.0f);
-  positionZ.push_back(0.0f);
 
-  scaleX.push_back(1.0f)   ;
-  scaleY.push_back(1.0f)   ;
-  scaleZ.push_back(1.0f)   ;
 
-  rotationX.push_back(0.0f);
-  rotationY.push_back(0.0f);
-  rotationZ.push_back(0.0f);
+  positionX.push_back(0.0f) ; positionY.push_back(0.0f) ; positionZ.push_back(0.0f)  ;
 
-  velocityX.push_back(0.0f);
-  velocityY.push_back(0.0f);
-  velocityZ.push_back(0.0f);
+  scalingX .push_back(1.0f) ; scalingY .push_back(1.0f) ; scalingZ .push_back(1.0f)  ;
 
-  speedX.push_back(200.0f)   ;
-  speedY.push_back(350.0f)   ;
+  rotationX.push_back(0.0f) ; rotationY.push_back(0.0f) ; rotationZ.push_back(0.0f)  ;
 
-  visible.push_back(true)  ;
-  exist.push_back(true)    ;
+  velocityX.push_back(0.0f) ; velocityY.push_back(0.0f) ; velocityZ.push_back(0.0f)  ;
+
+  scaleX   .push_back(0.0f) ; scaleY   .push_back(0.0f) ; scaleZ   .push_back(0.0f)  ;
+
+  rotateX  .push_back(0.0f) ; rotateY  .push_back(0.0f) ; rotateZ  .push_back(0.0f)  ;
+
+  speedX.push_back(200.0f)  ;
+  speedY.push_back(350.0f)  ;
+
+  visible.push_back(true)   ;
+  exist.push_back(true)     ;
 
   std::cout << "Object No: " << type.size() << '\n';
 
@@ -150,15 +142,15 @@ void World::velocityUpdate( )
 
   if (velocityX[playerId] != newVelocityX || velocityY[playerId] != newVelocityY || velocityX[playerId] != 0 || velocityY[playerId] != 0)
   {
-    velocityX[playerId] = dirX;
-    velocityY[playerId] = dirY;
+    rotateX[playerId] = dirX;
+    rotateY[playerId] = dirY;
 
-    dirty[playerId] = true;
+    dirtyVelocity[playerId] = true;
   }
   else
   {
-    velocityX[playerId] = 0;
-    velocityY[playerId] = 0;
+    rotateX[playerId] = 0;
+    rotateY[playerId] = 0;
   }
 
   // std::cout << velocityX[playerId] << '\t' << velocityY[playerId] << '\n';

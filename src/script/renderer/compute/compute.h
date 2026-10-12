@@ -9,7 +9,7 @@ class Compute
   public:
     void createCompute(SDL_GPUDevice* device);
 
-    void resourceLoad(RenderVelocity& renderVelocity);
+    void resourceLoad(ObjectData objectData, ObjectTransformData objectTransformData);
     void calculate();
     void createComputePipeline();
     void updateStorageBuffer();

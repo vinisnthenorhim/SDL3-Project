@@ -63,30 +63,19 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 
   gPipeline.createGraphicPipeline(device, window, vert.shader(), frag.shader(), state);
 
-  std::cout << "[OPENGL]"  << " Buffer created " << '\n'; 
+  std::cout << "[SDLGPU]"  << " Buffer created " << '\n'; 
 }
 
-void ObjectRender::resourceLoad(const RenderStoreResource resource)
+void ObjectRender::resourceLoad(ObjectData objectData)
 {
-  this->type      = resource.type     ;
-  this->visible   = resource.visible  ;
-  this->positionX = resource.positionX;
-  this->positionY = resource.positionY;
-  this->positionZ = resource.positionZ;
-  this->scaleX    = resource.scaleX   ;
-  this->scaleY    = resource.scaleY   ;
-  this->scaleZ    = resource.scaleZ   ;
-  this->rotationX = resource.rotationX;
-  this->rotationY = resource.rotationY;
-  this->rotationZ = resource.rotationZ;
-
-  std::cout << "[OPENGL]"  << " Resource Load " << '\n';  
+  this->visible   = objectData.visible  ;
+  std::cout << "[SDLGPU]"  << " Resource Load " << '\n';  
 
 }
 
 void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
 {
-
+  if(upload) return;
   vertBuff.startSetData(copy, DefaultMeshObject::vertex);
   indexBuff.startSetData(copy, DefaultMeshObject::indices);
 
@@ -96,11 +85,13 @@ void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
 
 void ObjectRender::endUpdate()
 {
+  if(upload) return;
+  upload = true;
   vertBuff .endSetData();
   indexBuff.endSetData();
 }
 
-void ObjectRender::bind(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* pass, SDL_GPUBuffer* model)
+void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model)
 {
   gPipeline.bind(pass);
 

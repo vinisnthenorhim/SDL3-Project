@@ -27,7 +27,7 @@ public:
     );             
     
 
-    std::cout << "[SDLGPU] Window is Sizing!" << '\n';
+    std::cout << "[SDLGPU] projection update!" << '\n';
   }
   void uploadProjection(SDL_GPUCommandBuffer* cmd)
   {

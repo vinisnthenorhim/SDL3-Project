@@ -13,10 +13,8 @@ class World
 {
   public:
     World();
-    const RenderStoreResource rendererResourceStore() const; 
-    const RenderStoreResource readData() const;
-    RenderObjectPosition savePosition() ;
-    RenderVelocity getVelocity();
+    ObjectData readData();
+    ObjectTransformData getObjectTranform();
     const std::vector<bool>& dirtyObject() const { return dirty;};
     void createObject(Type objectType);
     void velocityUpdate();
@@ -34,23 +32,34 @@ class World
     float holdtime = 0.0f;
 
     std::vector<Type> type          ;
-    std::vector<bool> dirty         ;
 
+    std::vector<bool>  dirty;
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
     std::vector<float> positionZ    ;
 
-    std::vector<float> scaleX       ;
-    std::vector<float> scaleY       ;
-    std::vector<float> scaleZ       ;
+    std::vector<float> scalingX       ;
+    std::vector<float> scalingY       ;
+    std::vector<float> scalingZ       ;
 
     std::vector<float> rotationX    ;
     std::vector<float> rotationY    ;
     std::vector<float> rotationZ    ;
 
+    std::vector<bool>  dirtyVelocity;
     std::vector<float> velocityX    ;
     std::vector<float> velocityY    ;
     std::vector<float> velocityZ    ;
+
+    std::vector<bool>  dirtyScale;
+    std::vector<float> scaleX    ;
+    std::vector<float> scaleY    ;
+    std::vector<float> scaleZ    ;
+
+    std::vector<bool>  dirtyRotate;
+    std::vector<float> rotateX    ;
+    std::vector<float> rotateY    ;
+    std::vector<float> rotateZ    ;
 
     std::vector<float> speedX       ;
     std::vector<float> speedY       ;

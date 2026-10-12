@@ -7,13 +7,14 @@ class ObjectRender
 {   
   public:
     void createObjectRender(SDL_Window* window, SDL_GPUDevice* device);
-    void resourceLoad(const RenderStoreResource resource);
+    void resourceLoad(ObjectData objectData);
     void uploadData(SDL_GPUCopyPass* copy);
     void endUpdate();
-    void bind(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* pass, SDL_GPUBuffer* model);
+    void bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model);
 
   private:
     SDL_GPUDevice* device = nullptr;
+    bool upload = false;
 
     GraphicPipeline gPipeline;
     
