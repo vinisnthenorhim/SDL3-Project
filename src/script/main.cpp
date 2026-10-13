@@ -12,8 +12,8 @@
 SDL_AppResult SDL_AppInit (void** appstate, int argc, char *argv[])
 {
 
-    freopen("log.txt", "w", stdout);
-    freopen("log.txt", "a", stderr);
+    // freopen("log.txt", "w", stdout);
+    // freopen("log.txt", "a", stderr);
 
     Engine* Chaoss = new Engine();
     *appstate = Chaoss;

@@ -57,7 +57,7 @@ void installCustomFrame(SDL_Window* win) {
 
     MARGINS m{ 0, 0, 1, 0 };            // brings back the drop shadow
     DwmExtendFrameIntoClientArea(hwnd, &m);
-    COLORREF border = RGB(255, 80, 80);   // red
+    COLORREF border = RGB(60, 60, 60);   // red
     DwmSetWindowAttribute(hwnd, 34 /*DWMWA_BORDER_COLOR*/, &border, sizeof(border));
     SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
         SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);

@@ -22,6 +22,7 @@ class Buffer
 
       buff = SDL_CreateGPUBuffer(device, &info);
       CHECK(buff);
+      currentSize = size;
     }
     ~Buffer()
     {
@@ -44,12 +45,13 @@ class Buffer
       }
       else
       {
-        updateBufferSizeNoCopy(size);
+        updateBufferSizeNoCopy(copypass, size);
       }
     }
     void updateBufferSizeCopy(SDL_GPUCopyPass* copypass, Uint32 size)
     {
       if (size <= currentSize) return;
+
 
       SDL_GPUBufferCreateInfo newBufferInfo{};
       newBufferInfo.size = size;
@@ -76,11 +78,15 @@ class Buffer
       buff = newBuffer;
       currentSize = size;
     }
-    void updateBufferSizeNoCopy(Uint32 size)
+    void updateBufferSizeNoCopy(SDL_GPUCopyPass* copypass, Uint32 size)
     {
       if (size <= currentSize) return;
 
-      SDL_ReleaseGPUBuffer(device, buff);
+      Uint32 vecSize = size / sizeof(float);
+
+      std::vector<float> zero(vecSize, 0.0f);
+
+      oldBuffer = buff;
 
       SDL_GPUBufferCreateInfo info{};
       info.size = size;
@@ -88,10 +94,39 @@ class Buffer
 
       buff = SDL_CreateGPUBuffer(device, &info);
 
+      SDL_GPUTransferBufferCreateInfo ti{};
+      ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+      ti.size  = size;
+      
+      transfer = SDL_CreateGPUTransferBuffer(device, &ti);
+      CHECK(transfer);
+
+      SDL_GPUTransferBufferLocation src = {};
+      src.transfer_buffer = transfer;
+      src.offset = 0;
+
+      SDL_GPUBufferRegion dst = {};
+      dst.buffer = buff;
+      dst.offset = 0;
+      dst.size   = size;
+    
+      void* mapped = (void*)SDL_MapGPUTransferBuffer(device, transfer, false);
+      CHECK(mapped);
+      if (!mapped) return;
+      SDL_memcpy(mapped, zero.data(), size);
+      SDL_UnmapGPUTransferBuffer(device, transfer);
+
+      SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+
       currentSize = size;
     }
     void releaseOldBuffer()
     {
+      if (transfer != nullptr)
+      {
+        SDL_ReleaseGPUTransferBuffer(device, transfer);
+        transfer = nullptr;
+      }
       if (oldBuffer != nullptr)
       {
         SDL_ReleaseGPUBuffer(device, oldBuffer);
@@ -223,7 +258,7 @@ class TransferBuffer
       SDL_GPUTransferBufferCreateInfo ti = {};
       ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
       ti.size  = size;
-      ;
+      
       transfer = SDL_CreateGPUTransferBuffer(device, &ti);
       CHECK(transfer);
     }

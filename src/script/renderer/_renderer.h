@@ -5,7 +5,6 @@
 #include <SDL3/SDL.h>
 #include <game/renderObject/enum/struct.h>
 #include <renderer/raii/_raii.h>
-#include <renderer/compute/compute.h>
 #include <renderer/core/ObjectRender.h>
 #include <renderer/core/projection.h>
 #include <renderer/core/ObjectTransform.h>
@@ -30,7 +29,8 @@ class Renderer
       SDL_GPUDevice*        device    = nullptr;
       SDL_GPUCommandBuffer* cmdBuffer = nullptr;
       SDL_GPUTexture*       swap      = nullptr;
-      SDL_GPUCopyPass* copy = nullptr;
+      SDL_GPUCopyPass*      copypass  = nullptr;
+      SDL_GPURenderPass*    renderpass= nullptr;
 
       Device          objectDevice;
       ObjectTransform objectTransform;

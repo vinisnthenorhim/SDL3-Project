@@ -70,8 +70,8 @@ void World::createObject(Type objectType)
 
   rotateX  .push_back(0.0f) ; rotateY  .push_back(0.0f) ; rotateZ  .push_back(0.0f)  ;
 
-  speedX.push_back(200.0f)  ;
-  speedY.push_back(350.0f)  ;
+  speedX.push_back(500.0f)  ;
+  speedY.push_back(500.0f)  ;
 
   visible.push_back(true)   ;
   exist.push_back(true)     ;
@@ -142,15 +142,16 @@ void World::velocityUpdate( )
 
   if (velocityX[playerId] != newVelocityX || velocityY[playerId] != newVelocityY || velocityX[playerId] != 0 || velocityY[playerId] != 0)
   {
-    rotateX[playerId] = dirX;
-    rotateY[playerId] = dirY;
+    velocityX[playerId] = dirX;
+    velocityY[playerId] = dirY;
 
     dirtyVelocity[playerId] = true;
   }
   else
   {
-    rotateX[playerId] = 0;
-    rotateY[playerId] = 0;
+    // dirtyVelocity[playerId] = false;
+    velocityX[playerId] = 0;
+    velocityY[playerId] = 0;
   }
 
   // std::cout << velocityX[playerId] << '\t' << velocityY[playerId] << '\n';

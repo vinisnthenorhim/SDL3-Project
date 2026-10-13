@@ -12,10 +12,10 @@ Engine::Engine()
 
 bool Engine::event(const SDL_Event* event)
 {
+  game->event(event);
 
   renderer->screenUpdate(event);
     
-  game->event(event);
 
   return window->event(event);
 }
@@ -25,7 +25,6 @@ bool Engine::event(const SDL_Event* event)
 bool Engine::render()
 {
   game->render(*renderer);
-  // if(renderer->copypass()) renderer->render();
   renderer->render();
   return true;
 }

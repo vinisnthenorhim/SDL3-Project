@@ -5,22 +5,22 @@
 
 struct ObjectData
 {
-  std::vector<bool>* visible;
+  const std::vector<bool>* visible;
 
-  std::vector<float>* speedX       ;
-  std::vector<float>* speedY       ;
-    
-  std::vector<float>* positionX    ;
-  std::vector<float>* positionY    ;
-  std::vector<float>* positionZ    ;
+  const std::vector<float>* speedX       ;
+  const std::vector<float>* speedY       ;  
+
+  const std::vector<float>* positionX    ;
+  const std::vector<float>* positionY    ;
+  const std::vector<float>* positionZ    ; 
+
+  const std::vector<float>* scalingX       ;
+  const std::vector<float>* scalingY       ;
+  const std::vector<float>* scalingZ       ;
   
-  std::vector<float>* scalingX       ;
-  std::vector<float>* scalingY       ;
-  std::vector<float>* scalingZ       ;
-
-  std::vector<float>* rotationX    ;
-  std::vector<float>* rotationY    ;
-  std::vector<float>* rotationZ    ;
+  const std::vector<float>* rotationX    ;
+  const std::vector<float>* rotationY    ;
+  const std::vector<float>* rotationZ    ;
 };
 
 struct RenderObjectPosition

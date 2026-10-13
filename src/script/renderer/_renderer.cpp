@@ -114,7 +114,7 @@ void Renderer::render()
   SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);
 
 
-  SDL_GPUCopyPass* copypass = SDL_BeginGPUCopyPass(cmdBuffer);
+  copypass = SDL_BeginGPUCopyPass(cmdBuffer);
   // SDL_Log("2");
 
   objectTransform.updateDataSize(copypass);
@@ -139,12 +139,12 @@ void Renderer::render()
 
   // SDL_Log("6");
 
-  SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
+  renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
 
   // SDL_Log("7");
-  objectRender.bind( pass, objectTransform.getModel() );
+  objectRender.bind( renderpass, objectTransform.getModel() );
 
-  SDL_EndGPURenderPass(pass);
+  SDL_EndGPURenderPass(renderpass);
 
   // SDL_Log("8");
   projection.uploadProjection(cmdBuffer);
