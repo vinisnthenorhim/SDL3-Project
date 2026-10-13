@@ -50,17 +50,52 @@ LRESULT CALLBACK CustomProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 }
 
 void installCustomFrame(SDL_Window* win) {
-    HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(win),
-                    SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+  HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(win),
+                  SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+  if(!hwnd) return;
 
-    g_oldProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)CustomProc);
+  g_oldProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)CustomProc);
 
-    MARGINS m{ 0, 0, 1, 0 };            // brings back the drop shadow
-    DwmExtendFrameIntoClientArea(hwnd, &m);
-    COLORREF border = RGB(60, 60, 60);   // red
-    DwmSetWindowAttribute(hwnd, 34 /*DWMWA_BORDER_COLOR*/, &border, sizeof(border));
-    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
-        SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
+  MARGINS m{ 0, 0, 1, 0 };            // brings back the drop shadow
+  DwmExtendFrameIntoClientArea(hwnd, &m);
+  COLORREF border = RGB(60, 60, 60);   
+  DwmSetWindowAttribute(hwnd, 34 , &border, sizeof(border));
+  SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+      SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
+}
+void borderFocus(SDL_Window* win, const SDL_Event* event)
+{
+  HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(win),
+                  SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+  if(!hwnd) return;
+  if (event->type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+  {
+    COLORREF border = RGB(0, 120, 215);   
+    DwmSetWindowAttribute(hwnd, 34 , &border, sizeof(border));
+  }
+
+  if (event->type == SDL_EVENT_WINDOW_FOCUS_LOST)
+  {
+    COLORREF border = RGB(60, 60, 60);   
+    DwmSetWindowAttribute(hwnd, 34 , &border, sizeof(border));
+  }
+
 }
 
+void maximizeOrRestore(SDL_Window* win)
+{
+  HWND hwnd = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(win),
+                  SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+
+  if (!hwnd) return;
+
+  WINDOWPLACEMENT placement{};
+  placement.length = sizeof(placement);
+
+  if (!GetWindowPlacement(hwnd, &placement)) return;
+
+  WPARAM command = placement.showCmd == SW_SHOWMAXIMIZED ? SC_RESTORE : SC_MAXIMIZE;
+
+  SendMessage(hwnd, WM_SYSCOMMAND, command, 0);
+}
 #endif
