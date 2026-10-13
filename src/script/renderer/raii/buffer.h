@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <iostream>
 #include <SDL3/SDL.h>
 #include <vector>
 #include "check.h"
@@ -35,7 +36,18 @@ class Buffer
           oldBuffer = nullptr;
       }
     }
-    void updateBufferSize(SDL_GPUCopyPass* copypass, Uint32 size)
+    void updateBufferSize(SDL_GPUCopyPass* copypass, Uint32 size, bool copy)
+    {
+      if (copy)
+      {
+        updateBufferSizeCopy(copypass, size);
+      }
+      else
+      {
+        updateBufferSizeNoCopy(size);
+      }
+    }
+    void updateBufferSizeCopy(SDL_GPUCopyPass* copypass, Uint32 size)
     {
       if (size <= currentSize) return;
 
@@ -62,6 +74,20 @@ class Buffer
       }
       oldBuffer = buff;
       buff = newBuffer;
+      currentSize = size;
+    }
+    void updateBufferSizeNoCopy(Uint32 size)
+    {
+      if (size <= currentSize) return;
+
+      SDL_ReleaseGPUBuffer(device, buff);
+
+      SDL_GPUBufferCreateInfo info{};
+      info.size = size;
+      info.usage = usage;
+
+      buff = SDL_CreateGPUBuffer(device, &info);
+
       currentSize = size;
     }
     void releaseOldBuffer()
