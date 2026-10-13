@@ -3,6 +3,7 @@
 
 #include <script/window/first/_window.first.h>
 #include "check.h"
+#include <window/border.settings.h>
 
 bool WindowF::create(const char* title)
 {
@@ -11,6 +12,8 @@ bool WindowF::create(const char* title)
 
 
     window = SDL_CreateWindow(title, 800, 450, SDL_WINDOW_RESIZABLE );
+    CHECK(window);
+    installCustomFrame(window);
     SDL_SetWindowAspectRatio(window, 16.0 / 9.0, 16.0 / 9.0f);
     SDL_SetWindowMinimumSize(window, 800, 450);
     SDL_SetWindowBordered(window, true);
