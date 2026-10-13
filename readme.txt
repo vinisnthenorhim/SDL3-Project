@@ -1,20 +1,20 @@
-##DESCRIPTION
+## DESCRIPTION
 
 A 2D game developed using C++ and SDL3 and SDL3GPU.
 
-##REQUIREMENTS
+## REQUIREMENTS
 
 - C++ UCRT64
 - CMake
 - SDL3
 
-##FEATURES
+## FEATURES
 
 - Compute Shaders
 - ECS (Entity Component System)
 - Cross Platform
 
-##NOTES
+## NOTES
 
 Still under developement.
 
