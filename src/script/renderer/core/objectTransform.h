@@ -26,9 +26,9 @@ class ObjectTransform
 
     Buffer modelBuffer;
 
-    const std::vector<float>* positionX    ;   const std::vector<float>* scalingX    ;  const std::vector<float>* rotationX    ;
-    const std::vector<float>* positionY    ;   const std::vector<float>* scalingY    ;  const std::vector<float>* rotationY    ;
-    const std::vector<float>* positionZ    ;   const std::vector<float>* scalingZ    ;  const std::vector<float>* rotationZ    ;
+    std::vector<float>* positionX    ;   std::vector<float>* scalingX    ;  std::vector<float>* rotationX    ;
+    std::vector<float>* positionY    ;   std::vector<float>* scalingY    ;  std::vector<float>* rotationY    ;
+    std::vector<float>* positionZ    ;   std::vector<float>* scalingZ    ;  std::vector<float>* rotationZ    ;
 
     std::vector<bool>  *dirtyVelocity;  std::vector<bool>  *dirtyScale   ;  std::vector<bool>  *dirtyRotate  ;
     std::vector<float> *velocityX    ;  std::vector<float> *scaleX       ;  std::vector<float> *rotateX      ;

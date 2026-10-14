@@ -6,13 +6,13 @@
 class Game
 {
   public:
-    Game(Renderer& renderer);
+    Game(Renderer& renderer, SDL_Window* window);
     void render(Renderer& renderer);
     void event(const SDL_Event* event);
     void update();
 
   private:
-    // bool update = false;
+    SDL_Window* window = nullptr;
     World world;
 };
 

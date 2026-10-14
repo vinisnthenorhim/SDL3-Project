@@ -1,10 +1,11 @@
-#ifndef WORLD_H
-#define WORLD_H
+#pragma once
 
 #include <SDL3/SDL.h>
 
 #include <vector>
 #include <glm/glm.hpp>
+
+#include <lua/LuaRuntime.h>
 
 #include <game/renderObject/enum/enum.h>
 #include <game/renderObject/enum/struct.h>
@@ -15,14 +16,15 @@ class World
     World();
     ObjectData readData();
     ObjectTransformData getObjectTranform();
-    const std::vector<bool>& dirtyObject() const { return dirty;};
-    void createObject(Type objectType);
+    void createObject(Type objectType, float locationX, float locationY);
     void velocityUpdate();
-    // void 
+    void create(int width, int height);
 
     void secondPerFrame();
 
   private:
+    LuaRuntime luaRuntime;
+
     float lastFrame;
     float secondFrame;
     
@@ -33,14 +35,13 @@ class World
 
     std::vector<Type> type          ;
 
-    std::vector<bool>  dirty;
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
     std::vector<float> positionZ    ;
 
-    std::vector<float> scalingX       ;
-    std::vector<float> scalingY       ;
-    std::vector<float> scalingZ       ;
+    std::vector<float> scalingX     ;
+    std::vector<float> scalingY     ;
+    std::vector<float> scalingZ     ;
 
     std::vector<float> rotationX    ;
     std::vector<float> rotationY    ;
@@ -51,15 +52,15 @@ class World
     std::vector<float> velocityY    ;
     std::vector<float> velocityZ    ;
 
-    std::vector<bool>  dirtyScale;
-    std::vector<float> scaleX    ;
-    std::vector<float> scaleY    ;
-    std::vector<float> scaleZ    ;
+    std::vector<bool>  dirtyScale   ;
+    std::vector<float> scaleX       ;
+    std::vector<float> scaleY       ;
+    std::vector<float> scaleZ       ;
 
-    std::vector<bool>  dirtyRotate;
-    std::vector<float> rotateX    ;
-    std::vector<float> rotateY    ;
-    std::vector<float> rotateZ    ;
+    std::vector<bool>  dirtyRotate  ;
+    std::vector<float> rotateX      ;
+    std::vector<float> rotateY      ;
+    std::vector<float> rotateZ      ;
 
     std::vector<float> speedX       ;
     std::vector<float> speedY       ;
@@ -68,5 +69,3 @@ class World
     std::vector<bool> exist         ;
 
 };
-
-#endif

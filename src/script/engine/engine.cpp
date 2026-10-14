@@ -1,11 +1,11 @@
 #include "_engine.h"
-
+#include <filesystem>
+#include <iostream>
 Engine::Engine()
 {
   window = new Window();
   renderer = new Renderer(window->getWindowFirst());
-  game = new Game(*renderer);
-  // renderer->transfer();
+  game = new Game(*renderer, window->getWindowFirst());
 }
 
 

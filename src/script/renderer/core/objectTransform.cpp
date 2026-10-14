@@ -172,7 +172,6 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
   {
     if((*dirtyRotate)[a] == true) tempRotDirty.push_back(a); 
   }
-
   Uint32 updateVelSize = tempVelDirty.size() * sizeof(float);
   Uint32 updateSclSize = tempSclDirty.size() * sizeof(float);
   Uint32 updateRotSize = tempRotDirty.size() * sizeof(float);
@@ -202,13 +201,9 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
     for ( int a : tempVelDirty )
     {
-      system("cls");
       src.offset = slot * sizeof(float)                    ; dst.offset = a * sizeof(float)             ; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
-      std::cout <<  a * sizeof(float) << '\t';
       src.offset = slot * sizeof(float) +     updateVelSize; dst.offset = a * sizeof(float) +     offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
-      std::cout <<  a * sizeof(float) +     offset<< '\t';
       src.offset = slot * sizeof(float) + 2 * updateVelSize; dst.offset = a * sizeof(float) + 2 * offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
-      std::cout <<a * sizeof(float) + 2 * offset<< '\n';
       slot++;
     }
   }
@@ -285,7 +280,6 @@ void ObjectTransform::bind(SDL_GPUCommandBuffer* cmd)
 {
   entityCount = visible->size();
   if (!computePipeline.pipeline() || entityCount == 0) return;
-  std::cout << entityCount;
 
   Uint32 groupCount = (entityCount + 64 - 1) / 64;
   UniformData uniformData = {*deltaTime, entityCount};
@@ -305,7 +299,6 @@ void ObjectTransform::bind(SDL_GPUCommandBuffer* cmd)
 
   // SDL_Log("11");
   SDL_GPUComputePass* computePass = SDL_BeginGPUComputePass(cmd, nullptr, 0, rw, 4);
-  // std::cout << SDL_GetError() << '\n';
   // SDL_Log("12");
 
   SDL_BindGPUComputePipeline( computePass, computePipeline.pipeline() );

@@ -6,7 +6,17 @@
 World::World()
 {
   lastFrame = SDL_GetTicksNS();
-  std::cout << std::fixed << std::setprecision(6);
+  luaRuntime.lua().new_enum<Type>
+  (
+    "EntityType",
+    {
+      {"Player", Type::Player}
+    }
+  );
+  luaRuntime.registerFunction("create_object", [this](Type type, float x, float y){createObject(type, x, y);});
+
+  luaRuntime.loadScript("../src/script/creation/creation.lua");
+
 }
 
 ObjectData World::readData()  
@@ -48,17 +58,22 @@ ObjectTransformData World::getObjectTranform()
     &rotateZ
   };
 }
-
-void World::createObject(Type objectType)
+void World::create(int width, int height)
 {
+  sol::protected_function function = luaRuntime.lua_function("random_location_creation");
 
+  function( width, height );
+  std::cout << "called" << '\n';
+}
+void World::createObject(Type objectType, float locationX, float locationY)
+{
+    std::cout << "C++ createObject called: "
+              << locationX << ", " << locationY << '\n';
   type.push_back(objectType);
-  dirty.push_back(false)    ;
+  
   dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
 
-
-
-  positionX.push_back(0.0f) ; positionY.push_back(0.0f) ; positionZ.push_back(0.0f)  ;
+  positionX.push_back(locationX) ; positionY.push_back(locationY) ; positionZ.push_back(0.0f)  ;
 
   scalingX .push_back(1.0f) ; scalingY .push_back(1.0f) ; scalingZ .push_back(1.0f)  ;
 
@@ -149,7 +164,7 @@ void World::velocityUpdate( )
   }
   else
   {
-    // dirtyVelocity[playerId] = false;
+    dirtyVelocity[playerId] = false;
     velocityX[playerId] = 0;
     velocityY[playerId] = 0;
   }

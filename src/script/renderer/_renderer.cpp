@@ -8,9 +8,7 @@ Renderer::Renderer(SDL_Window* window)
   objectDevice.createDevice(window, SDL_GPU_SHADERFORMAT_SPIRV );
 
   device = objectDevice.gpuDevice();
-
-
-  log_properties("device", SDL_GetGPUDeviceProperties(device));
+  
   SDL_Log(SDL_GetGPUDeviceDriver(device));
 
   projection.createProjection(window, device);
@@ -18,10 +16,6 @@ Renderer::Renderer(SDL_Window* window)
   objectTransform.createObjectTransform(device);
 
   objectRender.createObjectRender(window, device);
-
-
-
-  // compute.createCompute(device);
 }
 
 
@@ -43,67 +37,9 @@ void Renderer::screenUpdate(const SDL_Event* event)
 void Renderer::dataLoad(ObjectData objectData, ObjectTransformData objectTransformData)
 {
   objectTransform.loadData(objectData, objectTransformData);
-  // compute.resourceLoad(objectData, objectTransformData);
   objectRender.resourceLoad(objectData);
 }
 
-
-// void Renderer::transfer()
-// {
-//   SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
-
-//   copy = SDL_BeginGPUCopyPass(cmd);
-
-//   SDL_EndGPUCopyPass(copy);
-//   if(!copy) SDL_Log("no copy pass");
-//   SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmd);
-
-//   SDL_WaitForGPUFences(device, true, &fence, 1);
-
-
-//   SDL_ReleaseGPUFence(device, fence);
-// }
-
-
-// bool Renderer::copypass()
-// {
-//   compute.updateStorageBuffer();
-//   cmdBuffer = SDL_AcquireGPUCommandBuffer(device); 
-//   if(!cmdBuffer) return false;
-//   SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);
-//   if(!swap) return false;
-
-//   return true;
-// }
-
-// bool Renderer::r()
-// {
-
-//   compute.bindComp(cmdBuffer);
-//   projection.uploadProjection(cmdBuffer);
-
-//   SDL_GPUColorTargetInfo target {};
-
-//   target.texture = swap;
-//   target.clear_color = (SDL_FColor) {0.0f, 0.0f, 0.0f, 0.0f};
-//   target.load_op = SDL_GPU_LOADOP_CLEAR;
-//   target.store_op = SDL_GPU_STOREOP_STORE;
-//   SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
-
-//   objectRender.bind( pass, compute.getModel());
-
-//   SDL_EndGPURenderPass(pass);
-
-//   SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(cmdBuffer);
-
-
-//   SDL_WaitForGPUFences(device, true, &fence, 1);
-
-
-//   SDL_ReleaseGPUFence(device, fence);
-
-//   return true;
-// }
 
 
 void Renderer::render()
@@ -112,7 +48,6 @@ void Renderer::render()
   cmdBuffer = SDL_AcquireGPUCommandBuffer(device);
   if(!cmdBuffer) return;
   SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);
-
 
   copypass = SDL_BeginGPUCopyPass(cmdBuffer);
   // SDL_Log("2");
