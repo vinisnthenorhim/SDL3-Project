@@ -3,7 +3,8 @@ cbuffer Projection : register(b0, space1)
     row_major float4x4 _25_projection : packoffset(c0);
 };
 
-ByteAddressBuffer _32 : register(t0, space0);
+ByteAddressBuffer _32 : register(t1, space0);
+ByteAddressBuffer _39 : register(t0, space0);
 
 static float4 gl_Position;
 static int gl_InstanceIndex;
@@ -27,8 +28,9 @@ struct SPIRV_Cross_Output
 void main_inner()
 {
     uint entityIndex = uint(gl_InstanceIndex);
-    float4x4 _35 = asfloat(uint4x4(_32.Load4(entityIndex * 64 + 0), _32.Load4(entityIndex * 64 + 16), _32.Load4(entityIndex * 64 + 32), _32.Load4(entityIndex * 64 + 48)));
-    gl_Position = mul(float4(position, 1.0f), mul(_35, _25_projection));
+    float4x4 _34 = asfloat(uint4x4(_32.Load4(0), _32.Load4(16), _32.Load4(32), _32.Load4(48)));
+    float4x4 _42 = asfloat(uint4x4(_39.Load4(entityIndex * 64 + 0), _39.Load4(entityIndex * 64 + 16), _39.Load4(entityIndex * 64 + 32), _39.Load4(entityIndex * 64 + 48)));
+    gl_Position = mul(float4(position, 1.0f), mul(_42, mul(_34, _25_projection)));
     fragUV = uv;
 }
 

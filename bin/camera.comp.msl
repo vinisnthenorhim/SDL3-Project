@@ -1,0 +1,109 @@
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct UniFormBuffer
+{
+    float deltaTime;
+    uint follow;
+    uint entityId;
+};
+
+struct CameraPositionBuffer
+{
+    float4 cameraPosition[1];
+};
+
+struct PositionBuffer
+{
+    float4 position[1];
+};
+
+struct CameraDataBuffer
+{
+    float cameraData[1];
+};
+
+struct CameraMatrixBuffer
+{
+    float4x4 camera[1];
+};
+
+constant uint3 gl_WorkGroupSize [[maybe_unused]] = uint3(1u);
+
+static inline __attribute__((always_inline))
+float4x4 translationMatrix(thread const float4& offset)
+{
+    return float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(-offset.x, -offset.y, -offset.z, 1.0));
+}
+
+static inline __attribute__((always_inline))
+float4x4 scaleMatrix(thread const float4& offset)
+{
+    return float4x4(float4(offset.x, 0.0, 0.0, 0.0), float4(0.0, offset.y, 0.0, 0.0), float4(0.0, 0.0, offset.z, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+}
+
+static inline __attribute__((always_inline))
+float4x4 rotationMatrix(thread const float4& rotation)
+{
+    float4x4 result = float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    if (rotation.x != 0.0)
+    {
+        float c = cos(rotation.x);
+        float s = sin(rotation.x);
+        result = result * float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, c, s, 0.0), float4(0.0, -s, c, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    if (rotation.y != 0.0)
+    {
+        float c_1 = cos(rotation.y);
+        float s_1 = sin(rotation.y);
+        result = result * float4x4(float4(c_1, 0.0, -s_1, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(s_1, 0.0, c_1, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    if (rotation.z != 0.0)
+    {
+        float c_2 = cos(rotation.z);
+        float s_2 = sin(rotation.z);
+        result = result * float4x4(float4(c_2, s_2, 0.0, 0.0), float4(-s_2, c_2, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    return result;
+}
+
+kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataBuffer& _183 [[buffer(1)]], device PositionBuffer& _171 [[buffer(2)]], device CameraPositionBuffer& _166 [[buffer(3)]], device CameraMatrixBuffer& _292 [[buffer(4)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+{
+    if (gl_GlobalInvocationID.x != 0u)
+    {
+        return;
+    }
+    if (_154.follow != 0u)
+    {
+        _166.cameraPosition[0] = _171.position[_154.entityId];
+    }
+    else
+    {
+        ((device float*)&_166.cameraPosition[0])[0u] += (_183.cameraData[0] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[0])[1u] += (_183.cameraData[1] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[0])[2u] += (_183.cameraData[2] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[0])[3u] = 1.0;
+        ((device float*)&_166.cameraPosition[1])[0u] += (_183.cameraData[3] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[1])[1u] += (_183.cameraData[4] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[1])[2u] += (_183.cameraData[5] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[1])[3u] = 1.0;
+        ((device float*)&_166.cameraPosition[2])[0u] += (_183.cameraData[6] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[2])[1u] += (_183.cameraData[7] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[2])[2u] += (_183.cameraData[8] * _154.deltaTime);
+        ((device float*)&_166.cameraPosition[2])[3u] = 0.0;
+        ((device float*)&_166.cameraPosition[3])[0u] = _183.cameraData[9];
+        ((device float*)&_166.cameraPosition[3])[1u] = _183.cameraData[10];
+        ((device float*)&_166.cameraPosition[3])[2u] = _183.cameraData[11];
+        ((device float*)&_166.cameraPosition[3])[3u] = 1.0;
+    }
+    float4 param = _166.cameraPosition[3];
+    float4 param_1 = _166.cameraPosition[0];
+    float4 param_2 = _166.cameraPosition[1];
+    float4 param_3 = _166.cameraPosition[2];
+    _292.camera[0] = ((translationMatrix(param) * translationMatrix(param_1)) * scaleMatrix(param_2)) * rotationMatrix(param_3);
+}
+
