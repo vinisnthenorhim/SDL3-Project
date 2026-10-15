@@ -1,6 +1,7 @@
 #pragma once
 #include "enum.h"
 #include <glm/glm.hpp>
+#include <SDL3/SDL.h>
 
 struct ObjectData
 {
@@ -44,9 +45,18 @@ struct ObjectTransformData
 };
 struct Position
 {
-  float positionX    ;
-  float positionY    ;
-  // float positionZ    ;
+  Uint32*  follow;
+  Uint32*  entityID;
+  float*   deltaTime;
+  bool*    dirty;
+  std::array<float, 4>* updateDataX ;
+  std::array<float, 4>* updateDataY ;
+  std::array<float, 4>* updateDataZ ;
+  std::array<float, 4>* positionX ;
+  std::array<float, 4>* positionY ;
+  std::array<float, 4>* positionZ ;
+
+
   
   // float scalingX     ;
   // float scalingY     ;
@@ -56,7 +66,4 @@ struct Position
   // float rotationY    ;
   // float rotationZ    ;
 
-  Position(float x, float y)
-  :positionX(x), positionY(y)
-  {}
 };

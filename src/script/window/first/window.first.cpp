@@ -20,8 +20,8 @@ bool WindowF::create(const char* title)
 
     displayID = SDL_GetDisplayForWindow(window);
     mode = SDL_GetDesktopDisplayMode(displayID);
-    this->width = width;
-    this->height = height;
+    this->width  = mode->w;
+    this->height = mode->h;
 
     SDL_GL_SetSwapInterval(1);
     

@@ -11,13 +11,13 @@ class CameraHandle
     bool* dirty;
     bool created = false;
 
-    float* camPositionX;
-    float* camPositionY;
-    float* camPositionZ;
+    std::array<float, 4>* camPositionX = nullptr;
+    std::array<float, 4>* camPositionY = nullptr;
+    std::array<float, 4>* camPositionZ = nullptr;
 
-    float* velocityX   ;
-    float* velocityY   ;
-    float* velocityZ   ;
+    std::array<float, 4>* updateDataX = nullptr;
+    std::array<float, 4>* updateDataY = nullptr;
+    std::array<float, 4>* updateDataZ = nullptr;
 
     std::vector<float>* positionX    ;
     std::vector<float>* positionY    ;

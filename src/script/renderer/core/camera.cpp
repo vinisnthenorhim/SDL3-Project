@@ -35,9 +35,9 @@ void CameraHandle::loadData(ObjectData objectData, Position cameraPosition)
   this->deltaTime = cameraPosition.deltaTime;
   this->dirty = cameraPosition.dirty;
 
-  this->velocityX = cameraPosition.velocityX  ;
-  this->velocityY = cameraPosition.velocityY  ;
-  this->velocityZ = cameraPosition.velocityZ  ;
+  this->updateDataX = cameraPosition.updateDataX  ;
+  this->updateDataY = cameraPosition.updateDataY  ;
+  this->updateDataZ = cameraPosition.updateDataZ  ;
 
   camPositionX = cameraPosition.positionX;
   camPositionY = cameraPosition.positionY;
@@ -48,20 +48,29 @@ void CameraHandle::createCamera( SDL_GPUCopyPass* copypass)
   if (created) return;
   created = true;
 
-  cameraVelocity.createBuffer(device, 3 * sizeof(float), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
-  cameraPosition.createBuffer(device, sizeof(glm::vec4), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+  cameraVelocity.createBuffer(device, 12 * sizeof(float), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
+  cameraPosition.createBuffer(device, 4 * sizeof(glm::vec4), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
   cameraMatrice .createBuffer(device, sizeof(glm::mat4), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
 
-  cameraVelocity.updateBufferSize(copypass, 3 * sizeof(float), false);
+  cameraVelocity.updateBufferSize(copypass, 12 * sizeof(float), false);
 
-  glm::vec4 pos;
-  pos.x = (*positionX)[*entityId];
-  pos.y = (*positionZ)[*entityId];
-  pos.z = (*positionZ)[*entityId];
-  pos.w = 1;
-  positionTransfer.createTransferBuffer(device, sizeof(glm::vec4));
-  void* positionMapped = (void*)SDL_MapGPUTransferBuffer(device, positionTransfer.buffer(), false);
-  SDL_memcpy(positionMapped, &pos, sizeof(glm::vec4));
+  std::array<glm::vec4, 4> pos;
+  pos[0].x = (*positionX)[*entityId];
+  pos[0].y = (*positionY)[*entityId];
+  pos[0].z = (*positionZ)[*entityId];
+  pos[0].w = 1;
+
+  for (int a = 1; a < 4 ; a++)
+  {
+    pos[a].x = (*camPositionX)[a];
+    pos[a].y = (*camPositionY)[a];
+    pos[a].z = (*camPositionZ)[a];
+    pos[a].w = 1;
+  }
+
+  positionTransfer.createTransferBuffer(device, 4 * sizeof(glm::vec4));
+  uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, positionTransfer.buffer(), false);
+  SDL_memcpy(positionMapped, &pos, 4 * sizeof(glm::vec4));
   SDL_UnmapGPUTransferBuffer(device, positionTransfer.buffer());
 
   SDL_GPUTransferBufferLocation possrc = {};
@@ -71,7 +80,7 @@ void CameraHandle::createCamera( SDL_GPUCopyPass* copypass)
   possrc.offset = 0;
   posdst.buffer = cameraPosition.buffer();
   posdst.offset = 0;
-  posdst.size   = sizeof(glm::vec4);
+  posdst.size   = 4 * sizeof(glm::vec4);
 
   SDL_UploadToGPUBuffer(copypass, &possrc, &posdst, false);
 
@@ -82,16 +91,43 @@ void CameraHandle::updateCameraData( SDL_GPUCopyPass* copypass)
   if ( *follow != 0u ) return;
   if ( *dirty == false) return;
 
-  posUpdateTransfer.createTransferBuffer(device, 3 * sizeof(float));
+  posUpdateTransfer.createTransferBuffer(device, 12 * sizeof(float));
+
+  float veloX = (*updateDataX)[0];
+  float veloY = (*updateDataY)[0];
+  float veloZ = (*updateDataZ)[0];
+  float scaleX = (*updateDataX)[1];
+  float scaleY = (*updateDataY)[1];
+  float scaleZ = (*updateDataZ)[1];
+  float rotateX = (*updateDataX)[2];
+  float rotateY = (*updateDataY)[2];
+  float rotateZ = (*updateDataZ)[2];
+  float winPosX = (*updateDataX)[3];
+  float winPosY = (*updateDataY)[3];
+  float winPosZ = (*updateDataZ)[3];
+
+// std::cout << "Velocity:\t" << veloX << '\t' << veloY << '\t' << veloZ << '\n';
+// std::cout << "Scale:\t\t" << scaleX << '\t' << scaleY << '\t' << scaleZ << '\n';
+// std::cout << "Rotation:\t" << rotateX << '\t' << rotateY << '\t' << rotateZ << '\n';
+// std::cout << "WindowPos:\t" << winPosX << '\t' << winPosY << '\t' << winPosZ << '\n';
 
   uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, posUpdateTransfer.buffer(), false);
   if(!positionMapped)
   {
     return;
   }
-  SDL_memcpy(positionMapped + 0 * sizeof(float), velocityX, sizeof(float));
-  SDL_memcpy(positionMapped + 1 * sizeof(float), velocityY, sizeof(float));
-  SDL_memcpy(positionMapped + 2 * sizeof(float), velocityZ, sizeof(float));
+  SDL_memcpy(positionMapped + 0 * sizeof(float), &veloX, sizeof(float));
+  SDL_memcpy(positionMapped + 1 * sizeof(float), &veloY, sizeof(float));
+  SDL_memcpy(positionMapped + 2 * sizeof(float), &veloZ, sizeof(float));
+  SDL_memcpy(positionMapped + 3 * sizeof(float), &scaleX, sizeof(float));
+  SDL_memcpy(positionMapped + 4 * sizeof(float), &scaleY, sizeof(float));
+  SDL_memcpy(positionMapped + 5 * sizeof(float), &scaleZ, sizeof(float));
+  SDL_memcpy(positionMapped + 6 * sizeof(float), &rotateX, sizeof(float));
+  SDL_memcpy(positionMapped + 7 * sizeof(float), &rotateY, sizeof(float));
+  SDL_memcpy(positionMapped + 8 * sizeof(float), &rotateZ, sizeof(float));
+  SDL_memcpy(positionMapped + 9  * sizeof(float), &winPosX, sizeof(float));
+  SDL_memcpy(positionMapped + 10 * sizeof(float), &winPosY, sizeof(float));
+  SDL_memcpy(positionMapped + 11 * sizeof(float), &winPosZ, sizeof(float));
   SDL_UnmapGPUTransferBuffer(device, posUpdateTransfer.buffer());
 
   SDL_GPUTransferBufferLocation possrc = {};
@@ -102,7 +138,7 @@ void CameraHandle::updateCameraData( SDL_GPUCopyPass* copypass)
   
   posdst.buffer = cameraVelocity.buffer();
   posdst.offset = 0;
-  posdst.size   = 3 * sizeof(float);
+  posdst.size   = 12 * sizeof(float);
 
   SDL_UploadToGPUBuffer(copypass, &possrc, &posdst, false);
 

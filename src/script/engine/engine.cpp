@@ -13,10 +13,7 @@ Engine::Engine()
 bool Engine::event(const SDL_Event* event)
 {
   game->event(event);
-
   renderer->screenUpdate(event);
-    
-
   return window->event(event);
 }
 

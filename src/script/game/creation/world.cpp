@@ -58,17 +58,20 @@ ObjectTransformData World::getObjectTranform()
     &rotateZ
   };
 }
-void World::create(int width, int height)
+void World::create(SDL_Window* window)
 {
+  SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
+  const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+
+
   sol::protected_function function = luaRuntime.lua_function("random_location_creation");
 
-  function( width, height );
+  function( mode->w, mode->h );
   std::cout << "called" << '\n';
 }
 void World::createObject(Type objectType, float locationX, float locationY)
 {
-    std::cout << "C++ createObject called: "
-              << locationX << ", " << locationY << '\n';
+
   type.push_back(objectType);
   
   dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
@@ -119,7 +122,7 @@ void World::velocityUpdate( )
 
   if (playerId == -1) return; 
 
-  const bool* keyboardState = SDL_GetKeyboardState(NULL);
+  const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
   int8_t axisX = 0;
   int8_t axisY = 0;
@@ -164,9 +167,9 @@ void World::velocityUpdate( )
   }
   else
   {
-    dirtyVelocity[playerId] = false;
     velocityX[playerId] = 0;
     velocityY[playerId] = 0;
+    dirtyVelocity[playerId] = false;
   }
 
   // std::cout << velocityX[playerId] << '\t' << velocityY[playerId] << '\n';

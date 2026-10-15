@@ -18,7 +18,7 @@ class World
     ObjectTransformData getObjectTranform();
     void createObject(Type objectType, float locationX, float locationY);
     void velocityUpdate();
-    void create(int width, int height);
+    void create(SDL_Window* window);
 
     void secondPerFrame();
 

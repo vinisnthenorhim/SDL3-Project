@@ -3,6 +3,8 @@
 
 #include <renderer/_renderer.h>
 #include <game/creation/_world.h>
+#include <game/camera/camera.h>
+
 class Game
 {
   public:
@@ -13,7 +15,9 @@ class Game
 
   private:
     SDL_Window* window = nullptr;
+    const SDL_Event* eventH;
     World world;
+    Camera camera;
 };
 
 #endif

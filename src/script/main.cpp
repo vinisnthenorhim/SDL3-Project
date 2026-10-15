@@ -12,13 +12,13 @@
 SDL_AppResult SDL_AppInit (void** appstate, int argc, char *argv[])
 {
 
-    // freopen("log.txt", "w", stdout);
-    // freopen("log.txt", "a", stderr);
+  // freopen("log.txt", "w", stdout);
+  // freopen("log.txt", "a", stderr);
 
-    Engine* Chaoss = new Engine();
-    *appstate = Chaoss;
+  Engine* Chaoss = new Engine();
+  *appstate = Chaoss;
 
-    return SDL_APP_CONTINUE;
+  return SDL_APP_CONTINUE;
 
 }
 
@@ -35,10 +35,10 @@ SDL_AppResult SDL_AppEvent (void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate (void* appstate)
 {
 
-    Engine* Chaoss = static_cast<Engine*>(appstate);
-    if(!Chaoss->render()) return SDL_APP_FAILURE;
+  Engine* Chaoss = static_cast<Engine*>(appstate);
+  if(!Chaoss->render()) return SDL_APP_FAILURE;
 
-    return SDL_APP_CONTINUE;
+  return SDL_APP_CONTINUE;
 
 }
 
@@ -46,14 +46,14 @@ SDL_AppResult SDL_AppIterate (void* appstate)
 void SDL_AppQuit (void* appstate, SDL_AppResult result)
 {
 
-    Engine* Chaoss = static_cast<Engine*>(appstate);
-    if (appstate)
-    {
+  Engine* Chaoss = static_cast<Engine*>(appstate);
+  if (appstate)
+  {
 
-        delete Chaoss;
+      delete Chaoss;
 
-        Chaoss = nullptr;
-    }
-    SDL_Quit();
+      Chaoss = nullptr;
+  }
+  SDL_Quit();
     
 }

@@ -5,11 +5,20 @@
 Camera::Camera()
 {
   lastFrame = SDL_GetTicksNS() / 1000000000;
+
+  positionX[1] = 1;
+  positionY[1] = 1;
+  positionZ[1] = 1;
 }
 
-void Camera::cameraPosition()
+void Camera::cameraHandle()
 {
-  if (followPlayer) return;
+  dirty = cameraPosition() || cameraZoom() || cameraRotate();
+}
+
+bool Camera::cameraPosition()
+{
+  if (followPlayer) return false;
 
   int8_t axisX = 0;
   int8_t axisY = 0;
@@ -43,21 +52,97 @@ void Camera::cameraPosition()
   const float newVelocityX = length > 0 ? axisX / length : 0.0f;
   const float newVelocityY = length > 0 ? axisY / length : 0.0f;
 
-  if ( velocityX != newVelocityX || velocityY != newVelocityY || velocityX != 0 || velocityY != 0)
+  if ( updateDataX[0] != newVelocityX || updateDataY[0] != newVelocityY || updateDataX[0] != 0 || updateDataX[0] != 0)
   {
-    velocityX = newVelocityX * speedXYZ;
-    velocityY = newVelocityY * speedXYZ;
-    dirty = true;
+    updateDataX[0] = newVelocityX * speedXYZ;
+    updateDataY[0] = newVelocityY * speedXYZ;
+    return true;
   }
   else
   {
-    velocityX = 0;
-    velocityY = 0;
-    dirty = false;
+    updateDataX[0] = 0;
+    updateDataY[0] = 0;
+    return false;
+  }
+}
+bool Camera::cameraZoom()
+{  
+  const bool* keyboardState = SDL_GetKeyboardState(nullptr);
+
+  bool zoomIn    = keyboardState[SDL_SCANCODE_L ];
+  bool zoomOut   = keyboardState[SDL_SCANCODE_K ];
+
+
+  int8_t axis = 0;
+
+  if (zoomIn && zoomOut) axis = 0;
+  else if (zoomIn && !zoomOut) axis = -1;
+  else if (!zoomIn && zoomOut) axis = 1 ;
+  else if (!zoomIn && !zoomOut) axis = 0;
+
+  float zoom = axis * zoomSpeed;
+
+  if ((updateDataX[1] != 0 || updateDataY[1] != 0 || zoom != 0) && (positionX[1] + zoom *delta >= 0.2f || positionY[1] + zoom * delta >= 0.2f))
+  {
+    updateDataX[1] = zoom;
+    updateDataY[1] = zoom;
+    positionX[1] += zoom * delta;
+    positionY[1] += zoom * delta;
+    return true;
+  }
+  else if( updateDataX[1] != 0 || updateDataY[1] != 0)
+  {
+    updateDataX[1] = 0;
+    updateDataY[1] = 0;
+    return true;
+  }
+  else
+  {
+    updateDataX[1] = 0;
+    updateDataY[1] = 0;
+    return false;
   }
 
+}
+bool Camera::cameraRotate()
+{
+  const bool* keyboardState = SDL_GetKeyboardState(nullptr);
+
+  bool clockwise         = keyboardState[SDL_SCANCODE_M ];
+  bool counterclockwise  = keyboardState[SDL_SCANCODE_N ];
+
+  int8_t axis = 0;
+  return false;
 
 }
+void Camera::movingWindow(SDL_Window* window,const SDL_Event* event)
+{
+  // int x, y, w, h;
+  // if(event->type == SDL_EVENT_WINDOW_MOVED) 
+  // {
+  //   SDL_GetWindowPosition(window, &x, &y);
+  //   SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
+  //   const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+
+  //   x = x - mode->w/2;
+  //   y = -1 * (y - mode->h/2);
+  //   std::cout << x << '\t' << y << '\n';
+
+  //   // velocityX = -x;
+  //   // velocityY = -y;
+  //   dirty = true;
+  // }
+  // else
+  // {
+  //   // velocityX = 0;
+  //   // velocityY = 0;
+  //   dirty = true;
+  // }
+  
+
+  
+}
+
 
 void Camera::deltaTime()
 {
@@ -76,9 +161,9 @@ Position Camera::getCameraPosition()
     &playerId,
     &delta,
     &dirty,
-    &velocityX,
-    &velocityY,
-    &velocityZ,
+    &updateDataX,
+    &updateDataY,
+    &updateDataZ,
     &positionX,
     &positionY,
     &positionZ
