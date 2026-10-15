@@ -55,5 +55,6 @@ class ObjectTransform
     void bind( SDL_GPUCommandBuffer* cmd);
     void release();
     SDL_GPUBuffer* getModel() { return modelBuffer.buffer(); }
+    SDL_GPUBuffer* getPos() { return positionBuffer.buffer(); }
 
 };

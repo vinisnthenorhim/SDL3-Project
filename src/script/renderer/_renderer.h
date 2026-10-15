@@ -8,6 +8,7 @@
 #include <renderer/core/ObjectRender.h>
 #include <renderer/core/projection.h>
 #include <renderer/core/ObjectTransform.h>
+#include <renderer/core/camera.h>
 
 
 class Renderer
@@ -15,12 +16,10 @@ class Renderer
     public:
         Renderer(SDL_Window* window);
         ~Renderer();
-        void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData);
+        void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition);
 
         void screenUpdate(const SDL_Event* event);
-        // void transfer();
-        // bool copypass();
-        // bool r();
+
 
         void render();
 
@@ -36,9 +35,8 @@ class Renderer
       ObjectTransform objectTransform;
       ObjectRender    objectRender;
       Projection      projection;
+      CameraHandle camera;
 
-      // Compute         compute;
-      // Buffer          vertexBuffer;
 
 
 };

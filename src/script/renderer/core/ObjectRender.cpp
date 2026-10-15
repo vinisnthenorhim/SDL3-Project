@@ -26,7 +26,7 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 {
   this->device = device;
 
-  Shader vert(device, "vertex.vert", SDL_GPU_SHADERSTAGE_VERTEX, 1, 1);
+  Shader vert(device, "vertex.vert", SDL_GPU_SHADERSTAGE_VERTEX, 1, 2);
   Shader frag(device, "fragment.frag", SDL_GPU_SHADERSTAGE_FRAGMENT);
 
   vertBuff.createBuffer(device, sizeof(Vertex) * DefaultMeshObject::vertex.size(), SDL_GPU_BUFFERUSAGE_VERTEX);
@@ -69,8 +69,6 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 void ObjectRender::resourceLoad(ObjectData objectData)
 {
   this->visible   = objectData.visible  ;
-  std::cout << "[SDLGPU]"  << " Resource Load " << '\n';  
-
 }
 
 void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
@@ -78,9 +76,6 @@ void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
   if(upload) return;
   vertBuff.startSetData(copy, DefaultMeshObject::vertex);
   indexBuff.startSetData(copy, DefaultMeshObject::indices);
-
-
-  std::cout << "[SDLGPU]"  << " Buffer data updated " << '\n'; 
 }
 
 void ObjectRender::endUpdate()
@@ -91,7 +86,7 @@ void ObjectRender::endUpdate()
   indexBuff.endSetData();
 }
 
-void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model)
+void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera)
 {
   gPipeline.bind(pass);
 
@@ -107,8 +102,8 @@ void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model)
   indexBinding.offset = 0;
   SDL_BindGPUIndexBuffer(pass, &indexBinding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
-  SDL_GPUBuffer* bufs[] = { model };
-  SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 1);
+  SDL_GPUBuffer* bufs[] = { model, camera };
+  SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 2);
 
   SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
 

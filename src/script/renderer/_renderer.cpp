@@ -14,6 +14,7 @@ Renderer::Renderer(SDL_Window* window)
   projection.createProjection(window, device);
 
   objectTransform.createObjectTransform(device);
+  camera.createCameraHandle(device);
 
   objectRender.createObjectRender(window, device);
 }
@@ -34,10 +35,11 @@ void Renderer::screenUpdate(const SDL_Event* event)
 }
 
 
-void Renderer::dataLoad(ObjectData objectData, ObjectTransformData objectTransformData)
+void Renderer::dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition)
 {
   objectTransform.loadData(objectData, objectTransformData);
   objectRender.resourceLoad(objectData);
+  camera.loadData(objectData, cameraPosition);
 }
 
 
@@ -56,12 +58,17 @@ void Renderer::render()
   // SDL_Log("3");
   objectTransform.updateTransform(copypass);
 
+  camera.createCamera(copypass);
+  // SDL_Log("3.5");
+
+  camera.updateCameraData(copypass);
   // SDL_Log("4");
   objectRender.uploadData(copypass);
 
   SDL_EndGPUCopyPass(copypass);
 
   objectTransform.bind(cmdBuffer);
+  camera.bind(cmdBuffer, objectTransform.getPos());
   // SDL_Log("5");
 
 
@@ -77,7 +84,7 @@ void Renderer::render()
   renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
 
   // SDL_Log("7");
-  objectRender.bind( renderpass, objectTransform.getModel() );
+  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera() );
 
   SDL_EndGPURenderPass(renderpass);
 
@@ -89,5 +96,6 @@ void Renderer::render()
 
   objectTransform.release();
   objectRender.endUpdate();
+  camera.releaseOld();
 
 }
