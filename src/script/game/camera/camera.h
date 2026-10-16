@@ -16,25 +16,28 @@ class Camera
 
     const float speedXYZ = 800.0f;
     const float zoomSpeed = 0.5f;
-    const float rotateSpeed = 20.0f;
+    const float rotateSpeed = 3.0f;
 
     uint8_t lastAxisX = 1;
     uint8_t lastAxisY = 1;
 
+    int lastWinPosX = 0;
+    int lastWinPosY = 0;
 
     float lastFrame = 0;
     float delta = 0;
 
-    Uint32 followPlayer = 0u;
+    Uint32 followPlayer = 1u;
     Uint32 playerId = 0;
     bool dirty = false;
   public:
-    Camera();
-    void cameraHandle();
+    Camera( SDL_Window* windowv);
+    void cameraHandle(SDL_Window* window);
     bool cameraPosition();
     bool cameraZoom();
     bool cameraRotate();
     void deltaTime();
     Position getCameraPosition();
-    void movingWindow(SDL_Window* window,const SDL_Event* event);
+    bool movingWindow(SDL_Window* window);
+    void setSettings( const SDL_Event* event);
 };

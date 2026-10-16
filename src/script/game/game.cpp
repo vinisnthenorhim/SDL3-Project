@@ -1,6 +1,7 @@
 #include "_game.h"
 
 Game::Game(Renderer& renderer, SDL_Window* window)
+:camera(window)
 {
   this->window = window;
   world.createObject(Type::Player, 0, 0);
@@ -13,14 +14,13 @@ void Game::render(Renderer& renderer)
   world.secondPerFrame();
   world.velocityUpdate();
   camera.deltaTime();
-  camera.cameraHandle();
-  camera.movingWindow(window, eventH);
+  camera.cameraHandle(window);
 
 }
 
 void Game::event( const SDL_Event* event)
 {
-  this->eventH = event;
+  camera.setSettings(event);
   if (event->key.key == SDLK_Q )
   {
     world.create(window);

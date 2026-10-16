@@ -2,18 +2,32 @@
 #include <cmath>
 #include <iostream>
 
-Camera::Camera()
+Camera::Camera(SDL_Window* window)
 {
   lastFrame = SDL_GetTicksNS() / 1000000000;
 
   positionX[1] = 1;
   positionY[1] = 1;
   positionZ[1] = 1;
+  int x, y, w, h, cw, ch;
+
+
+  SDL_GetWindowPosition(window, &x, &y);
+  SDL_GetWindowSize(window, &cw, &ch);
+  SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
+  const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+    std::cout << x << '\t' << y << '\n';
+
+  x = x - mode->w/2      + cw/2;
+  y = -1 * (y - mode->h/2 ) - ch/2;
+
+  lastWinPosX = x;
+  lastWinPosY = y;
 }
 
-void Camera::cameraHandle()
+void Camera::cameraHandle(SDL_Window* window)
 {
-  dirty = cameraPosition() || cameraZoom() || cameraRotate();
+  dirty = cameraPosition() || cameraZoom() || cameraRotate() || movingWindow(window);
 }
 
 bool Camera::cameraPosition()
@@ -112,35 +126,71 @@ bool Camera::cameraRotate()
   bool counterclockwise  = keyboardState[SDL_SCANCODE_N ];
 
   int8_t axis = 0;
+
+  if (clockwise && counterclockwise) axis = 0;
+  else if (clockwise && !counterclockwise) axis = 1;
+  else if (!clockwise && counterclockwise) axis = -1;
+  else axis = 0;
+
+  float rotate = axis * rotateSpeed;
+
+  if(axis != 0)
+  {
+    updateDataX[2] = 0;
+    updateDataY[2] = 0;
+    updateDataZ[2] = rotate;
+    return true;
+  }
+  else if (updateDataX[2] != 0 || updateDataY[2] != 0 || updateDataZ[2] != 0)
+  {
+    updateDataX[2] = 0;
+    updateDataY[2] = 0;
+    updateDataZ[2] = 0;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+
+
   return false;
 
 }
-void Camera::movingWindow(SDL_Window* window,const SDL_Event* event)
+bool Camera::movingWindow(SDL_Window* window)
 {
-  // int x, y, w, h;
-  // if(event->type == SDL_EVENT_WINDOW_MOVED) 
-  // {
-  //   SDL_GetWindowPosition(window, &x, &y);
-  //   SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
-  //   const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
+  int x, y, w, h, cw, ch;
 
-  //   x = x - mode->w/2;
-  //   y = -1 * (y - mode->h/2);
-  //   std::cout << x << '\t' << y << '\n';
+  SDL_GetWindowPosition(window, &x, &y);
+  SDL_GetWindowSize(window, &cw, &ch);
+  SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
+  const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
 
-  //   // velocityX = -x;
-  //   // velocityY = -y;
-  //   dirty = true;
-  // }
-  // else
-  // {
-  //   // velocityX = 0;
-  //   // velocityY = 0;
-  //   dirty = true;
-  // }
+  x = x - mode->w/2      + cw/2;
+  y = -1 * (y - mode->h/2 ) - ch/2;
   
-
-  
+  if (lastWinPosX != x ||lastWinPosY != y)
+  {
+    updateDataX[3] = x;
+    updateDataY[3] = y;
+    lastWinPosX = x;
+    lastWinPosY = y;
+    return true;
+  }
+  else
+  {
+    lastWinPosX = x;
+    lastWinPosY = y;
+    return false;
+  }
+}
+void Camera::setSettings(const SDL_Event* event)
+{
+  if (event->key.key == SDLK_U && event->key.down && !event->key.repeat)
+  {
+    if (followPlayer == 0u) followPlayer = 1u;
+    else followPlayer = 0u;
+  }
 }
 
 
