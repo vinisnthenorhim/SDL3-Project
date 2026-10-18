@@ -19,6 +19,7 @@ class Renderer
         void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition);
 
         void screenUpdate(const SDL_Event* event);
+        void saveData();
 
 
         void render();
@@ -35,7 +36,7 @@ class Renderer
       ObjectTransform objectTransform;
       ObjectRender    objectRender;
       Projection      projection;
-      CameraHandle camera;
+      CameraHandle    camera;
 
 
 

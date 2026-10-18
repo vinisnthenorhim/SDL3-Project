@@ -16,7 +16,6 @@ Camera::Camera(SDL_Window* window)
   SDL_GetWindowSize(window, &cw, &ch);
   SDL_DisplayID displayID = SDL_GetDisplayForWindow(window);
   const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
-    std::cout << x << '\t' << y << '\n';
 
   x = x - mode->w/2      + cw/2;
   y = -1 * (y - mode->h/2 ) - ch/2;

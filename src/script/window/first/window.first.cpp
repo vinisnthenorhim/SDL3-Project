@@ -13,7 +13,7 @@ bool WindowF::create(const char* title)
 
     window = SDL_CreateWindow(title, 800, 450, SDL_WINDOW_RESIZABLE );
     CHECK(window);
-    installCustomFrame(window);
+    // installCustomFrame(window);
     SDL_SetWindowAspectRatio(window, 16.0 / 10.0f, 16.0 / 9.0f);
     SDL_SetWindowMinimumSize(window, 800, 450);
     SDL_SetWindowBordered(window, true);

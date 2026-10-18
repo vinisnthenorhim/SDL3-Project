@@ -200,21 +200,33 @@ class TransferBuffer
       transfer = SDL_CreateGPUTransferBuffer(device, &ti);
       CHECK(transfer);
     }
-    void mapped(bool cycle)
+    void downloadData(SDL_GPUDevice* device,SDL_GPUCopyPass* copypass, SDL_GPUBuffer* from, uint32_t size, uint32_t offsetSrc, uint32_t offsetDst)
     {
-      count = 0;
-      mappedPtr = (uint8_t*)SDL_MapGPUTransferBuffer(device, transfer, cycle);
+      if (size == 0) return;
+      this->device = device;
+      this->size = size;
+      if(transfer != nullptr) 
+      {
+        release();
+      }
+      SDL_GPUTransferBufferCreateInfo ti = {};
+      ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD;
+      ti.size  = size;
+      
+      transfer = SDL_CreateGPUTransferBuffer(device, &ti);
 
-    }void mappedData(float data)
-    {
-      if (!mappedPtr || (count + 1) * sizeof(float) > size) return;
-      SDL_memcpy(mappedPtr + count * 4, &data, sizeof(float));
-      count++;
-    }
-    void unmapped(SDL_GPUCopyPass* copy)
-    {
-      SDL_UnmapGPUTransferBuffer(device, transfer);
-      mappedPtr = nullptr;
+      CHECK(transfer);
+
+      SDL_GPUBufferRegion src = {};
+      src.buffer = from;
+      src.offset = offsetSrc;
+      src.size   = size;
+
+      SDL_GPUTransferBufferLocation dst = {};
+      dst.transfer_buffer = transfer;
+      dst.offset = offsetDst;
+
+      SDL_DownloadFromGPUBuffer(copypass, &src, &dst);
     }
     SDL_GPUTransferBuffer* buffer() {return transfer;}
     ~TransferBuffer()

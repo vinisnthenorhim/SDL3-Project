@@ -67,7 +67,6 @@ void World::create(SDL_Window* window)
   sol::protected_function function = luaRuntime.lua_function("random_location_creation");
 
   function( mode->w, mode->h );
-  std::cout << "called" << '\n';
 }
 void World::createObject(Type objectType, float locationX, float locationY)
 {

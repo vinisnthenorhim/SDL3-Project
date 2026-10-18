@@ -8,6 +8,7 @@ class CameraHandle
     Uint32* follow;
     Uint32* entityId;
     float* deltaTime;
+    bool* reset;
     bool* dirty;
     bool created = false;
 
@@ -39,6 +40,7 @@ class CameraHandle
 
     void createCamera( SDL_GPUCopyPass* copypass );
     void updateCameraData( SDL_GPUCopyPass* copypass );
+    void followEntity( SDL_GPUCopyPass* copypass );
     void releaseOld();
     void bind(SDL_GPUCommandBuffer* cmd,  SDL_GPUBuffer* position);
 

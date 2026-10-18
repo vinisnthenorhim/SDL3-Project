@@ -22,6 +22,7 @@ Renderer::Renderer(SDL_Window* window)
 
 Renderer::~Renderer()
 {
+  saveData();
   SDL_WaitForGPUIdle(device);
 }
 
@@ -98,4 +99,55 @@ void Renderer::render()
   objectRender.endUpdate();
   camera.releaseOld();
 
+}
+
+void Renderer::saveData()
+{
+
+  cmdBuffer = SDL_AcquireGPUCommandBuffer(device);
+  if(!cmdBuffer) return;
+  SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);
+
+  copypass = SDL_BeginGPUCopyPass(cmdBuffer);
+
+  objectTransform.updateDataSize(copypass);
+  objectTransform.updateTransform(copypass);
+
+  camera.createCamera(copypass);
+
+  camera.updateCameraData(copypass);
+  objectRender.uploadData(copypass);
+
+  SDL_EndGPUCopyPass(copypass);
+
+  objectTransform.bind(cmdBuffer);
+  camera.bind(cmdBuffer, objectTransform.getPos());
+
+
+  SDL_GPUColorTargetInfo target {};
+
+  target.texture = swap;
+  target.clear_color = (SDL_FColor) {0.0f, 0.0f, 0.0f, 0.0f};
+  target.load_op = SDL_GPU_LOADOP_CLEAR;
+  target.store_op = SDL_GPU_STOREOP_STORE;
+
+
+  renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
+
+  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera() );
+
+  SDL_EndGPURenderPass(renderpass);
+
+  projection.uploadProjection(cmdBuffer);
+
+
+
+
+  objectTransform.saveData(cmdBuffer);
+
+
+  
+  objectTransform.release();
+  objectRender.endUpdate();
+  camera.releaseOld();
 }
