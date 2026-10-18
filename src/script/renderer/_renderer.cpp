@@ -58,6 +58,7 @@ void Renderer::render()
   objectTransform.updateDataSize(copypass);
   // SDL_Log("3");
   objectTransform.updateTransform(copypass);
+  // SDL_Log("3.5");
 
   camera.createCamera(copypass);
   // SDL_Log("3.5");
@@ -89,7 +90,7 @@ void Renderer::render()
 
   SDL_EndGPURenderPass(renderpass);
 
-  // SDL_Log("8");
+  //  SDL_Log("8");
   projection.uploadProjection(cmdBuffer);
 
   // SDL_Log("9");
@@ -140,13 +141,8 @@ void Renderer::saveData()
 
   projection.uploadProjection(cmdBuffer);
 
-
-
-
   objectTransform.saveData(cmdBuffer);
 
-
-  
   objectTransform.release();
   objectRender.endUpdate();
   camera.releaseOld();

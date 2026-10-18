@@ -9,5 +9,7 @@ function random_location_creation( size_x, size_y )
   local location_x = (math.random() * size_x) - x_half
   local location_y = (math.random() * size_y) - y_half
 
-  create_object(EntityType.Player, location_x, location_y)
+  local layout = Layout.new(location_x, location_y, 1, 1, 1, 1, 0, 0, 0)
+
+  create_object( layout )
 end

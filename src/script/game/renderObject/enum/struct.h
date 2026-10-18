@@ -1,5 +1,4 @@
 #pragma once
-#include "enum.h"
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
@@ -55,15 +54,19 @@ struct Position
   std::array<float, 4>* positionX ;
   std::array<float, 4>* positionY ;
   std::array<float, 4>* positionZ ;
+};
 
+struct CreateEntityLayout
+{
+  float posX;
+  float posY;
+  float posZ;
 
-  
-  // float scalingX     ;
-  // float scalingY     ;
-  // float scalingZ     ;
+  float sclX;
+  float sclY;
+  float sclZ;
 
-  // float rotationX    ;
-  // float rotationY    ;
-  // float rotationZ    ;
-
+  float rotX;
+  float rotY;
+  float rotZ;
 };

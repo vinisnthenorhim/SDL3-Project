@@ -43,7 +43,7 @@ void ObjectTransform::loadData(ObjectData objectData, ObjectTransformData object
 void ObjectTransform::updateDataSize( SDL_GPUCopyPass* copypass)
 {
   Uint32 currentCount = visible->size();
-  if(currentCount <= entityCount || currentCount == 0) return;
+  if(currentCount <= entityCount || currentCount <= 0) return;
 
   Uint32 offset = entityCount * sizeof(glm::vec4);
   Uint32 newCount = currentCount - entityCount;
@@ -144,7 +144,7 @@ void ObjectTransform::updateDataSize( SDL_GPUCopyPass* copypass)
 void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 {
   Uint32 currentCount = visible->size();
-  if( currentCount == 0 ) return;
+  if( currentCount <= 0 ) return;
 
   Uint32 bufferSize = 3 * visible->size() * sizeof(float);
   Uint32 offset = sizeof(float) * visible->size();

@@ -47,5 +47,4 @@ sol::protected_function LuaRuntime::lua_function(const std::string& functionName
     }
 
     return function;
-    
 }

@@ -4,7 +4,6 @@ Game::Game(Renderer& renderer, SDL_Window* window)
 :camera(window)
 {
   this->window = window;
-  world.createObject(Type::Player, 0, 0);
   renderer.dataLoad(world.readData(), world.getObjectTranform(), camera.getCameraPosition());
 }
 

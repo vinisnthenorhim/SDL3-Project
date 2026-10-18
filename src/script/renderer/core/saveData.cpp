@@ -35,8 +35,10 @@ void ObjectTransform::saveData(SDL_GPUCommandBuffer* cmd)
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> w(buffer);
   
-
+  w.SetIndent(' ', 2);
   w.StartObject();
+  w.Key("count");
+  w.Int(visible->size());
   w.Key("position");
   w.StartObject();
   w.Key("x");

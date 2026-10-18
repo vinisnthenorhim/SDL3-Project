@@ -88,6 +88,7 @@ void ObjectRender::endUpdate()
 
 void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera)
 {
+  if (visible->size() <= 0) return;
   gPipeline.bind(pass);
 
   SDL_GPUBufferBinding vertexBinding{};
@@ -106,5 +107,4 @@ void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUB
   SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 2);
 
   SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
-
 }

@@ -45,6 +45,7 @@ void CameraHandle::loadData(ObjectData objectData, Position cameraPosition)
 }
 void CameraHandle::createCamera( SDL_GPUCopyPass* copypass)
 {
+  if ( positionX->size() <= 0) return;
   if (created) return;
   created = true;
 
@@ -94,6 +95,7 @@ void CameraHandle::createCamera( SDL_GPUCopyPass* copypass)
 
 void CameraHandle::updateCameraData( SDL_GPUCopyPass* copypass)
 {
+  if ( positionX->size() <= 0) return;
   if ( *dirty == false) return;
 
   if ( *follow != 0u ) 
@@ -188,7 +190,8 @@ struct UniformData
 
 void CameraHandle::bind( SDL_GPUCommandBuffer* cmd, SDL_GPUBuffer* position)
 {
- UniformData uniformData = {*deltaTime, *follow, *entityId};
+  if ( positionX->size() <= 0) return;
+  UniformData uniformData = {*deltaTime, *follow, *entityId};
 
   SDL_GPUStorageBufferReadWriteBinding rw[2] = {};
   rw[0].buffer = cameraPosition.buffer();

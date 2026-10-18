@@ -7,7 +7,6 @@
 
 #include <lua/LuaRuntime.h>
 
-#include <game/renderObject/enum/enum.h>
 #include <game/renderObject/enum/struct.h>
 
 class World
@@ -16,7 +15,8 @@ class World
     World();
     ObjectData readData();
     ObjectTransformData getObjectTranform();
-    void createObject(Type objectType, float locationX, float locationY);
+    void loadSaveData();
+    void createObject(CreateEntityLayout layout);
     void velocityUpdate();
     void create(SDL_Window* window);
 
@@ -24,6 +24,7 @@ class World
 
   private:
     LuaRuntime luaRuntime;
+    bool save = true;
 
     float lastFrame;
     float secondFrame;
@@ -33,7 +34,6 @@ class World
 
     float holdtime = 0.0f;
 
-    std::vector<Type> type          ;
 
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
