@@ -1,3 +1,7 @@
+#include <fstream>
+#include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
+
 #include "_renderer.h"
 
 #include "check.h"
@@ -104,6 +108,19 @@ void Renderer::render()
 
 void Renderer::saveData()
 {
+
+  FILE* fp = fopen("../src/script/data/games/save.json", "rb");
+
+  if (!fp) return;
+
+  char buf[65536];
+  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+
+  rapidjson::Document load;
+  load.ParseStream(is);
+  fclose(fp);
+
+  if (!load["save"].GetBool()) return;
 
   cmdBuffer = SDL_AcquireGPUCommandBuffer(device);
   if(!cmdBuffer) return;

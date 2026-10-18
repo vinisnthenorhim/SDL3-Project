@@ -24,7 +24,6 @@ class World
 
   private:
     LuaRuntime luaRuntime;
-    bool save = true;
 
     float lastFrame;
     float secondFrame;

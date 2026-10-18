@@ -28,15 +28,23 @@ World::World()
 
   luaRuntime.loadScript("../src/script/creation/creation.lua");
 
-  if (save) loadSaveData();
+  FILE* fp = fopen("../src/script/data/games/save.json", "rb");
 
+  if (!fp) return;
 
+  char buf[65536];
+  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
 
+  rapidjson::Document load;
+  load.ParseStream(is);
+  fclose(fp);
+
+  if (load["load"].GetBool()) loadSaveData();
 }
 
 void World::loadSaveData()
 {
-  FILE* fp = fopen("../src/script/data/games/save.json", "rb");
+  FILE* fp = fopen("../src/script/data/games/entitydata.json", "rb");
 
   if (!fp) return;
 
