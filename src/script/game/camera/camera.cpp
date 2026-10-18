@@ -1,9 +1,27 @@
 #include "camera.h"
 #include <cmath>
-#include <iostream>
-
+#include <fstream>
+#include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
 Camera::Camera(SDL_Window* window)
 {
+  FILE* fp = fopen("../src/script/data/settings/camera.json", "rb");
+
+  if (!fp) return;
+
+  char buf[65536];
+  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+
+  rapidjson::Document doc;
+  doc.ParseStream(is);
+  fclose(fp);
+  dev = doc["dev"].GetBool();
+  if (!dev) return;
+  up    = SDL_GetScancodeFromName(doc["camera_movement"]["up"].GetString());
+  down  = SDL_GetScancodeFromName(doc["camera_movement"]["down"].GetString());
+  left  = SDL_GetScancodeFromName(doc["camera_movement"]["left"].GetString());
+  right = SDL_GetScancodeFromName(doc["camera_movement"]["right"].GetString());
+
   lastFrame = SDL_GetTicksNS() / 1000000000;
 
   positionX[1] = 1;
@@ -22,10 +40,13 @@ Camera::Camera(SDL_Window* window)
 
   lastWinPosX = x;
   lastWinPosY = y;
+
+
 }
 
 void Camera::cameraHandle(SDL_Window* window)
 {
+  if (!dev) return;
   dirty = cameraPosition() || cameraZoom() || cameraRotate() || movingWindow(window);
 }
 
@@ -38,10 +59,10 @@ bool Camera::cameraPosition()
 
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
-  bool arrowUp    = keyboardState[SDL_SCANCODE_UP   ];
-  bool arrowDown  = keyboardState[SDL_SCANCODE_DOWN ];
-  bool arrowLeft  = keyboardState[SDL_SCANCODE_LEFT ];
-  bool arrowRight = keyboardState[SDL_SCANCODE_RIGHT];
+  bool arrowUp    = keyboardState[up];
+  bool arrowDown  = keyboardState[down];
+  bool arrowLeft  = keyboardState[left];
+  bool arrowRight = keyboardState[right];
 
 
   if      (arrowLeft && !arrowRight) lastAxisX = -1;
@@ -121,8 +142,8 @@ bool Camera::cameraRotate()
 {
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
-  bool clockwise         = keyboardState[SDL_SCANCODE_M ];
-  bool counterclockwise  = keyboardState[SDL_SCANCODE_N ];
+  bool clockwise         = keyboardState[SDL_SCANCODE_M];
+  bool counterclockwise  = keyboardState[SDL_SCANCODE_N];
 
   int8_t axis = 0;
 
@@ -185,6 +206,7 @@ bool Camera::movingWindow(SDL_Window* window)
 }
 void Camera::setSettings(const SDL_Event* event)
 {
+  if (!dev) return;
   if (event->key.key == SDLK_U && event->key.down && !event->key.repeat)
   {
     if (followPlayer == 0u) followPlayer = 1u;
@@ -195,6 +217,8 @@ void Camera::setSettings(const SDL_Event* event)
 
 void Camera::deltaTime()
 {
+  if (!dev) return;
+
   float currentFrame = SDL_GetTicksNS();
 
   delta = ( currentFrame - lastFrame) / 1000000000;

@@ -1,0 +1,9 @@
+{
+  "dev": true,
+  "camera_movement":{
+    "left" : "LEFT" ,
+    "right": "RIGHT",
+    "up"   : "UP"   ,
+    "down" : "DOWN"
+  }
+}

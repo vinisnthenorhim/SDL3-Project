@@ -6,6 +6,10 @@
 class Camera
 {
   private:
+    bool dev;
+    SDL_Scancode up, down, left, right;
+
+
     std::array<float, 4> positionX {0};
     std::array<float, 4> positionY {0};
     std::array<float, 4> positionZ {0};
