@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
@@ -69,4 +70,10 @@ struct CreateEntityLayout
   float rotX;
   float rotY;
   float rotZ;
+};
+
+struct RotateAxis
+{
+  SDL_Scancode counterclockwise;
+  SDL_Scancode clockwise;
 };

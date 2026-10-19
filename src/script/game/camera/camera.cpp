@@ -15,12 +15,22 @@ Camera::Camera(SDL_Window* window)
   rapidjson::Document doc;
   doc.ParseStream(is);
   fclose(fp);
-  dev = doc["dev"].GetBool();
-  if (!dev) return;
+  camera = doc["camera"].GetBool();
+  if (!camera) return;
   up    = SDL_GetScancodeFromName(doc["camera_movement"]["up"].GetString());
   down  = SDL_GetScancodeFromName(doc["camera_movement"]["down"].GetString());
   left  = SDL_GetScancodeFromName(doc["camera_movement"]["left"].GetString());
   right = SDL_GetScancodeFromName(doc["camera_movement"]["right"].GetString());
+
+  x_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["x_axis"]["counterclockwise"].GetString());
+  x_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["x_axis"]["clockwise"]       .GetString());
+  y_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["y_axis"]["counterclockwise"].GetString());
+  y_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["y_axis"]["clockwise"]       .GetString());
+  z_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["z_axis"]["counterclockwise"].GetString());
+  z_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["z_axis"]["clockwise"]       .GetString());
+
+  zoomIn  = SDL_GetScancodeFromName(doc["camera_zoom"]["in"] .GetString());
+  zoomOut = SDL_GetScancodeFromName(doc["camera_zoom"]["out"].GetString());
 
   lastFrame = SDL_GetTicksNS() / 1000000000;
 
@@ -46,7 +56,7 @@ Camera::Camera(SDL_Window* window)
 
 void Camera::cameraHandle(SDL_Window* window)
 {
-  if (!dev) return;
+  if (!camera) return;
   dirty = cameraPosition() || cameraZoom() || cameraRotate() || movingWindow(window);
 }
 
@@ -101,11 +111,12 @@ bool Camera::cameraPosition()
 }
 bool Camera::cameraZoom()
 {  
+  if (followPlayer) return false;
+
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
-  bool zoomIn    = keyboardState[SDL_SCANCODE_L ];
-  bool zoomOut   = keyboardState[SDL_SCANCODE_K ];
-
+  bool zoomIn    = keyboardState[this->zoomIn];
+  bool zoomOut   = keyboardState[this->zoomOut];
 
   int8_t axis = 0;
 
@@ -120,45 +131,69 @@ bool Camera::cameraZoom()
   {
     updateDataX[1] = zoom;
     updateDataY[1] = zoom;
+    updateDataZ[1] = zoom;
     positionX[1] += zoom * delta;
     positionY[1] += zoom * delta;
+    positionZ[1] += zoom * delta;
+
     return true;
   }
   else if( updateDataX[1] != 0 || updateDataY[1] != 0)
   {
     updateDataX[1] = 0;
     updateDataY[1] = 0;
+    updateDataZ[1] = 0;
+
     return true;
   }
   else
   {
     updateDataX[1] = 0;
     updateDataY[1] = 0;
+    updateDataZ[1] = 0;
     return false;
   }
 
 }
 bool Camera::cameraRotate()
 {
+  if (followPlayer) return false;
+
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
+  bool x_axis_clockwise         = keyboardState[x_axis.clockwise];
+  bool x_axis_counterclockwise  = keyboardState[x_axis.counterclockwise];
+  bool y_axis_clockwise         = keyboardState[y_axis.clockwise];
+  bool y_axis_counterclockwise  = keyboardState[y_axis.counterclockwise];
+  bool z_axis_clockwise         = keyboardState[z_axis.clockwise];
+  bool z_axis_counterclockwise  = keyboardState[z_axis.counterclockwise];
+  int8_t x_direction = 0;
+  int8_t y_direction = 0;
+  int8_t z_direction = 0;
 
-  bool clockwise         = keyboardState[SDL_SCANCODE_M];
-  bool counterclockwise  = keyboardState[SDL_SCANCODE_N];
+  if (x_axis_clockwise && x_axis_counterclockwise)       x_direction = 0;
+  else if (x_axis_clockwise && !x_axis_counterclockwise) x_direction = 1;
+  else if (!x_axis_clockwise && x_axis_counterclockwise) x_direction = -1;
+  else x_direction = 0;
 
-  int8_t axis = 0;
+  if (y_axis_clockwise && y_axis_counterclockwise)       y_direction = 0;
+  else if (y_axis_clockwise && !y_axis_counterclockwise) y_direction = 1;
+  else if (!y_axis_clockwise && y_axis_counterclockwise) y_direction = -1;
+  else y_direction = 0;
 
-  if (clockwise && counterclockwise) axis = 0;
-  else if (clockwise && !counterclockwise) axis = 1;
-  else if (!clockwise && counterclockwise) axis = -1;
-  else axis = 0;
+  if (z_axis_clockwise && z_axis_counterclockwise)       z_direction = 0;
+  else if (z_axis_clockwise && !z_axis_counterclockwise) z_direction = 1;
+  else if (!z_axis_clockwise && z_axis_counterclockwise) z_direction = -1;
+  else z_direction = 0;
 
-  float rotate = axis * rotateSpeed;
+  float rotate_x = x_direction * rotateSpeed;
+  float rotate_y = y_direction * rotateSpeed;
+  float rotate_z = z_direction * rotateSpeed;
 
-  if(axis != 0)
+  if(z_direction != 0)
   {
-    updateDataX[2] = 0;
-    updateDataY[2] = 0;
-    updateDataZ[2] = rotate;
+    updateDataX[2] = rotate_x;
+    updateDataY[2] = rotate_y;
+    updateDataZ[2] = rotate_z;
     return true;
   }
   else if (updateDataX[2] != 0 || updateDataY[2] != 0 || updateDataZ[2] != 0)
@@ -206,18 +241,21 @@ bool Camera::movingWindow(SDL_Window* window)
 }
 void Camera::setSettings(const SDL_Event* event)
 {
-  if (!dev) return;
+  if (!camera) return;
   if (event->key.key == SDLK_U && event->key.down && !event->key.repeat)
   {
     if (followPlayer == 0u) followPlayer = 1u;
     else followPlayer = 0u;
+    positionX[1] = 1;
+    positionY[1] = 1;
+    positionZ[1] = 1;
   }
 }
 
 
 void Camera::deltaTime()
 {
-  if (!dev) return;
+  if (!camera) return;
 
   float currentFrame = SDL_GetTicksNS();
 

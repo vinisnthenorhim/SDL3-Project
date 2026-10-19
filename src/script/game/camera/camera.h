@@ -3,12 +3,15 @@
 #include <SDL3/SDL.h>
 #include <game/renderObject/enum/struct.h>
 
+
+
 class Camera
 {
   private:
-    bool dev;
+    bool camera;
     SDL_Scancode up, down, left, right;
-
+    RotateAxis x_axis, y_axis, z_axis;
+    SDL_Scancode zoomIn, zoomOut;
 
     std::array<float, 4> positionX {0};
     std::array<float, 4> positionY {0};
