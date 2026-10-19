@@ -1,0 +1,6 @@
+{
+  "vertex"  : "../src/shaders/vertex.vert",
+  "fragment": "../src/shaders/fragment.frag",
+  "camera"  : "../src/shaders/camera.comp",
+  "model"   : "../src/shaders/model.comp"
+}
