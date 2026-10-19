@@ -1,11 +1,27 @@
 #include "objectTransform.h"
 #include <iostream>
 
+#include <fstream>
+#include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
+
 void ObjectTransform::createObjectTransform(SDL_GPUDevice* device)
 {
   this->device = device;
+  FILE* fp = fopen("../src/script/data/path/shader.json", "rb");
 
-  ComputeShader comp(device, "model.comp");
+  if (!fp) return;
+
+  char buf[16384];
+  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+
+  rapidjson::Document shader_path;
+  shader_path.ParseStream(is);
+  fclose(fp);
+
+  const char* modelShaderLocation   = shader_path["model"].GetString();
+
+  ComputeShader comp(device, modelShaderLocation);
 
   SDL_GPUComputePipelineCreateInfo pipelineInfo{};
   pipelineInfo.code = comp.compInfo().code;

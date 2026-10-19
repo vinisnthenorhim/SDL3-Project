@@ -1,6 +1,8 @@
 #include "ObjectRender.h"
 #include <iostream>
-
+#include <fstream>
+#include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
 struct Vertex
 {
     glm::vec3 position;
@@ -20,14 +22,26 @@ struct DefaultMeshObject
 
 };
 
-
-
 void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 {
   this->device = device;
 
-  Shader vert(device, "vertex.vert", SDL_GPU_SHADERSTAGE_VERTEX, 1, 2);
-  Shader frag(device, "fragment.frag", SDL_GPU_SHADERSTAGE_FRAGMENT);
+  FILE* fp = fopen("../src/script/data/path/shader.json", "rb");
+
+  if (!fp) return;
+
+  char buf[16384];
+  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+
+  rapidjson::Document shader_path;
+  shader_path.ParseStream(is);
+  fclose(fp);
+
+  const char* vertexShaderLocation   = shader_path["vertex"].GetString();
+  const char* fragmentShaderLocation = shader_path["fragment"].GetString();
+
+  Shader vert(device, vertexShaderLocation  , SDL_GPU_SHADERSTAGE_VERTEX, 1, 2);
+  Shader frag(device, fragmentShaderLocation, SDL_GPU_SHADERSTAGE_FRAGMENT);
 
   vertBuff.createBuffer(device, sizeof(Vertex) * DefaultMeshObject::vertex.size(), SDL_GPU_BUFFERUSAGE_VERTEX);
   indexBuff.createBuffer(device, sizeof(uint32_t) * DefaultMeshObject::indices.size(), SDL_GPU_BUFFERUSAGE_INDEX);
