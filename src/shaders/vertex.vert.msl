@@ -1,0 +1,41 @@
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct Projection
+{
+    float4x4 projection;
+};
+
+struct CameraMatrixBuffer
+{
+    float4x4 camera[1];
+};
+
+struct ModelMatrixBuffer
+{
+    float4x4 modelMat[1];
+};
+
+struct main0_out
+{
+    float2 fragUV [[user(locn0)]];
+    float4 gl_Position [[position]];
+};
+
+struct main0_in
+{
+    float3 position [[attribute(0)]];
+    float2 uv [[attribute(1)]];
+};
+
+vertex main0_out main0(main0_in in [[stage_in]], constant Projection& _25 [[buffer(0)]], const device ModelMatrixBuffer& _39 [[buffer(1)]], const device CameraMatrixBuffer& _32 [[buffer(2)]], uint gl_InstanceIndex [[instance_id]])
+{
+    main0_out out = {};
+    uint entityIndex = uint(int(gl_InstanceIndex));
+    out.gl_Position = ((_25.projection * _32.camera[0]) * _39.modelMat[entityIndex]) * float4(in.position, 1.0);
+    out.fragUV = in.uv;
+    return out;
+}
+

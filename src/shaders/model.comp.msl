@@ -1,0 +1,109 @@
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct UniFormBuffer
+{
+    float deltaTime;
+    uint entityCount;
+};
+
+struct PositionBuffer
+{
+    float4 position[1];
+};
+
+struct VelocityBuffer
+{
+    float velocity[1];
+};
+
+struct ScalingBuffer
+{
+    float4 scaling[1];
+};
+
+struct ScaleBuffer
+{
+    float scale[1];
+};
+
+struct RotationBuffer
+{
+    float4 rotation[1];
+};
+
+struct RotateBuffer
+{
+    float rotate[1];
+};
+
+struct ModelMatrixBuffer
+{
+    float4x4 modelMat[1];
+};
+
+constant uint3 gl_WorkGroupSize [[maybe_unused]] = uint3(64u, 1u, 1u);
+
+static inline __attribute__((always_inline))
+float4x4 translationMatrix(thread const float4& offset)
+{
+    return float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(offset.x, offset.y, offset.z, offset.w));
+}
+
+static inline __attribute__((always_inline))
+float4x4 scaleMatrix(thread const float4& offset)
+{
+    return float4x4(float4(offset.x, 0.0, 0.0, 0.0), float4(0.0, offset.y, 0.0, 0.0), float4(0.0, 0.0, offset.z, 0.0), float4(0.0, 0.0, 0.0, offset.w));
+}
+
+static inline __attribute__((always_inline))
+float4x4 rotationMatrix(thread const float4& rotation)
+{
+    float4x4 result = float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    if (rotation.x != 0.0)
+    {
+        float c = cos(rotation.x);
+        float s = sin(rotation.x);
+        result = result * float4x4(float4(1.0, 0.0, 0.0, 0.0), float4(0.0, c, s, 0.0), float4(0.0, -s, c, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    if (rotation.y != 0.0)
+    {
+        float c_1 = cos(rotation.y);
+        float s_1 = sin(rotation.y);
+        result = result * float4x4(float4(c_1, 0.0, -s_1, 0.0), float4(0.0, 1.0, 0.0, 0.0), float4(s_1, 0.0, c_1, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    if (rotation.z != 0.0)
+    {
+        float c_2 = cos(rotation.z);
+        float s_2 = sin(rotation.z);
+        result = result * float4x4(float4(c_2, s_2, 0.0, 0.0), float4(-s_2, c_2, 0.0, 0.0), float4(0.0, 0.0, 1.0, 0.0), float4(0.0, 0.0, 0.0, 1.0));
+    }
+    return result;
+}
+
+kernel void main0(constant UniFormBuffer& _155 [[buffer(0)]], device VelocityBuffer& _174 [[buffer(1)]], device ScaleBuffer& _225 [[buffer(2)]], device RotateBuffer& _275 [[buffer(3)]], device ModelMatrixBuffer& _320 [[buffer(4)]], device PositionBuffer& _168 [[buffer(5)]], device ScalingBuffer& _220 [[buffer(6)]], device RotationBuffer& _270 [[buffer(7)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+{
+    uint entityIndex = gl_GlobalInvocationID.x;
+    if (entityIndex >= _155.entityCount)
+    {
+        return;
+    }
+    ((device float*)&_168.position[entityIndex])[0u] += (_174.velocity[entityIndex] * _155.deltaTime);
+    ((device float*)&_168.position[entityIndex])[1u] += (_174.velocity[entityIndex + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_168.position[entityIndex])[2u] += (_174.velocity[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_220.scaling[entityIndex])[0u] += (_225.scale[entityIndex] * _155.deltaTime);
+    ((device float*)&_220.scaling[entityIndex])[1u] += (_225.scale[entityIndex + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_220.scaling[entityIndex])[2u] += (_225.scale[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_270.rotation[entityIndex])[0u] += (_275.rotate[entityIndex] * _155.deltaTime);
+    ((device float*)&_270.rotation[entityIndex])[1u] += (_275.rotate[entityIndex + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_270.rotation[entityIndex])[2u] += (_275.rotate[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    float4 param = _168.position[entityIndex];
+    float4 param_1 = _220.scaling[entityIndex];
+    float4 param_2 = _270.rotation[entityIndex];
+    _320.modelMat[entityIndex] = (translationMatrix(param) * scaleMatrix(param_1)) * rotationMatrix(param_2);
+}
+
