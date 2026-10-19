@@ -8,7 +8,7 @@
 class Camera
 {
   private:
-    bool camera;
+    bool camera_enable;
     SDL_Scancode up, down, left, right;
     RotateAxis x_axis, y_axis, z_axis;
     SDL_Scancode zoomIn, zoomOut;

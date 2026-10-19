@@ -9,28 +9,28 @@ Camera::Camera(SDL_Window* window)
 
   if (!fp) return;
 
-  char buf[65536];
+  char buf[16384];
   rapidjson::FileReadStream is(fp, buf, sizeof(buf));
 
-  rapidjson::Document doc;
-  doc.ParseStream(is);
+  rapidjson::Document camera_path;
+  camera_path.ParseStream(is);
   fclose(fp);
-  camera = doc["camera"].GetBool();
-  if (!camera) return;
-  up    = SDL_GetScancodeFromName(doc["camera_movement"]["up"].GetString());
-  down  = SDL_GetScancodeFromName(doc["camera_movement"]["down"].GetString());
-  left  = SDL_GetScancodeFromName(doc["camera_movement"]["left"].GetString());
-  right = SDL_GetScancodeFromName(doc["camera_movement"]["right"].GetString());
+  camera_enable = camera_path["camera"].GetBool();
+  if (!camera_enable) return;
+  up    = SDL_GetScancodeFromName(camera_path["camera_movement"]["up"].GetString());
+  down  = SDL_GetScancodeFromName(camera_path["camera_movement"]["down"].GetString());
+  left  = SDL_GetScancodeFromName(camera_path["camera_movement"]["left"].GetString());
+  right = SDL_GetScancodeFromName(camera_path["camera_movement"]["right"].GetString());
 
-  x_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["x_axis"]["counterclockwise"].GetString());
-  x_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["x_axis"]["clockwise"]       .GetString());
-  y_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["y_axis"]["counterclockwise"].GetString());
-  y_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["y_axis"]["clockwise"]       .GetString());
-  z_axis.counterclockwise = SDL_GetScancodeFromName(doc["camera_rotation"]["z_axis"]["counterclockwise"].GetString());
-  z_axis.clockwise        = SDL_GetScancodeFromName(doc["camera_rotation"]["z_axis"]["clockwise"]       .GetString());
+  x_axis.counterclockwise = SDL_GetScancodeFromName(camera_path["camera_rotation"]["x_axis"]["counterclockwise"].GetString());
+  x_axis.clockwise        = SDL_GetScancodeFromName(camera_path["camera_rotation"]["x_axis"]["clockwise"]       .GetString());
+  y_axis.counterclockwise = SDL_GetScancodeFromName(camera_path["camera_rotation"]["y_axis"]["counterclockwise"].GetString());
+  y_axis.clockwise        = SDL_GetScancodeFromName(camera_path["camera_rotation"]["y_axis"]["clockwise"]       .GetString());
+  z_axis.counterclockwise = SDL_GetScancodeFromName(camera_path["camera_rotation"]["z_axis"]["counterclockwise"].GetString());
+  z_axis.clockwise        = SDL_GetScancodeFromName(camera_path["camera_rotation"]["z_axis"]["clockwise"]       .GetString());
 
-  zoomIn  = SDL_GetScancodeFromName(doc["camera_zoom"]["in"] .GetString());
-  zoomOut = SDL_GetScancodeFromName(doc["camera_zoom"]["out"].GetString());
+  zoomIn  = SDL_GetScancodeFromName(camera_path["camera_zoom"]["in"] .GetString());
+  zoomOut = SDL_GetScancodeFromName(camera_path["camera_zoom"]["out"].GetString());
 
   lastFrame = SDL_GetTicksNS() / 1000000000;
 
@@ -56,7 +56,7 @@ Camera::Camera(SDL_Window* window)
 
 void Camera::cameraHandle(SDL_Window* window)
 {
-  if (!camera) return;
+  if (!camera_enable) return;
   dirty = cameraPosition() || cameraZoom() || cameraRotate() || movingWindow(window);
 }
 
@@ -121,8 +121,8 @@ bool Camera::cameraZoom()
   int8_t axis = 0;
 
   if (zoomIn && zoomOut) axis = 0;
-  else if (zoomIn && !zoomOut) axis = -1;
-  else if (!zoomIn && zoomOut) axis = 1 ;
+  else if (zoomIn && !zoomOut) axis = 1;
+  else if (!zoomIn && zoomOut) axis = -1 ;
   else if (!zoomIn && !zoomOut) axis = 0;
 
   float zoom = axis * zoomSpeed;
@@ -241,7 +241,7 @@ bool Camera::movingWindow(SDL_Window* window)
 }
 void Camera::setSettings(const SDL_Event* event)
 {
-  if (!camera) return;
+  if (!camera_enable) return;
   if (event->key.key == SDLK_U && event->key.down && !event->key.repeat)
   {
     if (followPlayer == 0u) followPlayer = 1u;
@@ -255,7 +255,7 @@ void Camera::setSettings(const SDL_Event* event)
 
 void Camera::deltaTime()
 {
-  if (!camera) return;
+  if (!camera_enable) return;
 
   float currentFrame = SDL_GetTicksNS();
 
