@@ -1,9 +1,27 @@
 {
-  "dev": true,
-  "camera_movement":{
+  "camera": true,
+  "camera_movement" :{
     "left" : "LEFT" ,
     "right": "RIGHT",
     "up"   : "UP"   ,
     "down" : "DOWN"
+  },
+  "camera_rotation" :{
+    "x_axis":{
+      "clockwise"        : "",
+      "counterclockwise" : ""
+    },
+    "y_axis":{
+      "clockwise"        : "",
+      "counterclockwise" : ""
+    },
+    "z_axis":{
+      "clockwise"        : "M",
+      "counterclockwise" : "N"
+    }
+  },
+  "camera_zoom" :{
+    "in" : "K",
+    "out": "L"
   }
 }
