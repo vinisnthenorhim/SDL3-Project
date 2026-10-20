@@ -17,13 +17,19 @@ void Texture::loadTexture(const char* path, SDL_GPUCopyPass* copypass)
   int width, height, ch;
   unsigned char* imgLoad = stbi_load("../src/assets/image/player.png", &width, &height, &ch, 4);
 
-  SDL_Log("file channels = %d", ch); 
+
   
   bool hasAlpha = false;
   for (int i = 0; i < width * height; i++) {
       if (imgLoad[i * 4 + 3] < 255) { hasAlpha = true; break; }
   }
-  SDL_Log("has transparent pixels: %d", (int)hasAlpha);
+  if (ch < 4 || !hasAlpha)
+  {
+    SDL_Log("%c\n", path);
+    SDL_Log("file channels = %d", ch); 
+    SDL_Log("has transparent pixels: %d", (int)hasAlpha);
+  }
+
 
   SDL_GPUTextureCreateInfo textureInfo{};
   textureInfo.type = SDL_GPU_TEXTURETYPE_2D;
