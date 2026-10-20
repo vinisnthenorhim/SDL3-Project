@@ -8,6 +8,7 @@
 #include <window/_window.h>
 #include <renderer/_renderer.h>
 #include <game/_game.h>
+#include <camera/camera.h>
 
 
 class Engine
@@ -24,6 +25,7 @@ class Engine
     Window* window = nullptr;
     Renderer* renderer = nullptr;
     Game* game = nullptr;
+    Camera* camera = nullptr;
 
 };
 

@@ -5,7 +5,10 @@ Engine::Engine()
 {
   window = new Window();
   renderer = new Renderer(window->getWindowFirst());
-  game = new Game(*renderer, window->getWindowFirst());
+  game = new Game( window->getWindowFirst());
+  camera = new Camera(window->getWindowFirst());
+
+  renderer->dataLoad(game->readData(), game->getObjectTranform(), camera->getCameraPosition());
 }
 
 
@@ -14,6 +17,7 @@ bool Engine::event(const SDL_Event* event)
 {
   game->event(event);
   renderer->screenUpdate(event);
+  camera->cameraEvent(event);
   return window->event(event);
 }
 
@@ -21,8 +25,9 @@ bool Engine::event(const SDL_Event* event)
 
 bool Engine::render()
 {
-  game->render(*renderer);
+  game->render();
   renderer->render();
+  camera->itterate();
   return true;
 }
 
@@ -30,6 +35,8 @@ bool Engine::render()
 
 Engine::~Engine()
 {
+  delete camera;
+  camera = nullptr;
   delete game;
   game = nullptr;
   delete renderer;
