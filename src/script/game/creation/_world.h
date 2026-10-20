@@ -7,7 +7,7 @@
 
 #include <lua/LuaRuntime.h>
 
-#include <game/renderObject/enum/struct.h>
+#include <struct/struct.h>
 
 class World
 {

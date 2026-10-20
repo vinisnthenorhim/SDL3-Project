@@ -6,7 +6,7 @@
 void CameraHandle::createCameraHandle(SDL_GPUDevice* device)
 {
   this->device = device;
-  FILE* fp = fopen("../src/script/data/path/shader.json", "rb");
+  FILE* fp = fopen("../src/data/json/path/shader.json", "rb");
 
   if (!fp) return;
 

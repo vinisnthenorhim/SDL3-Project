@@ -28,7 +28,7 @@ World::World()
 
   luaRuntime.loadScript("../src/script/creation/creation.lua");
 
-  FILE* fp = fopen("../src/script/data/games/save.json", "rb");
+  FILE* fp = fopen("../src/data/json/games/save.json", "rb");
 
   if (!fp) return;
 
@@ -165,9 +165,6 @@ void World::velocityUpdate( )
     velocityY[playerId] = 0;
     dirtyVelocity[playerId] = false;
   }
-
-  // std::cout << velocityX[playerId] << '\t' << velocityY[playerId] << '\n';
-
 }
 
 

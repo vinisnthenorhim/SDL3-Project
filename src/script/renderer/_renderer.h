@@ -3,7 +3,6 @@
 
 
 #include <SDL3/SDL.h>
-#include <game/renderObject/enum/struct.h>
 #include <renderer/raii/_raii.h>
 #include <renderer/core/ObjectRender.h>
 #include <renderer/core/projection.h>

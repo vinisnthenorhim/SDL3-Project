@@ -114,7 +114,7 @@ void ObjectTransform::saveData(SDL_GPUCommandBuffer* cmd)
 
   w.EndObject();
 
-  FILE* fp = fopen("../src/script/data/games/entitydata.json", "wb");
+  FILE* fp = fopen("../src/data/json/games/entitydata.json", "wb");
   if (fp)
   {
     fwrite(buffer.GetString(), 1, buffer.GetSize(), fp);

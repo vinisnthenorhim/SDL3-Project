@@ -1,23 +1,23 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <renderer/_renderer.h>
 #include <game/creation/_world.h>
-#include <game/camera/camera.h>
 
 class Game
 {
   public:
-    Game(Renderer& renderer, SDL_Window* window);
-    void render(Renderer& renderer);
+    Game(SDL_Window* window);
+    void render();
     void event(const SDL_Event* event);
     void update();
+
+    ObjectData readData() {return world.readData();};
+    ObjectTransformData getObjectTranform() {return world.getObjectTranform();};
 
   private:
     SDL_Window* window = nullptr;
     const SDL_Event* eventH;
     World world;
-    Camera camera;
 };
 
 #endif

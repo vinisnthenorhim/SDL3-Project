@@ -1,5 +1,5 @@
 #pragma once
-#include <game/renderObject/enum/struct.h>
+#include <struct/struct.h>
 #include <renderer/raii/_raii.h>
 
 class CameraHandle

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <renderer/raii/_raii.h>
-#include <game/renderObject/enum/struct.h>
+#include <struct/struct.h>
 
 class ObjectTransform
 {
