@@ -21,6 +21,8 @@ Renderer::Renderer(SDL_Window* window)
   camera.createCameraHandle(device);
 
   objectRender.createObjectRender(window, device);
+  texture.createTexture(device);
+  texture.createSampler();
 }
 
 
@@ -65,13 +67,16 @@ void Renderer::render()
   // SDL_Log("3.5");
 
   camera.createCamera(copypass);
-  // SDL_Log("3.5");
+  // SDL_Log("3.5");/
 
   camera.updateCameraData(copypass);
   // SDL_Log("4");
   objectRender.uploadData(copypass);
 
+  texture.loadTexture("", copypass);
+
   SDL_EndGPUCopyPass(copypass);
+  texture.setBinding();
 
   objectTransform.bind(cmdBuffer);
   camera.bind(cmdBuffer, objectTransform.getPos());
@@ -90,19 +95,20 @@ void Renderer::render()
   renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
 
   // SDL_Log("7");
-  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera() );
+  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera(),  texture.getBinding() );
 
   SDL_EndGPURenderPass(renderpass);
 
   //  SDL_Log("8");
   projection.uploadProjection(cmdBuffer);
 
-  // SDL_Log("9");
+  // SDL_Log("9");/
   SDL_SubmitGPUCommandBuffer(cmdBuffer);
 
   objectTransform.release();
   objectRender.endUpdate();
   camera.releaseOld();
+  texture.release();
 
 }
 
@@ -135,6 +141,7 @@ void Renderer::saveData()
 
   camera.updateCameraData(copypass);
   objectRender.uploadData(copypass);
+  texture.loadTexture("", copypass);
 
   SDL_EndGPUCopyPass(copypass);
 
@@ -152,7 +159,7 @@ void Renderer::saveData()
 
   renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
 
-  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera() );
+  objectRender.bind( renderpass, objectTransform.getModel(), camera.getCamera(), texture.getBinding() );
 
   SDL_EndGPURenderPass(renderpass);
 
@@ -163,4 +170,5 @@ void Renderer::saveData()
   objectTransform.release();
   objectRender.endUpdate();
   camera.releaseOld();
+  texture.release();
 }

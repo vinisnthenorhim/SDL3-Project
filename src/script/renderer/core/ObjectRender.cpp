@@ -12,10 +12,10 @@ struct DefaultMeshObject
 {
     static inline std::vector<Vertex> vertex =
     {
-        {{-30.0f, -30.0f, 0.0f}, {0.0f, 0.0f}},
-        {{ 30.0f, -30.0f, 0.0f}, {1.0f, 0.0f}},
-        {{ 30.0f,  30.0f, 0.0f}, {1.0f, 1.0f}},
-        {{-30.0f,  30.0f, 0.0f}, {0.0f, 1.0f}}
+        {{-60.0f, -60.0f, 0.0f}, {0.0f, 1.0f}},
+        {{ 60.0f, -60.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 60.0f,  60.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-60.0f,  60.0f, 0.0f}, {0.0f, 0.0f}}
     };
     static inline std::vector<uint32_t> indices =
     { 0, 1, 2, 0, 2, 3};
@@ -40,8 +40,18 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
   const char* vertexShaderLocation   = shader_path["vertex"].GetString();
   const char* fragmentShaderLocation = shader_path["fragment"].GetString();
 
-  Shader vert(device, vertexShaderLocation  , SDL_GPU_SHADERSTAGE_VERTEX, 1, 2);
-  Shader frag(device, fragmentShaderLocation, SDL_GPU_SHADERSTAGE_FRAGMENT);
+  SDL_GPUShaderCreateInfo vertInfo{};
+  vertInfo.stage      = SDL_GPU_SHADERSTAGE_VERTEX;
+  vertInfo.num_uniform_buffers = 1;
+  vertInfo.num_storage_buffers = 2;
+
+  SDL_GPUShaderCreateInfo fragInfo{};
+  fragInfo.stage      =  SDL_GPU_SHADERSTAGE_FRAGMENT;
+  fragInfo.num_samplers = 1;
+
+
+  Shader vert(device, vertexShaderLocation, vertInfo);
+  Shader frag(device, fragmentShaderLocation, fragInfo);
 
   vertBuff.createBuffer(device, sizeof(Vertex) * DefaultMeshObject::vertex.size(), SDL_GPU_BUFFERUSAGE_VERTEX);
   indexBuff.createBuffer(device, sizeof(uint32_t) * DefaultMeshObject::indices.size(), SDL_GPU_BUFFERUSAGE_INDEX);
@@ -74,10 +84,28 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
   state.vertex_attributes = attributes;
   state.num_vertex_attributes = 2;
 
+  SDL_GPUColorTargetDescription colorTarget = {};
 
-  gPipeline.createGraphicPipeline(device, window, vert.shader(), frag.shader(), state);
+  colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device, window);
+  colorTarget.blend_state.enable_blend          = true;
+  colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+  colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+  colorTarget.blend_state.color_blend_op        = SDL_GPU_BLENDOP_ADD;
+  colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+  colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+  colorTarget.blend_state.alpha_blend_op        = SDL_GPU_BLENDOP_ADD;
 
-  std::cout << "[SDLGPU]"  << " Buffer created " << '\n'; 
+  SDL_GPUGraphicsPipelineCreateInfo pipelineInfo {};
+
+  pipelineInfo.primitive_type  = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+  pipelineInfo.target_info.color_target_descriptions = &colorTarget;
+  pipelineInfo.target_info.num_color_targets         = 1;
+  pipelineInfo.vertex_shader   = vert.shader();
+  pipelineInfo.fragment_shader = frag.shader();
+  pipelineInfo.vertex_input_state = state;
+
+  gPipeline.createGraphicPipeline(device, pipelineInfo);
+
 }
 
 void ObjectRender::resourceLoad(ObjectData objectData)
@@ -100,25 +128,35 @@ void ObjectRender::endUpdate()
   indexBuff.endSetData();
 }
 
-void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera)
+void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera, SDL_GPUTextureSamplerBinding textureBind)
 {
   if (visible->size() <= 0) return;
   gPipeline.bind(pass);
+  // SDL_Log("7.1");
 
   SDL_GPUBufferBinding vertexBinding{};
   vertexBinding.buffer = vertBuff.buffer();
   vertexBinding.offset = 0;
+  // SDL_Log("7.2");
 
   SDL_BindGPUVertexBuffers( pass, 0, &vertexBinding, 1 );
+  // SDL_Log("7.3");
 
   SDL_GPUBufferBinding indexBinding{};
+  // SDL_Log("7.4");
 
   indexBinding.buffer = indexBuff.buffer();
   indexBinding.offset = 0;
   SDL_BindGPUIndexBuffer(pass, &indexBinding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+  // SDL_Log("7.5");
 
   SDL_GPUBuffer* bufs[] = { model, camera };
   SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 2);
+  // SDL_Log("7.6");
+  // SDL_Log("tex=%p samp=%p", (void*)textureBind.texture, (void*)textureBind.sampler);
+
+  SDL_BindGPUFragmentSamplers(pass, 0, &textureBind, 1);
+  // SDL_Log("7.7");
 
   SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
 }

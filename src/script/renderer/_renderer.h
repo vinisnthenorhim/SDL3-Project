@@ -8,6 +8,7 @@
 #include <renderer/core/projection.h>
 #include <renderer/core/ObjectTransform.h>
 #include <renderer/core/camera.h>
+#include <texture/loader/texture.h>
 
 
 class Renderer
@@ -36,6 +37,7 @@ class Renderer
       ObjectRender    objectRender;
       Projection      projection;
       CameraHandle    camera;
+      Texture         texture;
 
 
 

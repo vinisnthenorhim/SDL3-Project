@@ -6,21 +6,9 @@
 class GraphicPipeline
 {
   public:
-  void createGraphicPipeline(SDL_GPUDevice* device, SDL_Window* window, SDL_GPUShader* vert, SDL_GPUShader* frag, SDL_GPUVertexInputState state = {} )
+  void createGraphicPipeline(SDL_GPUDevice* device, SDL_GPUGraphicsPipelineCreateInfo info )
   {
     this->device = device;
-    SDL_GPUColorTargetDescription colorTarget = {};
-
-    colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device, window);
-
-    SDL_GPUGraphicsPipelineCreateInfo info = {};
-    info.vertex_shader   = vert;
-    info.fragment_shader = frag;
-    info.vertex_input_state = state;
-    info.primitive_type  = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
-    info.target_info.color_target_descriptions = &colorTarget;
-    info.target_info.num_color_targets         = 1;
-
     pipeline = SDL_CreateGPUGraphicsPipeline(device, &info);
     CHECK(pipeline);
     if (!pipeline) {

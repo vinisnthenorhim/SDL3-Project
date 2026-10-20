@@ -6,10 +6,10 @@
 class Shader 
 {
   public:
-    Shader(SDL_GPUDevice* device, const char* base, SDL_GPUShaderStage stage, Uint32 uniBuffer = 0,  Uint32 storageBuff = 0)
+    Shader(SDL_GPUDevice* device, const char* base, SDL_GPUShaderCreateInfo &info)
     {
       this->device = device;
-      shad = loadShader( device, base, stage, uniBuffer, storageBuff);
+      shad = loadShader( device, base, info);
     }
     ~Shader()
     {
@@ -32,7 +32,7 @@ class Shader
   private:
     SDL_GPUDevice* device = nullptr;
     SDL_GPUShader* shad   = nullptr;
-    SDL_GPUShader* loadShader(SDL_GPUDevice* device, const char* base, SDL_GPUShaderStage stage, Uint32 uniBuffer, Uint32 storageBuff)
+    SDL_GPUShader* loadShader(SDL_GPUDevice* device, const char* base, SDL_GPUShaderCreateInfo &info)
     {
         // 1. ask the backend which format it accepts
         SDL_GPUShaderFormat supported = SDL_GetGPUShaderFormats(device);
@@ -59,14 +59,10 @@ class Shader
         }
 
         // 4. create the shader
-        SDL_GPUShaderCreateInfo info = {};
         info.code       = (const Uint8*)code;
         info.code_size  = size;
         info.entrypoint = entry;
         info.format     = format;
-        info.stage      = stage;
-        info.num_uniform_buffers = uniBuffer;
-        info.num_storage_buffers = storageBuff;
 
         SDL_GPUShader* shader = SDL_CreateGPUShader(device, &info);
         SDL_free(code);
