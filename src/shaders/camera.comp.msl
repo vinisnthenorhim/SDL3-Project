@@ -71,7 +71,7 @@ float4x4 scaleMatrix(thread const float4& offset)
     return float4x4(float4(offset.x, 0.0, 0.0, 0.0), float4(0.0, offset.y, 0.0, 0.0), float4(0.0, 0.0, offset.z, 0.0), float4(0.0, 0.0, 0.0, 1.0));
 }
 
-kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataBuffer& _193 [[buffer(1)]], device PositionBuffer& _171 [[buffer(2)]], device CameraPositionBuffer& _166 [[buffer(3)]], device CameraMatrixBuffer& _312 [[buffer(4)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataBuffer& _193 [[buffer(1)]], device PositionBuffer& _171 [[buffer(2)]], device CameraPositionBuffer& _166 [[buffer(3)]], device CameraMatrixBuffer& _308 [[buffer(4)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
 {
     if (gl_GlobalInvocationID.x != 0u)
     {
@@ -95,10 +95,13 @@ kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataB
     }
     else
     {
-        ((device float*)&_166.cameraPosition[1])[0u] += (_193.cameraData[3] * _154.deltaTime);
-        ((device float*)&_166.cameraPosition[1])[1u] += (_193.cameraData[4] * _154.deltaTime);
-        ((device float*)&_166.cameraPosition[1])[2u] += (_193.cameraData[5] * _154.deltaTime);
-        ((device float*)&_166.cameraPosition[1])[3u] = 1.0;
+        if (_193.cameraData[3] != 0.0)
+        {
+            ((device float*)&_166.cameraPosition[1])[0u] *= _193.cameraData[3];
+            ((device float*)&_166.cameraPosition[1])[1u] *= _193.cameraData[4];
+            ((device float*)&_166.cameraPosition[1])[2u] *= _193.cameraData[5];
+            ((device float*)&_166.cameraPosition[1])[3u] = 1.0;
+        }
         float4 newPos = float4(_193.cameraData[0] * _154.deltaTime, _193.cameraData[1] * _154.deltaTime, _193.cameraData[2] * _154.deltaTime, 1.0);
         float4 param = _166.cameraPosition[2];
         float4x4 oldRotate = rotationMatrix(param);
@@ -116,6 +119,6 @@ kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataB
     float4 param_2 = _166.cameraPosition[1];
     float4 param_3 = _166.cameraPosition[2];
     float4 param_4 = _166.cameraPosition[0];
-    _312.camera[0] = ((translationMatrix(param_1) * scaleMatrix(param_2)) * rotationMatrix(param_3)) * translationMatrix(param_4);
+    _308.camera[0] = ((translationMatrix(param_1) * scaleMatrix(param_2)) * rotationMatrix(param_3)) * translationMatrix(param_4);
 }
 
