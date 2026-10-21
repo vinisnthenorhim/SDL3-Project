@@ -1,8 +1,5 @@
+#include <loader/image/BWimage.h>
 #include "texture.h"
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG
-
-#include <stb/stb_image.h>
 
 void Texture::createTexture( SDL_GPUDevice* device )
 {
@@ -14,37 +11,23 @@ void Texture::loadTexture(const char* path, SDL_GPUCopyPass* copypass)
   if (loaded) return;
   loaded = true;
 
-  int width, height, ch;
-  unsigned char* imgLoad = stbi_load("../src/assets/image/player.png", &width, &height, &ch, 4);
-
-
-  
-  bool hasAlpha = false;
-  for (int i = 0; i < width * height; i++) {
-      if (imgLoad[i * 4 + 3] < 255) { hasAlpha = true; break; }
-  }
-  if (ch < 4 || !hasAlpha)
-  {
-    SDL_Log("%c\n", path);
-    SDL_Log("file channels = %d", ch); 
-    SDL_Log("has transparent pixels: %d", (int)hasAlpha);
-  }
-
+  BW::Image image = BW::imageLoader("../src/assets/image/atlas.png", 4);
 
   SDL_GPUTextureCreateInfo textureInfo{};
   textureInfo.type = SDL_GPU_TEXTURETYPE_2D;
   textureInfo.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
   textureInfo.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-  textureInfo.width = width;
-  textureInfo.height = height;
+  textureInfo.width = image.w;
+  textureInfo.height = image.h;
   textureInfo.layer_count_or_depth = 1;
   textureInfo.num_levels = 1;
 
-  transferBuffer.createTransferBuffer(device, width * height * 4);
+  transferBuffer.createTransferBuffer(device, image.w * image.h * 4);
 
   void* mapped = SDL_MapGPUTransferBuffer(device, transferBuffer.buffer(), false);
-  memcpy(mapped, imgLoad, width * height * 4);
+  memcpy(mapped, image.image, image.w * image.h * 4);
   SDL_UnmapGPUTransferBuffer(device, transferBuffer.buffer());
+
 
   texture = SDL_CreateGPUTexture(device, &textureInfo);
   CHECK(texture);
@@ -55,8 +38,8 @@ void Texture::loadTexture(const char* path, SDL_GPUCopyPass* copypass)
 
   SDL_GPUTextureRegion dst = {};
   dst.texture = texture;
-  dst.w = width;
-  dst.h = height;
+  dst.w = image.w;
+  dst.h = image.h;
   dst.d = 1;
 
   SDL_UploadToGPUTexture(copypass, &src, &dst, false);
