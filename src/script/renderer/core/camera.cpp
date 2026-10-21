@@ -1,21 +1,19 @@
 #include "camera.h"
-#include <fstream>
+#include <loader/BW.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 
 void CameraHandle::createCameraHandle(SDL_GPUDevice* device)
 {
   this->device = device;
-  FILE* fp = fopen("../src/data/json/path/shader.json", "rb");
+  BW::File fp = {"../src/data/json/path/shader.json", "rb"};
 
-  if (!fp) return;
 
   char buf[16384];
-  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+  rapidjson::FileReadStream is(fp.fp, buf, sizeof(buf));
 
   rapidjson::Document shader_path;
   shader_path.ParseStream(is);
-  fclose(fp);
 
   const char* shaderLocation = shader_path["camera"].GetString();
 

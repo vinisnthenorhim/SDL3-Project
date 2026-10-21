@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <loader/BW.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 
@@ -10,8 +10,9 @@ World::World()
 {
   lastFrame = SDL_GetTicksNS();
 
-  luaRuntime.registerFunction("create_object", [this](CreateEntityLayout layout){createObject(layout);});
-  luaRuntime.lua().new_usertype<CreateEntityLayout>
+
+  creationstate.set_function("create_object", [this](CreateEntityLayout layout){createObject(layout);});
+  creationstate.new_usertype<CreateEntityLayout>
   (
     "Layout",
     sol::constructors<CreateEntityLayout(), CreateEntityLayout(float, float, float, float, float, float, float, float, float)>(),
@@ -25,19 +26,16 @@ World::World()
     "rotY", &CreateEntityLayout::rotY,
     "rotZ", &CreateEntityLayout::rotZ
   );
+  BW::stateLoader(creationstate, "../src/script/creation/creation.lua");
 
-  luaRuntime.loadScript("../src/script/creation/creation.lua");
+  BW::File fp = {"../src/data/json/games/save.json", "rb"};
 
-  FILE* fp = fopen("../src/data/json/games/save.json", "rb");
-
-  if (!fp) return;
 
   char buf[65536];
-  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+  rapidjson::FileReadStream is(fp.fp, buf, sizeof(buf));
 
   rapidjson::Document load;
   load.ParseStream(is);
-  fclose(fp);
 
   if (load["load"].GetBool()) loadSaveData();
 }
@@ -72,7 +70,7 @@ void World::create(SDL_Window* window)
   const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displayID);
 
 
-  sol::protected_function function = luaRuntime.lua_function("random_location_creation");
+  sol::protected_function function = creationstate["random_location_creation"];
 
   function( mode->w, mode->h );
 }

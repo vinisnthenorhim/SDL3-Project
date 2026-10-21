@@ -1,3 +1,6 @@
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+
 #include <loader/image/BWimage.h>
 #include "texture.h"
 

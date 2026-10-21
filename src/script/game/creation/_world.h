@@ -5,7 +5,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-#include <lua/LuaRuntime.h>
+#include <loader/lua/BWlua.h>
 
 #include <struct/struct.h>
 
@@ -23,7 +23,7 @@ class World
     void secondPerFrame();
 
   private:
-    LuaRuntime luaRuntime;
+    sol::state creationstate = nullptr;
 
     float lastFrame;
     float secondFrame;

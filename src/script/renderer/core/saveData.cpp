@@ -1,10 +1,7 @@
-#include <rapidjson/document.h>
-#include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/prettywriter.h>
-#include <rapidjson/filewritestream.h>
 #include <rapidjson/stringbuffer.h>
 #include <cstdio>
-#include <fstream>
+#include <loader/BW.h>
 
 #include "objectTransform.h"
 
@@ -113,12 +110,10 @@ void ObjectTransform::saveData(SDL_GPUCommandBuffer* cmd)
   w.EndObject();
 
   w.EndObject();
-
-  FILE* fp = fopen("../src/data/json/games/entitydata.json", "wb");
-  if (fp)
+  BW::File fp = {"../src/data/json/games/entitydata.json", "wb"};
+  if (fp.fp)
   {
-    fwrite(buffer.GetString(), 1, buffer.GetSize(), fp);
-    fclose(fp);
+    fwrite(buffer.GetString(), 1, buffer.GetSize(), fp.fp);
   }
 
   SDL_UnmapGPUTransferBuffer(device, savePositionTransfer.buffer());
