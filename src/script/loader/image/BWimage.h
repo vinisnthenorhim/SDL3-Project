@@ -19,7 +19,7 @@ namespace BW
     }
 
   };
-  Image imageLoader(const char* path, uint32_t channel)
+  inline Image imageLoader(const char* path, uint32_t channel)
   {
     int width, height, ch;
 
