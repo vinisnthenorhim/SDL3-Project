@@ -136,7 +136,7 @@ bool Camera::cameraZoom()
   else if (!zoomIn && zoomOut ) zoomSpeed = 0.98;
   else if (!zoomIn && !zoomOut) zoomSpeed = 1.0;
 
-  if ((zoomSpeed != 1) && ( positionX[1] * zoomSpeed >= 0.2 || positionY[1] * zoomSpeed >= 0.2 || positionZ[1] * zoomSpeed >= 0.2) && ( positionX[1] * zoomSpeed <= 1.8 || positionY[1] * zoomSpeed <= 1.8 || positionZ[1] * zoomSpeed <= 1.8))
+  if ((zoomSpeed != 1) && ( positionX[1] * zoomSpeed >= 0.2 || positionY[1] * zoomSpeed >= 0.2 || positionZ[1] * zoomSpeed >= 0.2) && ( positionX[1] * zoomSpeed <= 10.0 || positionY[1] * zoomSpeed <= 10.0 || positionZ[1] * zoomSpeed <= 10.0))
   {
     updateDataX[1] = zoomSpeed;
     updateDataY[1] = zoomSpeed;
