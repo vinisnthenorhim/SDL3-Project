@@ -125,7 +125,8 @@ void ObjectRender::endUpdate()
   indexBuff.endSetData();
 }
 
-void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera, SDL_GPUTextureSamplerBinding textureBind)
+
+void ObjectRender::startBind(SDL_GPURenderPass* pass)
 {
   if (visible->size() <= 0) return;
   gPipeline.bind(pass);
@@ -145,15 +146,9 @@ void ObjectRender::bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUB
   indexBinding.buffer = indexBuff.buffer();
   indexBinding.offset = 0;
   SDL_BindGPUIndexBuffer(pass, &indexBinding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-  // SDL_Log("7.5");
-
-  SDL_GPUBuffer* bufs[] = { model, camera };
-  SDL_BindGPUVertexStorageBuffers( pass, 0, bufs, 2);
-  // SDL_Log("7.6");
-  // SDL_Log("tex=%p samp=%p", (void*)textureBind.texture, (void*)textureBind.sampler);
-
-  SDL_BindGPUFragmentSamplers(pass, 0, &textureBind, 1);
-  // SDL_Log("7.7");
-
+}
+void ObjectRender::endBind(SDL_GPURenderPass* pass)
+{
+  if (visible->size() <= 0) return;
   SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
 }

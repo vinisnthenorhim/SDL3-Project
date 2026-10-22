@@ -10,7 +10,8 @@ class ObjectRender
     void resourceLoad(ObjectData objectData);
     void uploadData(SDL_GPUCopyPass* copy);
     void endUpdate();
-    void bind( SDL_GPURenderPass* pass, SDL_GPUBuffer* model, SDL_GPUBuffer* camera, SDL_GPUTextureSamplerBinding textureBind);
+    void startBind(SDL_GPURenderPass* pass);
+    void endBind(SDL_GPURenderPass* pass);
 
   private:
     SDL_GPUDevice* device = nullptr;
