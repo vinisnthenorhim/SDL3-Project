@@ -1,0 +1,12 @@
+{
+  "location" : "../src/assets/image/atlas.png",
+  "dimension" : {
+    "w" : 120.0,
+    "h" : 120.0
+  },
+  "image" : [
+    {"type" : "player"    , "w" : 60.0, "h" : 60.0, "x" :  0.0, "y" : 0.0 },
+    {"type" : "enemy"     , "w" : 60.0, "h" : 60.0, "x" :  0.0, "y" : 60.0},
+    {"type" : "projectile", "w" : 60.0, "h" : 60.0, "x" : 60.0, "y" : 0.0 }
+  ]
+}
