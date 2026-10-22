@@ -9,6 +9,7 @@
 World::World()
 {
   lastFrame = SDL_GetTicksNS();
+  entityId = entity.getTypeIDs();
 
 
   creationstate.set_function("create_object", [this](CreateEntityLayout layout){createObject(layout);});
@@ -38,22 +39,27 @@ World::World()
   load.ParseStream(is);
 
   if (load["load"].GetBool()) loadSaveData();
+
 }
 
 void World::loadSaveData()
 {
-  FILE* fp = fopen("../src/script/data/games/entitydata.json", "rb");
+  
+  BW::File fp = {"../src/data/json/games/entitydata.json", "rb"};
 
-  if (!fp) return;
 
   char buf[65536];
-  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+  rapidjson::FileReadStream is(fp.fp, buf, sizeof(buf));
 
   rapidjson::Document doc;
   doc.ParseStream(is);
-  fclose(fp);
 
-  if (!doc.HasMember("position") || !doc["position"].IsObject() || !doc.HasMember("scale") || !doc["scale"].IsObject() || !doc.HasMember("rotation") || !doc["rotation"].IsObject()) return;
+  if (!doc.HasMember("position") || !doc["position"].IsObject() || !doc.HasMember("scale") || !doc["scale"].IsObject() || !doc.HasMember("rotation") || !doc["rotation"].IsObject()) 
+  {
+
+    return;
+  }
+
   const auto& pos = doc["position"];
   const auto& scl = doc["scale"];
   const auto& rot = doc["rotation"];
@@ -77,6 +83,7 @@ void World::create(SDL_Window* window)
 
 void World::createObject(CreateEntityLayout layout)
 {
+  type.push_back(entityId->at("player"));
   
   dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
 
@@ -98,7 +105,7 @@ void World::createObject(CreateEntityLayout layout)
   visible.push_back(true)   ;
   exist.push_back(true)     ;
 
-  std::cout << "Object No: " << visible.size() << '\n';
+  std::cout << "Object No: " << visible.size() << " entity type: " << '\n';
 }
 void World::secondPerFrame()
 {
@@ -170,6 +177,7 @@ ObjectData World::readData()
 { 
   return 
   { 
+    &type,
     &visible,
     &speedX, 
     &speedY,

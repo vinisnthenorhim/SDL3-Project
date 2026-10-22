@@ -8,7 +8,7 @@
 #include <loader/lua/BWlua.h>
 
 #include <struct/struct.h>
-
+#include <game/entity/entity.h>
 class World
 {
   public:
@@ -23,6 +23,9 @@ class World
     void secondPerFrame();
 
   private:
+    Entity entity;
+    typeIDsData entityId;
+
     sol::state creationstate = nullptr;
 
     float lastFrame;
@@ -33,7 +36,7 @@ class World
 
     float holdtime = 0.0f;
 
-
+    std::vector<int>   type         ;
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
     std::vector<float> positionZ    ;
