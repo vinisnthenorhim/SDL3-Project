@@ -353,3 +353,11 @@ void ObjectTransform::release()
   scalTrans       .release();
   rotaTrans       .release();
 }
+
+void ObjectTransform::bindG(SDL_GPURenderPass* pass, uint32_t slot)
+{
+  if (visible->size() <= 0) return;
+  SDL_GPUBuffer* bufs[] = { modelBuffer.buffer() };
+
+  SDL_BindGPUVertexStorageBuffers( pass, slot, bufs, 1);
+}

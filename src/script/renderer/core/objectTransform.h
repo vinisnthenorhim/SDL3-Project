@@ -53,6 +53,7 @@ class ObjectTransform
     void updateDataSize( SDL_GPUCopyPass* copypass);
     void updateTransform( SDL_GPUCopyPass* copypass);
     void bind( SDL_GPUCommandBuffer* cmd);
+    void bindG(SDL_GPURenderPass* pass, uint32_t slot);
     void saveData(SDL_GPUCommandBuffer* cmd);
     void release();
     SDL_GPUBuffer* getModel() { return modelBuffer.buffer(); }

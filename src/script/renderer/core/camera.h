@@ -43,6 +43,7 @@ class CameraHandle
     void followEntity( SDL_GPUCopyPass* copypass );
     void releaseOld();
     void bind(SDL_GPUCommandBuffer* cmd,  SDL_GPUBuffer* position);
+    void bindG(SDL_GPURenderPass* pass, uint32_t slot);
 
     SDL_GPUBuffer* getCamera() { return cameraMatrice.buffer(); }
 };

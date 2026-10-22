@@ -233,3 +233,11 @@ void CameraHandle::releaseOld()
   positionTransfer.release();
   posUpdateTransfer.release();
 }
+
+void CameraHandle::bindG(SDL_GPURenderPass* pass, uint32_t slot)
+{
+  if (positionX->size() <= 0) return;
+  SDL_GPUBuffer* bufs[] = { cameraMatrice.buffer()};
+
+  SDL_BindGPUVertexStorageBuffers( pass, slot, bufs, 1);
+}
