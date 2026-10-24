@@ -1,10 +1,13 @@
 #pragma once
 #include <iostream>
+#include <string>
+#include <unordered_map>
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
 struct ObjectData
 {
+  std::vector<int>*   type         ;
   const std::vector<bool>* visible;
 
   const std::vector<float>* speedX       ;
@@ -77,3 +80,5 @@ struct RotateAxis
   SDL_Scancode counterclockwise;
   SDL_Scancode clockwise;
 };
+
+typedef const std::unordered_map<std::string, int>* typeIDsData;
