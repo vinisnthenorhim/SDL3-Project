@@ -104,7 +104,7 @@ void Texture::updateTextureIdBUffer( SDL_GPUCopyPass* copypass )
 
   Uint32 currentCount = type->size();
   Uint32 difference = currentCount - lastCount;
-  Uint32 offset = currentCount * sizeof(int);
+  Uint32 offset = lastCount * sizeof(int);
   std::vector<int> tempIdUpload{};
 
   for (int a = lastCount; a < currentCount; a++)
@@ -115,7 +115,7 @@ void Texture::updateTextureIdBUffer( SDL_GPUCopyPass* copypass )
   if (!textureIDBuffer.buffer()) textureIDBuffer.createBuffer(device, sizeof(int) * currentCount, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
   else textureIDBuffer.updateBufferSize(copypass, sizeof(int) * currentCount, true);
 
-  if( tempIdUpload.empty())
+  if( !tempIdUpload.empty())
   {
     lastCount = currentCount;
     transferBuffer.createTransferBuffer(device, difference * sizeof(int) );
@@ -133,6 +133,7 @@ void Texture::updateTextureIdBUffer( SDL_GPUCopyPass* copypass )
     posdst.size   = difference * sizeof(int);
     SDL_UploadToGPUBuffer(copypass, &possrc, &posdst, false);
   }
+  lastCount = currentCount;
 }
 
 
