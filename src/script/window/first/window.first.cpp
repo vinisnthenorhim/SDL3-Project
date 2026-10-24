@@ -11,7 +11,7 @@ bool WindowF::create(const char* title)
     if (!SDL_Init(SDL_INIT_VIDEO)) return false;
 
 
-    window = SDL_CreateWindow(title, 800, 450, SDL_WINDOW_RESIZABLE );
+    window = SDL_CreateWindow(title, 800, 450, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
     CHECK(window);
     installCustomFrame(window);
     SDL_SetWindowAspectRatio(window, 16.0 / 10.0f, 16.0 / 9.0f);
