@@ -18,6 +18,16 @@ struct ModelMatrixBuffer
     float4x4 modelMat[1];
 };
 
+struct TextureId
+{
+    int textureID[1];
+};
+
+struct UVLayout
+{
+    float4 UVlayout[1];
+};
+
 struct main0_out
 {
     float2 fragUV [[user(locn0)]];
@@ -30,12 +40,14 @@ struct main0_in
     float2 uv [[attribute(1)]];
 };
 
-vertex main0_out main0(main0_in in [[stage_in]], constant Projection& _25 [[buffer(0)]], const device ModelMatrixBuffer& _39 [[buffer(1)]], const device CameraMatrixBuffer& _32 [[buffer(2)]], uint gl_InstanceIndex [[instance_id]])
+vertex main0_out main0(main0_in in [[stage_in]], constant Projection& _25 [[buffer(0)]], const device ModelMatrixBuffer& _39 [[buffer(1)]], const device CameraMatrixBuffer& _32 [[buffer(2)]], const device UVLayout& _71 [[buffer(3)]], const device TextureId& _60 [[buffer(4)]], uint gl_InstanceIndex [[instance_id]])
 {
     main0_out out = {};
     uint entityIndex = uint(int(gl_InstanceIndex));
     out.gl_Position = ((_25.projection * _32.camera[0]) * _39.modelMat[entityIndex]) * float4(in.position, 1.0);
-    out.fragUV = in.uv;
+    uint tex = uint(_60.textureID[entityIndex]);
+    float4 rect = _71.UVlayout[tex];
+    out.fragUV = rect.xy + (in.uv * rect.zw);
     return out;
 }
 
