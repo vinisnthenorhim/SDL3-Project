@@ -40,7 +40,7 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
   SDL_GPUShaderCreateInfo vertInfo{};
   vertInfo.stage      = SDL_GPU_SHADERSTAGE_VERTEX;
   vertInfo.num_uniform_buffers = 1;
-  vertInfo.num_storage_buffers = 2;
+  vertInfo.num_storage_buffers = 4;
 
   SDL_GPUShaderCreateInfo fragInfo{};
   fragInfo.stage      =  SDL_GPU_SHADERSTAGE_FRAGMENT;
@@ -130,18 +130,14 @@ void ObjectRender::startBind(SDL_GPURenderPass* pass)
 {
   if (visible->size() <= 0) return;
   gPipeline.bind(pass);
-  // SDL_Log("7.1");
 
   SDL_GPUBufferBinding vertexBinding{};
   vertexBinding.buffer = vertBuff.buffer();
   vertexBinding.offset = 0;
-  // SDL_Log("7.2");
 
   SDL_BindGPUVertexBuffers( pass, 0, &vertexBinding, 1 );
-  // SDL_Log("7.3");
 
   SDL_GPUBufferBinding indexBinding{};
-  // SDL_Log("7.4");
 
   indexBinding.buffer = indexBuff.buffer();
   indexBinding.offset = 0;
