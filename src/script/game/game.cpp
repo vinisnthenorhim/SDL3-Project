@@ -33,4 +33,12 @@ void Game::event( const SDL_Event* event)
   {
     chase = !chase;
   }
+  if (event->key.key == SDLK_Y && !event->key.repeat && event->type == SDL_EVENT_KEY_DOWN)
+  {
+    (*world.getMovementData().speedX)[(*world.readData().playerId)] = 300.0f;
+    (*world.getMovementData().speedY)[(*world.readData().playerId)] = 300.0f;
+    (*world.readData().playerId)++;
+    (*world.getMovementData().speedX)[(*world.readData().playerId)] = 500.0f;
+    (*world.getMovementData().speedY)[(*world.readData().playerId)] = 500.0f;
+  }
 }
