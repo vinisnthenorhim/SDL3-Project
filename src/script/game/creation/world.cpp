@@ -79,11 +79,12 @@ void World::create(SDL_Window* window)
   sol::protected_function function = creationstate["random_location_creation"];
 
   function( mode->w, mode->h );
+  // createObject({0});
 }
 
 void World::createObject(CreateEntityLayout layout)
 {
-  type.push_back(entityId->at("player"));
+  type.push_back(entityId->at("projectile"));
   
   dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
 
@@ -99,13 +100,22 @@ void World::createObject(CreateEntityLayout layout)
 
   rotateX  .push_back(0.0f) ; rotateY  .push_back(0.0f) ; rotateZ  .push_back(0.0f)  ;
 
-  speedX.push_back(500.0f)  ;
-  speedY.push_back(500.0f)  ;
+  if (speedX.size() == 0)
+  {
+    speedX.push_back(500.0f)  ;
+    speedY.push_back(500.0f)  ;
+  }
+  else
+  {
+    speedX.push_back(300.0f)  ;
+    speedY.push_back(300.0f)  ;
+  }
+
 
   visible.push_back(true)   ;
   exist.push_back(true)     ;
 
-  std::cout << "Object No: " << visible.size() << " entity type: " << '\n';
+  std::cout << "Object No: " << visible.size() << " entity type: " << type[visible.size()-1]<< '\n';
 }
 void World::secondPerFrame()
 {
@@ -162,6 +172,7 @@ void World::velocityUpdate( )
     velocityX[playerId] = dirX;
     velocityY[playerId] = dirY;
 
+
     dirtyVelocity[playerId] = true;
   }
   else
@@ -170,46 +181,4 @@ void World::velocityUpdate( )
     velocityY[playerId] = 0;
     dirtyVelocity[playerId] = false;
   }
-}
-
-
-ObjectData World::readData()  
-{ 
-  return 
-  { 
-    &type,
-    &visible,
-    &speedX, 
-    &speedY,
-    &positionX,
-    &positionY,
-    &positionZ,
-    &scalingX,
-    &scalingY,
-    &scalingZ,    
-    &rotationX,
-    &rotationY,
-    &rotationZ,
-  }; 
-}; 
-
-
-ObjectTransformData World::getObjectTranform()
-{
-  return
-  {
-    &secondFrame,
-    &dirtyVelocity,
-    &velocityX,
-    &velocityY,
-    &velocityZ,
-    &dirtyScale,
-    &scaleY,
-    &scaleZ,
-    &scaleX,
-    &dirtyRotate,
-    &rotateX,
-    &rotateY,
-    &rotateZ
-  };
 }
