@@ -130,7 +130,6 @@ void World::secondPerFrame()
 void World::velocityUpdate( )
 {
   if (visible.size() <= 0) return;
-  int playerId = 0; 
 
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
@@ -163,23 +162,23 @@ void World::velocityUpdate( )
   const float newVelocityX = length > 0 ? axisX / length : 0.0f;
   const float newVelocityY = length > 0 ? axisY / length : 0.0f;
 
-  const float dirX = newVelocityX * speedX[playerId];
-  const float dirY = newVelocityY * speedY[playerId];
+  const float dirX = newVelocityX * speedX[playerID];
+  const float dirY = newVelocityY * speedY[playerID];
 
 
-  if (velocityX[playerId] != newVelocityX || velocityY[playerId] != newVelocityY || velocityX[playerId] != 0 || velocityY[playerId] != 0)
+  if (velocityX[playerID] != newVelocityX || velocityY[playerID] != newVelocityY || velocityX[playerID] != 0 || velocityY[playerID] != 0)
   {
-    velocityX[playerId] = dirX;
-    velocityY[playerId] = dirY;
+    velocityX[playerID] = dirX;
+    velocityY[playerID] = dirY;
 
 
-    dirtyVelocity[playerId] = true;
+    dirtyVelocity[playerID] = true;
   }
   else
   {
-    velocityX[playerId] = 0;
-    velocityY[playerId] = 0;
-    dirtyVelocity[playerId] = false;
+    velocityX[playerID] = 0;
+    velocityY[playerID] = 0;
+    dirtyVelocity[playerID] = false;
   }
 }
 
