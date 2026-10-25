@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <game/creation/_world.h>
+#include <logic/movement/movement.h>
 
 class Game
 {
@@ -18,6 +19,7 @@ class Game
     SDL_Window* window = nullptr;
     const SDL_Event* eventH;
     World world;
+    Movement movement;
 };
 
 #endif

@@ -3,6 +3,7 @@
 Game::Game( SDL_Window* window)
 {
   this->window = window;
+  movement.loadData(world.getMovementData());
 }
 
 void Game::render()
@@ -10,6 +11,8 @@ void Game::render()
 
   world.secondPerFrame();
   world.velocityUpdate();
+  movement.move({},{}, 0, 0);
+  movement.ren();
 
 
 }
