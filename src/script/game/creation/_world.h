@@ -15,6 +15,7 @@ class World
     World();
     ObjectData readData();
     ObjectTransformData getObjectTranform();
+    MovementStructData getMovementData();
     void loadSaveData();
     void createObject(CreateEntityLayout layout);
     void velocityUpdate();
