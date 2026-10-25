@@ -1,21 +1,19 @@
 #include "camera.h"
 #include <cmath>
-#include <fstream>
+#include <loader/BW.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 Camera::Camera(SDL_Window* window)
 {
   this->window = window;
-  FILE* fp = fopen("../src/data/json/settings/camera.json", "rb");
-
-  if (!fp) return;
+  BW::File fp = {"../src/data/json/settings/camera.json", "rb"};
 
   char buf[16384];
-  rapidjson::FileReadStream is(fp, buf, sizeof(buf));
+  rapidjson::FileReadStream is(fp.fp, buf, sizeof(buf));
 
   rapidjson::Document camera_path;
   camera_path.ParseStream(is);
-  fclose(fp);
+  
   camera_enable = camera_path["camera"].GetBool();
   if (!camera_enable) return;
   up    = SDL_GetScancodeFromName(camera_path["camera_movement"]["up"]   .GetString());
