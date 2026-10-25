@@ -273,7 +273,6 @@ Position Camera::getCameraPosition()
   return
   {
     &followPlayer,
-    &playerId,
     &delta,
     &dirty,
     &updateDataX,

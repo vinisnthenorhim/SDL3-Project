@@ -37,7 +37,6 @@ class Camera
     float delta = 0;
 
     Uint32 followPlayer = 1u;
-    Uint32 playerId = 0;
     bool dirty = false;
   public:
     Camera( SDL_Window* windowv);
