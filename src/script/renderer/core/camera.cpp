@@ -44,7 +44,7 @@ void CameraHandle::loadData(ObjectData objectData, Position cameraPosition)
   this->positionZ = objectData.positionZ    ;
 
   this->follow   = cameraPosition.follow  ;
-  this->entityId = cameraPosition.entityID;
+  this->entityId = objectData.playerId;
   this->deltaTime = cameraPosition.deltaTime;
   this->dirty = cameraPosition.dirty;
 

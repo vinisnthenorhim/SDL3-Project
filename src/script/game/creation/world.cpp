@@ -182,3 +182,28 @@ void World::velocityUpdate( )
     dirtyVelocity[playerId] = false;
   }
 }
+
+void World::updateData()
+{
+  for (int a = 0; a < visible.size(); a++)
+  {
+    if (dirtyVelocity[a] == true)
+    {
+      positionX[a] += velocityX[a] * secondFrame;
+      positionY[a] += velocityY[a] * secondFrame;
+      positionZ[a] += velocityZ[a] * secondFrame;
+    }
+    if (dirtyScale[a] == true)
+    {
+      scalingX[a] += scaleX[a] * secondFrame;
+      scalingY[a] += scaleY[a] * secondFrame;
+      scalingZ[a] += scaleZ[a] * secondFrame;
+    }
+    if (dirtyRotate[a] == true)
+    {
+      rotationX[a] += rotateX[a] * secondFrame;
+      rotationY[a] += rotateY[a] * secondFrame;
+      rotationZ[a] += rotateZ[a] * secondFrame;
+    }
+  }
+}

@@ -18,13 +18,12 @@ class Movement
     std::vector<float> *speedX       ;
     std::vector<float> *speedY       ;
 
-    int playerId = 0;
+    uint32_t* playerId;
     bool moveit = false;
     int itterate = 8;
     int step = 0;
   public:
 
     void loadData(MovementStructData data);
-    void ren();
-    void move(std::vector<float> curPos, std::vector<float> nowPos, float playPosX, float playPosy);
+    void move(std::vector<float> curPos, std::vector<float> nowPos, float playPosX, float playPosy, bool nn = false);
 };

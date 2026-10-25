@@ -1,13 +1,35 @@
 #include "movement.h"
 #include <iostream>
 
-void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float playPosX, float playPosy)
+void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float playPosX, float playPosy, bool nn)
 {
-  if (dirtyVelocity->size() <= 0) return;
-  for ( int a = 1; a < dirtyVelocity->size(); a++)
+  if (nn)
   {
-    float dx = (*positionX)[playerId] - (*positionX)[a];
-    float dy = (*positionY)[playerId] - (*positionY)[a];
+    for ( int a = 0; a < dirtyVelocity->size(); a++)
+    {
+      if (a == *playerId) continue;
+
+      if ((*velocityX)[a] != 0 || (*velocityY)[a] != 0)
+      {
+        (*velocityX)[a] = 0;
+        (*velocityY)[a] = 0;
+
+        (*dirtyVelocity)[a] = true;
+      }
+      else 
+      {
+        (*dirtyVelocity)[a] = false;
+      } 
+    }
+    return;
+  }
+  if (dirtyVelocity->size() <= 0) return;
+  for ( int a = 0; a < dirtyVelocity->size(); a++)
+  {
+    if (a == *playerId) continue;
+
+    float dx = (*positionX)[*playerId] - (*positionX)[a];
+    float dy = (*positionY)[*playerId] - (*positionY)[a];
     if (!( fabsf(dx) < 1.0f && fabsf(dy) < 1.0f ))
     {
       const float length = std::sqrt(float( dx * dx + dy * dy));
@@ -36,21 +58,11 @@ void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float 
     }
   }
 }
-void Movement::ren()
-{
-  for (int a = 0; a < dirtyVelocity->size(); a++)
-  {
-    if ((*dirtyVelocity)[a] == true)
-    {
-      (*positionX)[a] += (*velocityX)[a] * *deltaTime;
-      (*positionY)[a] += (*velocityY)[a] * *deltaTime;
-      (*positionZ)[a] += (*velocityZ)[a] * *deltaTime;
-    }
-  }
-}
+
 
 void Movement::loadData(MovementStructData data)
 {
+  this->playerId      = data.playerID ;
   this->deltaTime     = data.deltaTime;
   this->positionX     = data.positionX;
   this->positionY     = data.positionY;

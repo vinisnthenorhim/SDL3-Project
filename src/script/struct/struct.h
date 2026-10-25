@@ -7,6 +7,7 @@
 
 struct ObjectData
 {
+  uint32_t* playerId;
   std::vector<int>*   type         ;
   const std::vector<bool>* visible;
 
@@ -49,7 +50,6 @@ struct ObjectTransformData
 struct Position
 {
   Uint32*  follow;
-  Uint32*  entityID;
   float*   deltaTime;
   bool*    dirty;
   std::array<float, 4>* updateDataX ;
@@ -82,6 +82,7 @@ struct RotateAxis
 };
 struct MovementStructData
 {
+  uint32_t* playerID;
   float* deltaTime;
 
   std::vector<float> *positionX    ;
@@ -94,7 +95,7 @@ struct MovementStructData
   std::vector<float> *velocityZ    ;
 
   std::vector<float> *speedX       ;
-    std::vector<float> *speedY       ; 
+  std::vector<float> *speedY       ; 
 };
 
 

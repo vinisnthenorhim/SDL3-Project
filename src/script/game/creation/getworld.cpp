@@ -6,6 +6,7 @@ ObjectData World::readData()
 { 
   return 
   { 
+    &playerID,
     &type,
     &visible,
     &speedX, 
@@ -47,6 +48,7 @@ MovementStructData World::getMovementData()
 {
   return
   {
+    &playerID     ,
     &secondFrame  ,
     &positionX    ,
     &positionY    ,

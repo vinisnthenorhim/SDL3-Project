@@ -20,6 +20,8 @@ class Game
     const SDL_Event* eventH;
     World world;
     Movement movement;
+
+    bool chase = false;
 };
 
 #endif

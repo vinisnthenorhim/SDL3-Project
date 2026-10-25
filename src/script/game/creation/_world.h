@@ -19,6 +19,7 @@ class World
     void loadSaveData();
     void createObject(CreateEntityLayout layout);
     void velocityUpdate();
+    void updateData();
     void create(SDL_Window* window);
 
     void secondPerFrame();
@@ -36,6 +37,8 @@ class World
     int8_t lastAxisY = 0;
 
     float holdtime = 0.0f;
+
+    uint32_t playerID = 0;
 
     std::vector<int>   type         ;
     std::vector<float> positionX    ;
