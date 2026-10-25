@@ -80,5 +80,22 @@ struct RotateAxis
   SDL_Scancode counterclockwise;
   SDL_Scancode clockwise;
 };
+struct MovementStructData
+{
+  float* deltaTime;
+
+  std::vector<float> *positionX    ;
+  std::vector<float> *positionY    ;
+  std::vector<float> *positionZ    ;
+
+  std::vector<bool>  *dirtyVelocity;
+  std::vector<float> *velocityX    ;
+  std::vector<float> *velocityY    ;
+  std::vector<float> *velocityZ    ;
+
+  std::vector<float> *speedX       ;
+    std::vector<float> *speedY       ; 
+};
+
 
 typedef const std::unordered_map<std::string, int>* typeIDsData;
