@@ -23,8 +23,4 @@ Entity::Entity()
   {
     typeIDs.emplace(name["type"].GetString(), entityIdCount++);
   }
-  for (const auto& [key, value] : typeIDs)
-  {
-    std::cout << key << " -> " << value << '\n';
-  }
 }
