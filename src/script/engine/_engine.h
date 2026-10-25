@@ -3,8 +3,6 @@
 
 #include <SDL3/SDL.h>
 
-
-
 #include <window/_window.h>
 #include <renderer/_renderer.h>
 #include <game/_game.h>
