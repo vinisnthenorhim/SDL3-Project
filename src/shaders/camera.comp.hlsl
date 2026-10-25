@@ -9,8 +9,8 @@ cbuffer UniFormBuffer : register(b0, space2)
 
 RWByteAddressBuffer _166 : register(u0, space1);
 ByteAddressBuffer _171 : register(t1, space0);
-ByteAddressBuffer _193 : register(t0, space0);
-RWByteAddressBuffer _308 : register(u1, space1);
+ByteAddressBuffer _194 : register(t0, space0);
+RWByteAddressBuffer _309 : register(u1, space1);
 
 static uint3 gl_GlobalInvocationID;
 struct SPIRV_Cross_Input
@@ -61,50 +61,50 @@ void main_inner()
     if (_154_follow != 0u)
     {
         _166.Store4(0, asuint(asfloat(_171.Load4(_154_entityId * 16 + 0))));
-        _166.Store(16, asuint(1.0f));
-        _166.Store(20, asuint(1.0f));
-        _166.Store(24, asuint(1.0f));
+        _166.Store(16, asuint(0.60000002384185791015625f));
+        _166.Store(20, asuint(0.60000002384185791015625f));
+        _166.Store(24, asuint(0.60000002384185791015625f));
         _166.Store(28, asuint(1.0f));
         _166.Store(32, asuint(0.0f));
         _166.Store(36, asuint(0.0f));
         _166.Store(40, asuint(0.0f));
         _166.Store(44, asuint(0.0f));
-        _166.Store(48, asuint(asfloat(_193.Load(36))));
-        _166.Store(52, asuint(asfloat(_193.Load(40))));
-        _166.Store(56, asuint(asfloat(_193.Load(44))));
+        _166.Store(48, asuint(asfloat(_194.Load(36))));
+        _166.Store(52, asuint(asfloat(_194.Load(40))));
+        _166.Store(56, asuint(asfloat(_194.Load(44))));
         _166.Store(60, asuint(1.0f));
     }
     else
     {
-        if (asfloat(_193.Load(12)) != 0.0f)
+        if (asfloat(_194.Load(12)) != 0.0f)
         {
-            _166.Store(16, asuint(asfloat(_166.Load(16)) * asfloat(_193.Load(12))));
-            _166.Store(20, asuint(asfloat(_166.Load(20)) * asfloat(_193.Load(16))));
-            _166.Store(24, asuint(asfloat(_166.Load(24)) * asfloat(_193.Load(20))));
+            _166.Store(16, asuint(asfloat(_166.Load(16)) * asfloat(_194.Load(12))));
+            _166.Store(20, asuint(asfloat(_166.Load(20)) * asfloat(_194.Load(16))));
+            _166.Store(24, asuint(asfloat(_166.Load(24)) * asfloat(_194.Load(20))));
             _166.Store(28, asuint(1.0f));
         }
-        float4 newPos = float4(asfloat(_193.Load(0)) * _154_deltaTime, asfloat(_193.Load(4)) * _154_deltaTime, asfloat(_193.Load(8)) * _154_deltaTime, 1.0f);
+        float4 newPos = float4(asfloat(_194.Load(0)) * _154_deltaTime, asfloat(_194.Load(4)) * _154_deltaTime, asfloat(_194.Load(8)) * _154_deltaTime, 1.0f);
         float4 param = asfloat(_166.Load4(32));
         float4x4 oldRotate = rotationMatrix(param);
         _166.Store4(0, asuint(asfloat(_166.Load4(0)) + mul(newPos, transpose(oldRotate))));
-        _166.Store(32, asuint(asfloat(_166.Load(32)) + (asfloat(_193.Load(24)) * _154_deltaTime)));
-        _166.Store(36, asuint(asfloat(_166.Load(36)) + (asfloat(_193.Load(28)) * _154_deltaTime)));
-        _166.Store(40, asuint(asfloat(_166.Load(40)) + (asfloat(_193.Load(32)) * _154_deltaTime)));
+        _166.Store(32, asuint(asfloat(_166.Load(32)) + (asfloat(_194.Load(24)) * _154_deltaTime)));
+        _166.Store(36, asuint(asfloat(_166.Load(36)) + (asfloat(_194.Load(28)) * _154_deltaTime)));
+        _166.Store(40, asuint(asfloat(_166.Load(40)) + (asfloat(_194.Load(32)) * _154_deltaTime)));
         _166.Store(44, asuint(0.0f));
-        _166.Store(48, asuint(asfloat(_193.Load(36))));
-        _166.Store(52, asuint(asfloat(_193.Load(40))));
-        _166.Store(56, asuint(asfloat(_193.Load(44))));
+        _166.Store(48, asuint(asfloat(_194.Load(36))));
+        _166.Store(52, asuint(asfloat(_194.Load(40))));
+        _166.Store(56, asuint(asfloat(_194.Load(44))));
         _166.Store(60, asuint(1.0f));
     }
     float4 param_1 = asfloat(_166.Load4(48));
     float4 param_2 = asfloat(_166.Load4(16));
     float4 param_3 = asfloat(_166.Load4(32));
     float4 param_4 = asfloat(_166.Load4(0));
-    float4x4 _327 = mul(translationMatrix(param_4), mul(rotationMatrix(param_3), mul(scaleMatrix(param_2), translationMatrix(param_1))));
-    _308.Store4(0, asuint(_327[0]));
-    _308.Store4(16, asuint(_327[1]));
-    _308.Store4(32, asuint(_327[2]));
-    _308.Store4(48, asuint(_327[3]));
+    float4x4 _328 = mul(translationMatrix(param_4), mul(rotationMatrix(param_3), mul(scaleMatrix(param_2), translationMatrix(param_1))));
+    _309.Store4(0, asuint(_328[0]));
+    _309.Store4(16, asuint(_328[1]));
+    _309.Store4(32, asuint(_328[2]));
+    _309.Store4(48, asuint(_328[3]));
 }
 
 [numthreads(1, 1, 1)]
