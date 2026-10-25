@@ -6,10 +6,10 @@ class Device
 {
 
   public:
-    void createDevice(SDL_Window* window, SDL_GPUShaderFormat format)
+    void createDevice(SDL_Window* window, bool debug, SDL_GPUShaderFormat format)
     {
       this->window = window;
-      device = SDL_CreateGPUDevice(format  , true, nullptr);
+      device = SDL_CreateGPUDevice(format , debug, nullptr);
       CHECK(device);
       CHECK(SDL_ClaimWindowForGPUDevice(device, window));
     }
