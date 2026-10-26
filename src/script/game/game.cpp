@@ -4,6 +4,10 @@ Game::Game( SDL_Window* window)
 {
   this->window = window;
   movement.loadData(world.getMovementData());
+  for (int a = 0; a < 10000; a++)
+  {
+    world.create(window);
+  }
 }
 
 void Game::render()
@@ -13,12 +17,13 @@ void Game::render()
   world.velocityUpdate();
   if (chase)
   {
-    movement.move({},{}, 0, 0);
+    movement.move();
   }
   else
   {
-    movement.move({},{}, 0, 0, true);
+    movement.move( true );
   }
+
 
   world.updateData();
 }
@@ -38,7 +43,7 @@ void Game::event( const SDL_Event* event)
     (*world.getMovementData().speedX)[(*world.readData().playerId)] = 300.0f;
     (*world.getMovementData().speedY)[(*world.readData().playerId)] = 300.0f;
     (*world.readData().playerId)++;
-    (*world.getMovementData().speedX)[(*world.readData().playerId)] = 500.0f;
-    (*world.getMovementData().speedY)[(*world.readData().playerId)] = 500.0f;
+    (*world.getMovementData().speedX)[(*world.readData().playerId)] = 1000.0f;
+    (*world.getMovementData().speedY)[(*world.readData().playerId)] = 1000.0f;
   }
 }

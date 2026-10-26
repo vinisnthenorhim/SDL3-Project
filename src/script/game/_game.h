@@ -14,7 +14,10 @@ class Game
 
     ObjectData readData() {return world.readData();};
     ObjectTransformData getObjectTranform() {return world.getObjectTranform();};
-
+    ~Game()
+    {
+      world.saveData();
+    }
   private:
     SDL_Window* window = nullptr;
     const SDL_Event* eventH;
