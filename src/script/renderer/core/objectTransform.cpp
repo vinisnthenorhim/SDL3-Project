@@ -217,6 +217,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
       src.offset = slot * sizeof(float)                    ; dst.offset = a * sizeof(float)             ; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) +     updateVelSize; dst.offset = a * sizeof(float) +     offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) + 2 * updateVelSize; dst.offset = a * sizeof(float) + 2 * offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+      (*dirtyVelocity)[a] = false;
       slot++;
     }
   }
@@ -248,6 +249,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
       src.offset = slot * sizeof(float)                    ; dst.offset = a * sizeof(float)             ; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) +     updateSclSize; dst.offset = a * sizeof(float) +     offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) + 2 * updateSclSize; dst.offset = a * sizeof(float) + 2 * offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+      (*dirtyScale)[a] = false;
       slot++;
     }
   }
@@ -278,6 +280,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
       src.offset = slot * sizeof(float)                    ; dst.offset = a * sizeof(float)             ; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) +     updateRotSize; dst.offset = a * sizeof(float) +     offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
       src.offset = slot * sizeof(float) + 2 * updateRotSize; dst.offset = a * sizeof(float) + 2 * offset; SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+      (*dirtyRotate)[a] = false;
       slot++;
     }
   }
