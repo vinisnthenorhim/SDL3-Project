@@ -1,8 +1,10 @@
 #include "movement.h"
 #include <iostream>
 
-void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float playPosX, float playPosy, bool nn)
+void Movement::move( bool nn )
 {
+  int newrate = rate.tick(*deltaTime);
+  if (newrate <= 0) return;
   if (nn)
   {
     for ( int a = 0; a < dirtyVelocity->size(); a++)
@@ -16,11 +18,7 @@ void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float 
 
         (*dirtyVelocity)[a] = true;
       }
-      else 
-      {
-        (*dirtyVelocity)[a] = false;
-      } 
-    }
+    } 
     return;
   }
   if (dirtyVelocity->size() <= 0) return;
@@ -30,7 +28,7 @@ void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float 
 
     float dx = (*positionX)[*playerId] - (*positionX)[a];
     float dy = (*positionY)[*playerId] - (*positionY)[a];
-    if (!( fabsf(dx) < 1.0f && fabsf(dy) < 1.0f ))
+    if (!( fabsf(dx) < 8.0f && fabsf(dy) < 8.0f ))
     {
       const float length = std::sqrt(float( dx * dx + dy * dy));
 
@@ -40,8 +38,8 @@ void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float 
       const float dirX = newVelocityX * (*speedX)[a];
       const float dirY = newVelocityY * (*speedY)[a];
 
-      (*velocityX)[a] = dirX;
-      (*velocityY)[a] = dirY;
+      (*velocityX)[a] =  dirX;
+      (*velocityY)[a] =  dirY;
 
       (*dirtyVelocity)[a] = true;
     }
@@ -51,10 +49,6 @@ void Movement::move(std::vector<float> curPos, std::vector<float> nowPos, float 
       (*velocityY)[a] = 0;
 
       (*dirtyVelocity)[a] = true;
-    }
-    else 
-    {
-      (*dirtyVelocity)[a] = false;
     }
   }
 }
