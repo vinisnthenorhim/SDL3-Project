@@ -3,7 +3,8 @@
 #include <loader/BW.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
-
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 #include "_world.h"
 
 World::World()
@@ -206,5 +207,108 @@ void World::updateData()
       rotationY[a] += rotateY[a]   * secondFrame;
       rotationZ[a] += rotateZ[a]   * secondFrame;
     // }
+  }
+}
+
+
+void World::saveData()
+{
+  BW::File fp = {"../src/data/json/games/save.json", "rb"};
+
+
+  char buf[65536];
+  rapidjson::FileReadStream is(fp.fp, buf, sizeof(buf));
+
+  rapidjson::Document load;
+  load.ParseStream(is);
+
+
+  if (!load["save"].GetBool()) return;
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> w(buffer);
+  
+  w.SetIndent(' ', 2);
+  w.StartObject();
+  w.Key("count");
+  w.Uint64(visible.size());
+  w.Key("position");
+  w.StartObject();
+  w.Key("x");
+  w.StartArray();
+
+  w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+  w.SetMaxDecimalPlaces(1);
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(positionX[a]);
+  w.EndArray();
+
+  w.Key("y");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(positionY[a]);
+  w.EndArray();
+
+  w.Key("z");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(positionZ[a]);
+  w.EndArray();
+  w.EndObject();
+
+  w.Key("scale");
+  w.StartObject();
+
+  w.Key("x");
+  w.StartArray();
+  w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+  w.SetMaxDecimalPlaces(1);
+
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(scalingX[a]);
+  w.EndArray();
+
+  w.Key("y");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(scalingY[a]);
+  w.EndArray();
+
+  w.Key("z");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(scalingZ[a]);
+  w.EndArray();
+  w.EndObject();
+
+  w.Key("rotation");
+  w.StartObject();
+
+  w.Key("x");
+  w.StartArray();
+  w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+  w.SetMaxDecimalPlaces(1);
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(rotationX[a]);
+  w.EndArray();
+
+  w.Key("y");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(rotationY[a]);
+  w.EndArray();
+
+  w.Key("z");
+  w.StartArray();
+  for (int a = 0; a < visible.size(); a ++)
+    w.Double(rotationZ[a]);
+  w.EndArray();
+  w.EndObject();
+
+  w.EndObject();
+  BW::File fpw = {"../src/data/json/games/entitydata.json", "wb"};
+  if (fpw.fp)
+  {
+    fwrite(buffer.GetString(), 1, buffer.GetSize(), fpw.fp);
   }
 }

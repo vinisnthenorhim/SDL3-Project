@@ -19,8 +19,6 @@ class Renderer
         void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition);
 
         void screenUpdate(const SDL_Event* event);
-        void saveData();
-
 
         void render();
 

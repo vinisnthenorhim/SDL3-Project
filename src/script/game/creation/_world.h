@@ -24,6 +24,8 @@ class World
 
     void secondPerFrame();
 
+    void saveData();
+
   private:
     Entity entity;
     typeIDsData entityId;
