@@ -46,7 +46,9 @@
 #define NOIME
 #define NOKANJI
 #define NOMCX
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #define NOPROXYSTUB
 #define NOSERVICE
 #define NOSOUND
