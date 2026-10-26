@@ -178,7 +178,7 @@ class TransferBuffer
     SDL_GPUTransferBuffer* transfer = nullptr;
     uint8_t* mappedPtr = nullptr;
     Uint32 count = 0;
-    Uint32 size  = 0;
+    Uint32 lastSize  = 0;
   public:
     TransferBuffer() = default;                                    
     TransferBuffer(const TransferBuffer&) = delete;
@@ -188,23 +188,27 @@ class TransferBuffer
     {
       if (size == 0) return;
       this->device = device;
-      this->size = size;
+
+      if (size <= lastSize)  return;
+
       if(transfer != nullptr) 
       {
-        release();
+        SDL_ReleaseGPUTransferBuffer(device, transfer);
+        transfer = nullptr;
       }
       SDL_GPUTransferBufferCreateInfo ti = {};
       ti.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
       ti.size  = size;
-      
       transfer = SDL_CreateGPUTransferBuffer(device, &ti);
       CHECK(transfer);
+      lastSize = size;
+
     }
     void downloadData(SDL_GPUDevice* device,SDL_GPUCopyPass* copypass, SDL_GPUBuffer* from, uint32_t size, uint32_t offsetSrc, uint32_t offsetDst)
     {
       if (size == 0) return;
       this->device = device;
-      this->size = size;
+      this->lastSize = size;
       if(transfer != nullptr) 
       {
         release();
@@ -231,12 +235,12 @@ class TransferBuffer
     SDL_GPUTransferBuffer* buffer() {return transfer;}
     ~TransferBuffer()
     {
-      release();
-    }
-    void release()
-    {
       if(!transfer) return;
       SDL_ReleaseGPUTransferBuffer(device, transfer);
       transfer = nullptr;
+    }
+    void release()
+    {
+
     }
 };
