@@ -16,7 +16,9 @@ struct main0_in
 fragment main0_out main0(main0_in in [[stage_in]], texture2d<float> tex [[texture(0)]], sampler texSmplr [[sampler(0)]])
 {
     main0_out out = {};
-    out.outColor = tex.sample(texSmplr, in.fragUV);
+    float4 color = tex.sample(texSmplr, in.fragUV);
+    color.w *= 0.699999988079071044921875;
+    out.outColor = color;
     return out;
 }
 

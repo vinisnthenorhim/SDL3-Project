@@ -1,8 +1,8 @@
 Texture2D<float4> tex : register(t0, space2);
 SamplerState _tex_sampler : register(s0, space2);
 
-static float4 outColor;
 static float2 fragUV;
+static float4 outColor;
 
 struct SPIRV_Cross_Input
 {
@@ -16,7 +16,9 @@ struct SPIRV_Cross_Output
 
 void main_inner()
 {
-    outColor = tex.Sample(_tex_sampler, fragUV);
+    float4 color = tex.Sample(_tex_sampler, fragUV);
+    color.w *= 0.699999988079071044921875f;
+    outColor = color;
 }
 
 SPIRV_Cross_Output main(SPIRV_Cross_Input stage_input)
