@@ -78,13 +78,15 @@ void World::create(SDL_Window* window)
 
   sol::protected_function function = creationstate["random_location_creation"];
 
-  function( mode->w, mode->h );
-  // createObject({0});
+  float x = positionX.size() > playerID ? positionX[playerID] : 0 ;
+  float y = positionY.size() > playerID ? positionY[playerID] : 0 ;
+
+  function( mode->w, mode->h, static_cast<int>(x), static_cast<int>(y));
 }
 
 void World::createObject(CreateEntityLayout layout)
 {
-  type.push_back(entityId->at("projectile"));
+  type.push_back(entityId->at("enemy"));
   
   dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
 
@@ -102,8 +104,8 @@ void World::createObject(CreateEntityLayout layout)
 
   if (speedX.size() == 0)
   {
-    speedX.push_back(500.0f)  ;
-    speedY.push_back(500.0f)  ;
+    speedX.push_back(1000.0f)  ;
+    speedY.push_back(1000.0f)  ;
   }
   else
   {
@@ -174,11 +176,11 @@ void World::velocityUpdate( )
 
     dirtyVelocity[playerID] = true;
   }
-  else
+  else if ( velocityX[playerID] != 0 || velocityY[playerID] != 0 )
   {
     velocityX[playerID] = 0;
     velocityY[playerID] = 0;
-    dirtyVelocity[playerID] = false;
+    dirtyVelocity[playerID] = true;
   }
 }
 
@@ -186,23 +188,23 @@ void World::updateData()
 {
   for (int a = 0; a < visible.size(); a++)
   {
-    if (dirtyVelocity[a] == true)
-    {
+    // if (dirtyVelocity[a] == true)
+    // {
       positionX[a] += velocityX[a] * secondFrame;
       positionY[a] += velocityY[a] * secondFrame;
       positionZ[a] += velocityZ[a] * secondFrame;
-    }
-    if (dirtyScale[a] == true)
-    {
-      scalingX[a] += scaleX[a] * secondFrame;
-      scalingY[a] += scaleY[a] * secondFrame;
-      scalingZ[a] += scaleZ[a] * secondFrame;
-    }
-    if (dirtyRotate[a] == true)
-    {
-      rotationX[a] += rotateX[a] * secondFrame;
-      rotationY[a] += rotateY[a] * secondFrame;
-      rotationZ[a] += rotateZ[a] * secondFrame;
-    }
+    // }
+    // if (dirtyScale[a]   == true)
+    // {
+      scalingX[a]  += scaleX[a]    * secondFrame;
+      scalingY[a]  += scaleY[a]    * secondFrame;
+      scalingZ[a]  += scaleZ[a]    * secondFrame;
+    // }
+    // if (dirtyRotate[a]  == true)
+    // {
+      rotationX[a] += rotateX[a]   * secondFrame;
+      rotationY[a] += rotateY[a]   * secondFrame;
+      rotationZ[a] += rotateZ[a]   * secondFrame;
+    // }
   }
 }
