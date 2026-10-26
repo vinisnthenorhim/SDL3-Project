@@ -1,10 +1,15 @@
 #include "movement.h"
 #include <iostream>
-
 void Movement::move( bool nn )
 {
-  int newrate = rate.tick(*deltaTime);
-  if (newrate <= 0) return;
+  
+  if (positionX->size() > lastsize)
+  {
+  for (size_t i = lastsize; i < positionX->size(); i++)
+      sim.addAgent(RVO::Vector3((*positionX)[i], (*positionY)[i], (*positionZ)[i]));
+    lastsize = positionX->size();
+  }
+
   if (nn)
   {
     for ( int a = 0; a < dirtyVelocity->size(); a++)
@@ -22,34 +27,43 @@ void Movement::move( bool nn )
     return;
   }
   if (dirtyVelocity->size() <= 0) return;
-  for ( int a = 0; a < dirtyVelocity->size(); a++)
+   const size_t count = positionX->size();
+
+  for (size_t i = 0; i < count; i++)
   {
-    if (a == *playerId) continue;
+    sim.setAgentPosition(i, RVO::Vector3((*positionX)[i], (*positionY)[i], (*positionZ)[i]));
 
-    float dx = (*positionX)[*playerId] - (*positionX)[a];
-    float dy = (*positionY)[*playerId] - (*positionY)[a];
-    if (!( fabsf(dx) < 8.0f && fabsf(dy) < 8.0f ))
+    if (i == *playerId)
     {
-      const float length = std::sqrt(float( dx * dx + dy * dy));
-
-      const float newVelocityX = length > 0 ? dx / length : 0.0f;
-      const float newVelocityY = length > 0 ? dy / length : 0.0f;
-
-      const float dirX = newVelocityX * (*speedX)[a];
-      const float dirY = newVelocityY * (*speedY)[a];
-
-      (*velocityX)[a] =  dirX;
-      (*velocityY)[a] =  dirY;
-
-      (*dirtyVelocity)[a] = true;
+      sim.setAgentPrefVelocity(i, RVO::Vector3((*velocityX)[i], (*velocityY)[i], (*velocityZ)[i]));
+      continue;
     }
-    else if ((*velocityX)[a] != 0 || (*velocityY)[a] != 0)
-    {
-      (*velocityX)[a] = 0;
-      (*velocityY)[a] = 0;
 
-      (*dirtyVelocity)[a] = true;
-    }
+    float dx = (*positionX)[*playerId] - (*positionX)[i];
+    float dy = (*positionY)[*playerId] - (*positionY)[i];
+    float dz = (*positionZ)[*playerId] - (*positionZ)[i];
+    float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+    if (dist > stopDist)
+      sim.setAgentPrefVelocity(i, RVO::Vector3(dx / dist * (*speedX)[i],
+                                               dy / dist * (*speedY)[i],
+                                               dz / dist * (*speedY)[i]));
+    else
+      sim.setAgentPrefVelocity(i, RVO::Vector3(0.f, 0.f, 0.f));
+  }
+
+
+sim.doStep();   // the thing you want to measure
+
+  for (size_t i = 0; i < count; i++)
+  {
+    if (i == *playerId) continue;
+
+    RVO::Vector3 v = sim.getAgentVelocity(i);
+    (*velocityX)[i] = v.x();
+    (*velocityY)[i] = v.y();
+    (*velocityZ)[i] = v.z();
+    (*dirtyVelocity)[i] = true;
   }
 }
 
