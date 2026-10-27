@@ -27,17 +27,17 @@ class Movement
     TimeRate rate;
     RVO::RVOSimulator sim;
     int lastsize = 0;
-    const float stopDist = 20.0f;
+    const float stopDist = 60.0f;
   public:
     Movement()
     : rate(30)
     {
       sim.setTimeStep(1.0f / 20.0f);        // match how often you call doStep()
       sim.setAgentDefaults(
-          50.0f,   // neighborDist
-          5,      // maxNeighbors
+          40.0f,   // neighborDist
+          8,      // maxNeighbors
           2.0f,   // timeHorizon
-          40.0f,   // radius (agents are spheres)
+          60.0f,   // radius (agents are spheres)
           300.0f);  // maxSpeed
     }
 

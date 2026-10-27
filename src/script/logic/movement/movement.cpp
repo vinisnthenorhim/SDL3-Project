@@ -9,25 +9,42 @@ void Movement::move( bool nn )
       sim.addAgent(RVO::Vector3((*positionX)[i], (*positionY)[i], (*positionZ)[i]));
     lastsize = positionX->size();
   }
+   const size_t count = positionX->size();
 
   if (nn)
   {
+
     for ( int a = 0; a < dirtyVelocity->size(); a++)
     {
-      if (a == *playerId) continue;
+    sim.setAgentPosition(a, RVO::Vector3((*positionX)[a], (*positionY)[a], (*positionZ)[a]));
 
-      if ((*velocityX)[a] != 0 || (*velocityY)[a] != 0)
+      if (a == *playerId) 
       {
-        (*velocityX)[a] = 0;
-        (*velocityY)[a] = 0;
+      sim.setAgentPrefVelocity(a, RVO::Vector3((*velocityX)[a], (*velocityY)[a], (*velocityZ)[a]));
 
-        (*dirtyVelocity)[a] = true;
+        continue;
       }
+
+
+       sim.setAgentPrefVelocity(a, RVO::Vector3(0.f, 0.f, 0.f));
+
     } 
+
+    sim.doStep();   // the thing you want to measure
+
+    for (size_t i = 0; i < count; i++)
+    {
+      if (i == *playerId) continue;
+
+      RVO::Vector3 v = sim.getAgentVelocity(i);
+      (*velocityX)[i] = v.x();
+      (*velocityY)[i] = v.y();
+      (*velocityZ)[i] = v.z();
+      (*dirtyVelocity)[i] = true;
+    }
     return;
   }
   if (dirtyVelocity->size() <= 0) return;
-   const size_t count = positionX->size();
 
   for (size_t i = 0; i < count; i++)
   {
@@ -39,15 +56,15 @@ void Movement::move( bool nn )
       continue;
     }
 
-    float dx = (*positionX)[*playerId] - (*positionX)[i];
-    float dy = (*positionY)[*playerId] - (*positionY)[i];
+    float dx = 0 - (*positionX)[i];
+    float dy = 0 - (*positionY)[i];
     float dz = (*positionZ)[*playerId] - (*positionZ)[i];
     float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
 
     if (dist > stopDist)
       sim.setAgentPrefVelocity(i, RVO::Vector3(dx / dist * (*speedX)[i],
                                                dy / dist * (*speedY)[i],
-                                               dz / dist * (*speedY)[i]));
+                                               dz / dist * 0));
     else
       sim.setAgentPrefVelocity(i, RVO::Vector3(0.f, 0.f, 0.f));
   }
