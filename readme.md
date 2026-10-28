@@ -18,3 +18,4 @@ A 2D game developed using C++ and SDL3 and SDL3GPU.
 
 Still under developement.
 
+Author is trying to learn raylib rn
