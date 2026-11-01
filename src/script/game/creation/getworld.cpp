@@ -50,6 +50,9 @@ MovementStructData World::getMovementData()
   {
     &playerID     ,
     &secondFrame  ,
+    &dimension    ,
+    &animatingCount,
+    &isAnimating  ,
     &positionX    ,
     &positionY    ,
     &positionZ    ,
