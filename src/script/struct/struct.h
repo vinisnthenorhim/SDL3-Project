@@ -80,10 +80,20 @@ struct RotateAxis
   SDL_Scancode counterclockwise;
   SDL_Scancode clockwise;
 };
+struct ObjectDimension
+{
+  float width;
+  float height;
+};
 struct MovementStructData
 {
   uint32_t* playerID;
-  float* deltaTime;
+  float*    deltaTime;
+
+  std::vector<ObjectDimension> *dimension;
+
+  std::vector<int>  *animatingCount;
+  std::vector<bool> *isAnimating;
 
   std::vector<float> *positionX    ;
   std::vector<float> *positionY    ;
@@ -100,3 +110,4 @@ struct MovementStructData
 
 
 typedef const std::unordered_map<std::string, int>* typeIDsData;
+
