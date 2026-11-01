@@ -45,8 +45,7 @@ class World
     std::vector<int>   type         ;
     std::vector<ObjectDimension> dimension;
 
-    std::vector<int> animatingCount;
-    std::vector<bool> isAnimating;
+
 
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
