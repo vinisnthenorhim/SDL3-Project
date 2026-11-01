@@ -11,6 +11,7 @@ class Game
     void render();
     void event(const SDL_Event* event);
     void update();
+    void loadData(Position cameraPosition);
 
     ObjectData readData() {return world.readData();};
     ObjectTransformData getObjectTranform() {return world.getObjectTranform();};
