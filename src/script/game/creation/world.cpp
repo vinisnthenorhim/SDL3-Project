@@ -88,8 +88,10 @@ void World::create(SDL_Window* window)
 void World::createObject(CreateEntityLayout layout)
 {
   type.push_back(entityId->at("enemy"));
+
+  dimension.push_back({60, 60});
   
-  dirtyVelocity.push_back(false)  ; dirtyScale.push_back(false)  ;  dirtyRotate.push_back(false)  ; 
+  dirtyVelocity.push_back(true)  ; dirtyScale.push_back(true)  ;  dirtyRotate.push_back(true)  ; 
 
   positionX.push_back(layout.posX) ; positionY.push_back(layout.posY) ; positionZ.push_back(layout.posZ)  ;
 
