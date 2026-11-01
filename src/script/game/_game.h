@@ -20,11 +20,9 @@ class Game
     }
   private:
     SDL_Window* window = nullptr;
-    const SDL_Event* eventH;
+    const SDL_Event* eventH = nullptr;
     World world;
     Movement movement;
-
-    bool chase = false;
 };
 
 #endif
