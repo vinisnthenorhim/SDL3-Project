@@ -30,7 +30,7 @@ void Movement::updateCell()
   }
 }
 
-void Movement::move( float dx, float dy, float dz )
+void Movement::checkCollide()
 {
 
   int currentCount = positionX->size();
@@ -64,10 +64,10 @@ void Movement::move( float dx, float dy, float dz )
             if (itY == itX->second.end()) continue;
             for ( int d : itY->second)
             {
-              Box A = {(*positionX)[i], (*positionY)[i], 30, 30, 0};
-              Box B = {(*positionX)[d], (*positionY)[d], 30, 30, 0};
+              Box A = {(*positionX)[i], (*positionY)[i], (*dimension)[i].width / 2, (*dimension)[i].height / 2, 0};
+              Box B = {(*positionX)[d], (*positionY)[d], (*dimension)[d].width / 2, (*dimension)[d].height / 2, 0};
 
-              if (i > d && boxesCollide( A, B)) 
+              if (i > d && boxesCollide( A, B )) 
               {
   
                 float difX = A.cx - B.cx;
@@ -103,8 +103,8 @@ void Movement::doAnimate()
       continue;
     }
     animatingCount[a]--;
-    (*positionX)[a] += nn[a].x * 500 * *deltaTime;
-    (*positionY)[a] += nn[a].y * 500 * *deltaTime; 
+    (*positionX)[a] += nn[a].x * 100 * *deltaTime;
+    (*positionY)[a] += nn[a].y * 100 * *deltaTime; 
     (*dirtyVelocity)[a] = true;
   }
 }
@@ -139,7 +139,6 @@ bool boxesCollide(const Box& A, const Box& B)
 }
 void Movement::loadData( ObjectData objectData, MovementStructData data, Position cameraPosition)
 {
-  std::cout << "load\n";
 
   this->playerId      = objectData.playerId  ;
 

@@ -43,7 +43,7 @@ class Movement
     const int gridsize = 100;
     const int updateSize = 20;
     const int checksize = 1;
-    const int step = 20;
+    const int step = 10;
     Grid cell;
 
     uint32_t* playerId;
@@ -55,7 +55,7 @@ class Movement
 
 
     void loadData( ObjectData objectData, MovementStructData data , Position cameraPosition);
-    void move( float dx, float dy, float dz );
+    void checkCollide();
     void updateCell();
     void doAnimate();
 
