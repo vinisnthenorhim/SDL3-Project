@@ -168,7 +168,7 @@ void CameraHandle::followEntity(SDL_GPUCopyPass* copypass)
   float winPosY = (*updateDataY)[3];
   float winPosZ = (*updateDataZ)[3];
   posUpdateTransfer.createTransferBuffer(device, 3 * sizeof(float));
- uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, posUpdateTransfer.buffer(), false);
+  uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, posUpdateTransfer.buffer(), false);
   if(!positionMapped)
   {
     return;
