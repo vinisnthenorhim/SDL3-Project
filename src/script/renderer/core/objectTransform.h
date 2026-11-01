@@ -50,8 +50,9 @@ class ObjectTransform
   public:
     void createObjectTransform(SDL_GPUDevice* device);
     void loadData( ObjectData objectData, ObjectTransformData objectTransform);
-    void updateDataSize( SDL_GPUCopyPass* copypass);
-    void updateTransform( SDL_GPUCopyPass* copypass);
+    void updateDataSize( SDL_GPUCopyPass* copypass );
+    void updateData (  SDL_GPUCopyPass* copypass  );
+    void updateTransform( SDL_GPUCopyPass* copypass );
     void bind( SDL_GPUCommandBuffer* cmd);
     void bindG(SDL_GPURenderPass* pass, uint32_t slot);
     void release();
