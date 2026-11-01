@@ -11,10 +11,10 @@ struct DefaultMeshObject
 {
     static inline std::vector<Vertex> vertex =
     {
-        {{-60.0f, -60.0f, 0.0f}, {0.0f, 1.0f}},
-        {{ 60.0f, -60.0f, 0.0f}, {1.0f, 1.0f}},
-        {{ 60.0f,  60.0f, 0.0f}, {1.0f, 0.0f}},
-        {{-60.0f,  60.0f, 0.0f}, {0.0f, 0.0f}}
+        {{-30.0f, -30.0f, 0.0f}, {0.0f, 1.0f}},
+        {{ 30.0f, -30.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 30.0f,  30.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-30.0f,  30.0f, 0.0f}, {0.0f, 0.0f}}
     };
     static inline std::vector<uint32_t> indices =
     { 0, 1, 2, 0, 2, 3};
