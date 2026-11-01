@@ -1,101 +1,189 @@
 #include "movement.h"
+#include <cmath>
 #include <iostream>
-void Movement::move( bool nn )
+struct Box { float cx, cy, hw, hh, angle; };
+bool boxesCollide(const Box& A, const Box& B);
+
+void Movement::updateCell()
 {
-  
-  if (positionX->size() > lastsize)
+
+
+  size_t currentCount = positionX->size();
+  if ( currentCount <= 0) return;
+
+  cell.clear();
+  glm::vec3 center = getCenter();
+  std::cout << center.x << '\t' << center.y << '\n';
+
+  int camX = (int)floorf(center.x / gridsize);
+  int camY = (int)floorf(center.y / gridsize);
+
+  const float minX = (camX - updateSize)     * gridsize;
+  const float maxX = (camX + updateSize + 1) * gridsize;
+  const float minY = (camY - updateSize)     * gridsize;
+  const float maxY = (camY + updateSize + 1) * gridsize;
+
+  for (size_t i = 0; i < positionX->size(); i++)
   {
-  for (size_t i = lastsize; i < positionX->size(); i++)
-      sim.addAgent(RVO::Vector3((*positionX)[i], (*positionY)[i], (*positionZ)[i]));
-    lastsize = positionX->size();
-  }
-   const size_t count = positionX->size();
-
-  if (nn)
-  {
-
-    for ( int a = 0; a < dirtyVelocity->size(); a++)
-    {
-    sim.setAgentPosition(a, RVO::Vector3((*positionX)[a], (*positionY)[a], (*positionZ)[a]));
-
-      if (a == *playerId) 
-      {
-      sim.setAgentPrefVelocity(a, RVO::Vector3((*velocityX)[a], (*velocityY)[a], (*velocityZ)[a]));
-
-        continue;
-      }
-
-
-       sim.setAgentPrefVelocity(a, RVO::Vector3(0.f, 0.f, 0.f));
-
-    } 
-
-    sim.doStep();   // the thing you want to measure
-
-    for (size_t i = 0; i < count; i++)
-    {
-      if (i == *playerId) continue;
-
-      RVO::Vector3 v = sim.getAgentVelocity(i);
-      (*velocityX)[i] = v.x();
-      (*velocityY)[i] = v.y();
-      (*velocityZ)[i] = v.z();
-      (*dirtyVelocity)[i] = true;
-    }
-    return;
-  }
-  if (dirtyVelocity->size() <= 0) return;
-
-  for (size_t i = 0; i < count; i++)
-  {
-    sim.setAgentPosition(i, RVO::Vector3((*positionX)[i], (*positionY)[i], (*positionZ)[i]));
-
-    if (i == *playerId)
-    {
-      sim.setAgentPrefVelocity(i, RVO::Vector3((*velocityX)[i], (*velocityY)[i], (*velocityZ)[i]));
-      continue;
-    }
-
-    float dx = 0 - (*positionX)[i];
-    float dy = 0 - (*positionY)[i];
-    float dz = (*positionZ)[*playerId] - (*positionZ)[i];
-    float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
-
-    if (dist > stopDist)
-      sim.setAgentPrefVelocity(i, RVO::Vector3(dx / dist * (*speedX)[i],
-                                               dy / dist * (*speedY)[i],
-                                               dz / dist * 0));
-    else
-      sim.setAgentPrefVelocity(i, RVO::Vector3(0.f, 0.f, 0.f));
-  }
-
-
-sim.doStep();   // the thing you want to measure
-
-  for (size_t i = 0; i < count; i++)
-  {
-    if (i == *playerId) continue;
-
-    RVO::Vector3 v = sim.getAgentVelocity(i);
-    (*velocityX)[i] = v.x();
-    (*velocityY)[i] = v.y();
-    (*velocityZ)[i] = v.z();
-    (*dirtyVelocity)[i] = true;
+    float x = (*positionX)[i], y = (*positionY)[i];
+    if (x < minX || x >= maxX || y < minY || y >= maxY) continue;
+    cell[(int)floorf(x / gridsize)][(int)floorf(y / gridsize)].push_back((int)i);
   }
 }
 
-
-void Movement::loadData(MovementStructData data)
+void Movement::move( float dx, float dy, float dz )
 {
-  this->playerId      = data.playerID ;
+
+  int currentCount = positionX->size();
+  if ( currentCount <= 0) return;
+
+  if (currentCount > lastSize)
+  {
+    for (int a = lastSize; a < currentCount; a++)
+    {
+      nn.push_back({0, 0});
+      animatingCount.push_back(step);
+      isAnimating.push_back(false);
+    }
+    lastSize = currentCount;
+  }
+  for (auto& [gx, column] : cell)
+  {
+    for (auto& [gy, list] : column)
+    {
+      for (int i : list)
+      {
+        int tempx = (int)floorf((*positionX)[i] / gridsize);
+        int tempy = (int)floorf((*positionY)[i] / gridsize);
+        for (int a = tempx - checksize; a <= tempx + checksize; a++)
+        {
+          auto itX = cell.find(a);                 // look, never create
+          if (itX == cell.end()) continue;
+          for (int b = tempy - checksize; b <= tempy + checksize; b++)
+          {
+            auto itY = itX->second.find(b);
+            if (itY == itX->second.end()) continue;
+            for ( int d : itY->second)
+            {
+              Box A = {(*positionX)[i], (*positionY)[i], 30, 30, 0};
+              Box B = {(*positionX)[d], (*positionY)[d], 30, 30, 0};
+
+              if (i > d && boxesCollide( A, B)) 
+              {
+  
+                float difX = A.cx - B.cx;
+                float difY = A.cy - B.cy;
+                float len  = sqrtf(difX * difX + difY * difY);
+                float nxx = 1.f, nyy = 0.f;                        // fallback if centers are identical
+                if (len > 0.0001f) { nxx = difX / len; nyy = difY / len; }
+
+                nn[i] = {  nxx,  nyy };                            // a moves away from b
+                nn[d] = { -nxx, -nyy };                            // b moves away from a
+                isAnimating[i] = true;
+                isAnimating[d] = true;
+              }  
+            }
+          }  
+        }
+      }
+    }
+  }
+}
+void Movement::doAnimate()
+{
+  int currentCount = positionX->size();
+  if ( currentCount <= 0) return;
+
+  for (int a = 0; a < positionX->size(); a++)
+  {
+    if (isAnimating[a] == false) continue;
+    if (animatingCount[a] <= 0 ) 
+    {
+      animatingCount[a] = step;
+      isAnimating[a] = false;
+      continue;
+    }
+    animatingCount[a]--;
+    (*positionX)[a] += nn[a].x * 500 * *deltaTime;
+    (*positionY)[a] += nn[a].y * 500 * *deltaTime; 
+    (*dirtyVelocity)[a] = true;
+  }
+}
+
+bool boxesCollide(const Box& A, const Box& B)
+{
+  
+  // the two edge directions of each box
+  float aux =  cosf(A.angle), auy = sinf(A.angle);    // A's "right"
+  float avx = -sinf(A.angle), avy = cosf(A.angle);    // A's "down"
+  float bux =  cosf(B.angle), buy = sinf(B.angle);
+  float bvx = -sinf(B.angle), bvy = cosf(B.angle);
+
+  float dx = B.cx - A.cx;                              // center to center
+  float dy = B.cy - A.cy;
+
+  float axes[4][2] = { {aux, auy}, {avx, avy}, {bux, buy}, {bvx, bvy} };
+
+  for (int i = 0; i < 4; i++)
+  {
+    float ax = axes[i][0], ay = axes[i][1];
+
+    // how far each box reaches along this axis
+    float rA = A.hw * fabsf(aux * ax + auy * ay) + A.hh * fabsf(avx * ax + avy * ay);
+    float rB = B.hw * fabsf(bux * ax + buy * ay) + B.hh * fabsf(bvx * ax + bvy * ay);
+
+    float dist = fabsf(dx * ax + dy * ay);             // centers' distance along the axis
+
+    if (dist > rA + rB) return false;                  // gap found, so no collision
+  }
+  return true;                                         // no gap on any axis
+}
+void Movement::loadData( ObjectData objectData, MovementStructData data, Position cameraPosition)
+{
+  std::cout << "load\n";
+
+  this->playerId      = objectData.playerId  ;
+
+  this->positionX      = objectData.positionX;
+  this->positionY      = objectData.positionY;
+  this->positionZ      = objectData.positionZ;
+
+  this->scalingX       = objectData.scalingX;
+  this->scalingY       = objectData.scalingY;
+  this->scalingZ       = objectData.scalingZ;
+
+  this->rotationX      = objectData.rotationX;
+  this->rotationY      = objectData.rotationY;
+  this->rotationZ      = objectData.rotationZ;
+
   this->deltaTime     = data.deltaTime;
-  this->positionX     = data.positionX;
-  this->positionY     = data.positionY;
-  this->positionZ     = data.positionZ;
+  this->dimension     = data.dimension;
+
   this->dirtyVelocity = data.dirtyVelocity;
   this->velocityX     = data.velocityX;
   this->velocityY     = data.velocityY;
   this->velocityZ     = data.velocityZ;
   this->speedX        = data.speedX;
   this->speedY        = data.speedY;
+
+  this->follow       = cameraPosition.follow;
+  this->camPositionX = cameraPosition.positionX;
+  this->camPositionY = cameraPosition.positionY;
+  this->camPositionZ = cameraPosition.positionZ;
+}
+
+glm::vec3 Movement::getCenter()
+{
+  if (*follow == 1u)
+  {
+    (*camPositionX)[0] = (*positionX)[*playerId];
+    (*camPositionY)[0] = (*positionY)[*playerId];
+    (*camPositionZ)[0] = (*positionZ)[*playerId];
+    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
+  }
+  else if (*follow == 0u)
+  {
+    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
+  }
+  return {};
 }
