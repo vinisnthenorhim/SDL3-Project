@@ -157,10 +157,7 @@ void Texture::getAtlasData(SDL_GPUCopyPass* copypass)
   {
     spDimension.push_back({ b["x"].GetFloat() / atlasDimension[0].w, b["y"].GetFloat() / atlasDimension[0].h,  b["w"].GetFloat() / atlasDimension[0].w, b["h"].GetFloat() / atlasDimension[0].h});
   }
-  for ( const auto& a : spDimension)
-  {
-    std::cout << a.x <<spDimension[0].x<< '\n';
-  }
+
 
   layout.createBuffer(device, sizeof(float) * 4 * spDimension.size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
 
