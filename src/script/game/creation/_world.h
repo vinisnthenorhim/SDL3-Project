@@ -43,6 +43,11 @@ class World
     uint32_t playerID = 0;
 
     std::vector<int>   type         ;
+    std::vector<ObjectDimension> dimension;
+
+    std::vector<int> animatingCount;
+    std::vector<bool> isAnimating;
+
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
     std::vector<float> positionZ    ;
