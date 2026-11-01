@@ -85,25 +85,25 @@ float4x4 rotationMatrix(thread const float4& rotation)
     return result;
 }
 
-kernel void main0(constant UniFormBuffer& _155 [[buffer(0)]], device VelocityBuffer& _174 [[buffer(1)]], device ScaleBuffer& _225 [[buffer(2)]], device RotateBuffer& _275 [[buffer(3)]], device ModelMatrixBuffer& _320 [[buffer(4)]], device PositionBuffer& _168 [[buffer(5)]], device ScalingBuffer& _220 [[buffer(6)]], device RotationBuffer& _270 [[buffer(7)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+kernel void main0(constant UniFormBuffer& _155 [[buffer(0)]], device VelocityBuffer& _174 [[buffer(1)]], device ScaleBuffer& _207 [[buffer(2)]], device RotateBuffer& _239 [[buffer(3)]], device ModelMatrixBuffer& _266 [[buffer(4)]], device PositionBuffer& _168 [[buffer(5)]], device ScalingBuffer& _202 [[buffer(6)]], device RotationBuffer& _234 [[buffer(7)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
 {
     uint entityIndex = gl_GlobalInvocationID.x;
     if (entityIndex >= _155.entityCount)
     {
         return;
     }
-    ((device float*)&_168.position[entityIndex])[0u] += (_174.velocity[entityIndex] * _155.deltaTime);
-    ((device float*)&_168.position[entityIndex])[1u] += (_174.velocity[entityIndex + _155.entityCount] * _155.deltaTime);
-    ((device float*)&_168.position[entityIndex])[2u] += (_174.velocity[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
-    ((device float*)&_220.scaling[entityIndex])[0u] += (_225.scale[entityIndex] * _155.deltaTime);
-    ((device float*)&_220.scaling[entityIndex])[1u] += (_225.scale[entityIndex + _155.entityCount] * _155.deltaTime);
-    ((device float*)&_220.scaling[entityIndex])[2u] += (_225.scale[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
-    ((device float*)&_270.rotation[entityIndex])[0u] += (_275.rotate[entityIndex] * _155.deltaTime);
-    ((device float*)&_270.rotation[entityIndex])[1u] += (_275.rotate[entityIndex + _155.entityCount] * _155.deltaTime);
-    ((device float*)&_270.rotation[entityIndex])[2u] += (_275.rotate[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    ((device float*)&_168.position[entityIndex])[0u] = _174.velocity[entityIndex];
+    ((device float*)&_168.position[entityIndex])[1u] = _174.velocity[entityIndex + _155.entityCount];
+    ((device float*)&_168.position[entityIndex])[2u] = _174.velocity[(entityIndex + _155.entityCount) + _155.entityCount];
+    ((device float*)&_202.scaling[entityIndex])[0u] = _207.scale[entityIndex];
+    ((device float*)&_202.scaling[entityIndex])[1u] = _207.scale[entityIndex + _155.entityCount];
+    ((device float*)&_202.scaling[entityIndex])[2u] = _207.scale[(entityIndex + _155.entityCount) + _155.entityCount];
+    ((device float*)&_234.rotation[entityIndex])[0u] = _239.rotate[entityIndex];
+    ((device float*)&_234.rotation[entityIndex])[1u] = _239.rotate[entityIndex + _155.entityCount];
+    ((device float*)&_234.rotation[entityIndex])[2u] = _239.rotate[(entityIndex + _155.entityCount) + _155.entityCount];
     float4 param = _168.position[entityIndex];
-    float4 param_1 = _220.scaling[entityIndex];
-    float4 param_2 = _270.rotation[entityIndex];
-    _320.modelMat[entityIndex] = (translationMatrix(param) * scaleMatrix(param_1)) * rotationMatrix(param_2);
+    float4 param_1 = _202.scaling[entityIndex];
+    float4 param_2 = _234.rotation[entityIndex];
+    _266.modelMat[entityIndex] = (translationMatrix(param) * scaleMatrix(param_1)) * rotationMatrix(param_2);
 }
 

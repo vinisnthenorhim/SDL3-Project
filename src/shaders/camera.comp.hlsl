@@ -64,7 +64,7 @@ void main_inner()
         _166.Store(16, asuint(0.60000002384185791015625f));
         _166.Store(20, asuint(0.60000002384185791015625f));
         _166.Store(24, asuint(0.60000002384185791015625f));
-        _166.Store(28, asuint(1.0f));
+        _166.Store(28, asuint(0.60000002384185791015625f));
         _166.Store(32, asuint(0.0f));
         _166.Store(36, asuint(0.0f));
         _166.Store(40, asuint(0.0f));

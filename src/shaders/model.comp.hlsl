@@ -8,11 +8,11 @@ cbuffer UniFormBuffer : register(b0, space2)
 
 RWByteAddressBuffer _168 : register(u1, space1);
 ByteAddressBuffer _174 : register(t0, space0);
-RWByteAddressBuffer _220 : register(u2, space1);
-ByteAddressBuffer _225 : register(t1, space0);
-RWByteAddressBuffer _270 : register(u3, space1);
-ByteAddressBuffer _275 : register(t2, space0);
-RWByteAddressBuffer _320 : register(u0, space1);
+RWByteAddressBuffer _202 : register(u2, space1);
+ByteAddressBuffer _207 : register(t1, space0);
+RWByteAddressBuffer _234 : register(u3, space1);
+ByteAddressBuffer _239 : register(t2, space0);
+RWByteAddressBuffer _266 : register(u0, space1);
 
 static uint3 gl_GlobalInvocationID;
 struct SPIRV_Cross_Input
@@ -61,23 +61,23 @@ void main_inner()
     {
         return;
     }
-    _168.Store(entityIndex * 16 + 0, asuint(asfloat(_168.Load(entityIndex * 16 + 0)) + (asfloat(_174.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
-    _168.Store(entityIndex * 16 + 4, asuint(asfloat(_168.Load(entityIndex * 16 + 4)) + (asfloat(_174.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
-    _168.Store(entityIndex * 16 + 8, asuint(asfloat(_168.Load(entityIndex * 16 + 8)) + (asfloat(_174.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
-    _220.Store(entityIndex * 16 + 0, asuint(asfloat(_220.Load(entityIndex * 16 + 0)) + (asfloat(_225.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
-    _220.Store(entityIndex * 16 + 4, asuint(asfloat(_220.Load(entityIndex * 16 + 4)) + (asfloat(_225.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
-    _220.Store(entityIndex * 16 + 8, asuint(asfloat(_220.Load(entityIndex * 16 + 8)) + (asfloat(_225.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
-    _270.Store(entityIndex * 16 + 0, asuint(asfloat(_270.Load(entityIndex * 16 + 0)) + (asfloat(_275.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
-    _270.Store(entityIndex * 16 + 4, asuint(asfloat(_270.Load(entityIndex * 16 + 4)) + (asfloat(_275.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
-    _270.Store(entityIndex * 16 + 8, asuint(asfloat(_270.Load(entityIndex * 16 + 8)) + (asfloat(_275.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    _168.Store(entityIndex * 16 + 0, asuint(asfloat(_174.Load(entityIndex * 4 + 0))));
+    _168.Store(entityIndex * 16 + 4, asuint(asfloat(_174.Load((entityIndex + _155_entityCount) * 4 + 0))));
+    _168.Store(entityIndex * 16 + 8, asuint(asfloat(_174.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
+    _202.Store(entityIndex * 16 + 0, asuint(asfloat(_207.Load(entityIndex * 4 + 0))));
+    _202.Store(entityIndex * 16 + 4, asuint(asfloat(_207.Load((entityIndex + _155_entityCount) * 4 + 0))));
+    _202.Store(entityIndex * 16 + 8, asuint(asfloat(_207.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
+    _234.Store(entityIndex * 16 + 0, asuint(asfloat(_239.Load(entityIndex * 4 + 0))));
+    _234.Store(entityIndex * 16 + 4, asuint(asfloat(_239.Load((entityIndex + _155_entityCount) * 4 + 0))));
+    _234.Store(entityIndex * 16 + 8, asuint(asfloat(_239.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
     float4 param = asfloat(_168.Load4(entityIndex * 16 + 0));
-    float4 param_1 = asfloat(_220.Load4(entityIndex * 16 + 0));
-    float4 param_2 = asfloat(_270.Load4(entityIndex * 16 + 0));
-    float4x4 _339 = mul(rotationMatrix(param_2), mul(scaleMatrix(param_1), translationMatrix(param)));
-    _320.Store4(entityIndex * 64 + 0, asuint(_339[0]));
-    _320.Store4(entityIndex * 64 + 16, asuint(_339[1]));
-    _320.Store4(entityIndex * 64 + 32, asuint(_339[2]));
-    _320.Store4(entityIndex * 64 + 48, asuint(_339[3]));
+    float4 param_1 = asfloat(_202.Load4(entityIndex * 16 + 0));
+    float4 param_2 = asfloat(_234.Load4(entityIndex * 16 + 0));
+    float4x4 _285 = mul(rotationMatrix(param_2), mul(scaleMatrix(param_1), translationMatrix(param)));
+    _266.Store4(entityIndex * 64 + 0, asuint(_285[0]));
+    _266.Store4(entityIndex * 64 + 16, asuint(_285[1]));
+    _266.Store4(entityIndex * 64 + 32, asuint(_285[2]));
+    _266.Store4(entityIndex * 64 + 48, asuint(_285[3]));
 }
 
 [numthreads(64, 1, 1)]

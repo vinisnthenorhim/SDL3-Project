@@ -83,7 +83,7 @@ kernel void main0(constant UniFormBuffer& _154 [[buffer(0)]], device CameraDataB
         ((device float*)&_166.cameraPosition[1])[0u] = 0.60000002384185791015625;
         ((device float*)&_166.cameraPosition[1])[1u] = 0.60000002384185791015625;
         ((device float*)&_166.cameraPosition[1])[2u] = 0.60000002384185791015625;
-        ((device float*)&_166.cameraPosition[1])[3u] = 1.0;
+        ((device float*)&_166.cameraPosition[1])[3u] = 0.60000002384185791015625;
         ((device float*)&_166.cameraPosition[2])[0u] = 0.0;
         ((device float*)&_166.cameraPosition[2])[1u] = 0.0;
         ((device float*)&_166.cameraPosition[2])[2u] = 0.0;
