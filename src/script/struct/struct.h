@@ -5,6 +5,9 @@
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
+typedef std::unordered_map<int64_t, std::unordered_map<int64_t, std::vector<int>>> Grid;
+typedef const std::unordered_map<std::string, int>* typeIDsData;
+
 struct ObjectData
 {
   uint32_t* playerId;
@@ -92,8 +95,6 @@ struct MovementStructData
 
   std::vector<ObjectDimension> *dimension;
 
-  std::vector<int>  *animatingCount;
-  std::vector<bool> *isAnimating;
 
   std::vector<float> *positionX    ;
   std::vector<float> *positionY    ;
@@ -109,5 +110,4 @@ struct MovementStructData
 };
 
 
-typedef const std::unordered_map<std::string, int>* typeIDsData;
 
