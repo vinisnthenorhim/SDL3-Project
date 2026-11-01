@@ -119,7 +119,6 @@ bool Camera::cameraPosition()
 }
 bool Camera::cameraZoom()
 {  
-
   if (followPlayer) return false;
 
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
@@ -142,6 +141,7 @@ bool Camera::cameraZoom()
     positionX[1]  *= zoomSpeed ;
     positionY[1]  *= zoomSpeed ;
     positionZ[1]  *= zoomSpeed ;
+
     return true;
   }
   else if( updateDataX[1] != 1 || updateDataY[1] != 1)
@@ -299,6 +299,10 @@ void Camera::updateData()
 {
   for (int a = 0; a < 4; a++)
   {
+    if (a == 1)
+    {
+      continue;
+    }
     positionX[a] += updateDataX[a] * delta;
     positionY[a] += updateDataY[a] * delta;
     positionZ[a] += updateDataZ[a] * delta;
