@@ -23,7 +23,7 @@ class Camera
     std::array<float, 4> updateDataY {0}  ;
     std::array<float, 4> updateDataZ {0}  ;
 
-    const float speedXYZ = 800.0f;
+    const float speedXYZ = 8000.0f;
     const float rotateSpeed = 3.0f;
     float zoomSpeed = 30.0f;
 
@@ -48,6 +48,7 @@ class Camera
     Position getCameraPosition();
     bool movingWindow();
     void setSettings( const SDL_Event* event);
+    void updateData();
 
     void itterate();
     void cameraEvent(const SDL_Event* event);

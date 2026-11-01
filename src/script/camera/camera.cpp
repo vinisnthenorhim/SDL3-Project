@@ -218,7 +218,7 @@ bool Camera::cameraRotate()
 }
 bool Camera::movingWindow()
 {
-  int x, y, w, h, cw, ch;
+  int x, y, cw, ch;
 
   SDL_GetWindowPosition(window, &x, &y);
   SDL_GetWindowSize(window, &cw, &ch);
@@ -288,9 +288,19 @@ void Camera::itterate()
 {
   deltaTime();
   cameraHandle();
+  updateData();
 }
 
 void Camera::cameraEvent(const SDL_Event* event)
 {
   setSettings(event);
+}
+void Camera::updateData()
+{
+  for (int a = 0; a < 4; a++)
+  {
+    positionX[a] += updateDataX[a] * delta;
+    positionY[a] += updateDataY[a] * delta;
+    positionZ[a] += updateDataZ[a] * delta;
+  }
 }
