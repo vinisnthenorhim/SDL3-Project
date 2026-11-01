@@ -1,6 +1,9 @@
 #include "_engine.h"
 #include <filesystem>
 #include <iostream>
+
+// #include <chrono>
+
 Engine::Engine()
 {
   window = new Window();
@@ -8,6 +11,7 @@ Engine::Engine()
   renderer = new Renderer(window->getWindowFirst());
   camera = new Camera(window->getWindowFirst());
   renderer->dataLoad(game->readData(), game->getObjectTranform(), camera->getCameraPosition());
+  game->loadData(camera->getCameraPosition());
 }
 
 
@@ -26,7 +30,10 @@ bool Engine::render()
 {
   game->render();
   camera->itterate();
+  // auto t0 = std::chrono::steady_clock::now();
   renderer->render();
+  // auto t1 = std::chrono::steady_clock::now();
+  // std::cout << "name: " << std::chrono::duration<float, std::milli>(t1 - t0).count() << " ms\n";
   return true;
 }
 
