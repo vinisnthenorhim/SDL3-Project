@@ -13,7 +13,6 @@ void Movement::updateCell()
 
   cell.clear();
   glm::vec3 center = getCenter();
-  std::cout << center.x << '\t' << center.y << '\n';
 
   int camX = (int)floorf(center.x / gridsize);
   int camY = (int)floorf(center.y / gridsize);

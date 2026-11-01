@@ -41,7 +41,7 @@ class Movement
     std::array<float, 4> *camPositionZ ;
 
     const int gridsize = 100;
-    const int updateSize = 8;
+    const int updateSize = 20;
     const int checksize = 1;
     const int step = 20;
     Grid cell;
