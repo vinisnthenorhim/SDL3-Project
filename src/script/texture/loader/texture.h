@@ -39,7 +39,7 @@ class Texture
 
     std::vector<AtlasDimension>  atlasDimension{};
     std::vector<SpriteDimension> spDimension   {};
-    std::vector<int>*   type         ;
+    const std::vector<int>*   type         ;
 
     Uint32 lastCount = 0;
 
@@ -52,7 +52,7 @@ class Texture
     void createTexture( SDL_GPUDevice* device );
     void updateTextureIdBUffer( SDL_GPUCopyPass* copypass );
     void loadTexture( SDL_GPUCopyPass* copypass);
-    void loadData(ObjectData data);
+    void loadData(ObjectDataRO objectDataRO);
     void createSampler();
     void setBinding();
     void release();

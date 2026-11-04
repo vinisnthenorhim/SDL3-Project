@@ -22,9 +22,9 @@ void Texture::createTexture( SDL_GPUDevice* device )
   this->device = device;
 }
 
-void Texture::loadData(ObjectData data)
+void Texture::loadData(ObjectDataRO objectDataRO)
 {
-  this->type = data.type;
+  this->type = objectDataRO.type;
 }
 
 void Texture::loadTexture( SDL_GPUCopyPass* copypass)
