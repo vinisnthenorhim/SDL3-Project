@@ -45,7 +45,9 @@ class Camera
     bool cameraZoom();
     bool cameraRotate();
     void deltaTime();
-    Position getCameraPosition();
+    CameraData cameraData();
+    CameraDataRW cameraDataRW();
+
     bool movingWindow();
     void setSettings( const SDL_Event* event);
     void updateData();

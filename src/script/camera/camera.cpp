@@ -268,7 +268,7 @@ void Camera::deltaTime()
 }
 
 
-Position Camera::getCameraPosition()
+CameraData Camera::cameraData()
 {
   return
   {
@@ -283,7 +283,21 @@ Position Camera::getCameraPosition()
     &positionZ
   };
 }
-
+CameraDataRW Camera::cameraDataRW()
+{
+  return
+  {
+    &followPlayer,
+    &delta,
+    &dirty,
+    &updateDataX,
+    &updateDataY,
+    &updateDataZ,
+    &positionX,
+    &positionY,
+    &positionZ
+  };
+}
 void Camera::itterate()
 {
   deltaTime();
