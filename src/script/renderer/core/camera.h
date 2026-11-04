@@ -5,24 +5,24 @@
 class CameraHandle
 {
   private:
-    Uint32* follow;
-    Uint32* entityId;
-    float* deltaTime;
-    bool* reset;
-    bool* dirty;
+    const uint32_t* follow;
+    const uint64_t* entityId;
+    const float* deltaTime;
+    const bool* reset;
+    const bool* dirty;
     bool created = false;
 
-    std::array<float, 4>* camPositionX = nullptr;
-    std::array<float, 4>* camPositionY = nullptr;
-    std::array<float, 4>* camPositionZ = nullptr;
+    const std::array<float, 4>* camPositionX = nullptr;
+    const std::array<float, 4>* camPositionY = nullptr;
+    const std::array<float, 4>* camPositionZ = nullptr;
 
-    std::array<float, 4>* updateDataX = nullptr;
-    std::array<float, 4>* updateDataY = nullptr;
-    std::array<float, 4>* updateDataZ = nullptr;
+    const std::array<float, 4>* updateDataX = nullptr;
+    const std::array<float, 4>* updateDataY = nullptr;
+    const std::array<float, 4>* updateDataZ = nullptr;
 
-    std::vector<float>* positionX    ;
-    std::vector<float>* positionY    ;
-    std::vector<float>* positionZ    ;
+    const std::vector<float>* positionX    ;
+    const std::vector<float>* positionY    ;
+    const std::vector<float>* positionZ    ;
     
     ComputePipeline cameraPipeline;
 
@@ -36,7 +36,7 @@ class CameraHandle
     SDL_GPUDevice* device = nullptr;
   public:
     void createCameraHandle(SDL_GPUDevice* device);
-    void loadData(ObjectData objectData, Position cameraPosition);
+    void loadData( ObjectDataRO objectData, CameraData cameraData );
 
     void createCamera( SDL_GPUCopyPass* copypass );
     void updateCameraData( SDL_GPUCopyPass* copypass );

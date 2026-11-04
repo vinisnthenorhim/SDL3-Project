@@ -37,24 +37,25 @@ void CameraHandle::createCameraHandle(SDL_GPUDevice* device)
   cameraPipeline.createComputePipeline(device, pipelineInfo);
 }
 
-void CameraHandle::loadData(ObjectData objectData, Position cameraPosition)
+void CameraHandle::loadData( ObjectDataRO objectDataRO, CameraData cameraData )
 {
-  this->positionX = objectData.positionX    ;
-  this->positionY = objectData.positionY    ;
-  this->positionZ = objectData.positionZ    ;
+  this->entityId  = objectDataRO.playerId     ;
+  this->positionX = objectDataRO.positionX    ;
+  this->positionY = objectDataRO.positionY    ;
+  this->positionZ = objectDataRO.positionZ    ;
+  this->entityId  = objectDataRO.playerId     ;
 
-  this->follow   = cameraPosition.follow  ;
-  this->entityId = objectData.playerId;
-  this->deltaTime = cameraPosition.deltaTime;
-  this->dirty = cameraPosition.dirty;
+  this->follow    = cameraData.follow  ;
+  this->deltaTime = cameraData.deltaTime;
+  this->dirty     = cameraData.dirty;
 
-  this->updateDataX = cameraPosition.updateDataX  ;
-  this->updateDataY = cameraPosition.updateDataY  ;
-  this->updateDataZ = cameraPosition.updateDataZ  ;
+  this->updateDataX = cameraData.updateDataX  ;
+  this->updateDataY = cameraData.updateDataY  ;
+  this->updateDataZ = cameraData.updateDataZ  ;
 
-  camPositionX = cameraPosition.positionX;
-  camPositionY = cameraPosition.positionY;
-  camPositionZ = cameraPosition.positionZ;
+  this->camPositionX = cameraData.positionX;
+  this->camPositionY = cameraData.positionY;
+  this->camPositionZ = cameraData.positionZ;
 }
 void CameraHandle::createCamera( SDL_GPUCopyPass* copypass)
 {
@@ -194,15 +195,15 @@ void CameraHandle::followEntity(SDL_GPUCopyPass* copypass)
 struct UniformData
 {
   float deltaTime;
-  Uint32 follow;
-  Uint32 entityId;
+  uint32_t follow;
+  uint32_t entityId;
+  uint32_t entityCount;
 };
 
 void CameraHandle::bind( SDL_GPUCommandBuffer* cmd, SDL_GPUBuffer* position)
 {
   if ( positionX->size() <= 0) return;
-  UniformData uniformData = {*deltaTime, *follow, *entityId};
-
+  UniformData uniformData = {*deltaTime, *follow, static_cast<uint32_t>(*entityId), static_cast<uint32_t>(positionX->size())};
   SDL_GPUStorageBufferReadWriteBinding rw[2] = {};
   rw[0].buffer = cameraPosition.buffer();
   rw[0].cycle  = false;
