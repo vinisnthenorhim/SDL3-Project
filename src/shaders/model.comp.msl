@@ -13,7 +13,7 @@ struct UniFormBuffer
 
 struct PositionBuffer
 {
-    float4 position[1];
+    float position[1];
 };
 
 struct VelocityBuffer
@@ -23,7 +23,7 @@ struct VelocityBuffer
 
 struct ScalingBuffer
 {
-    float4 scaling[1];
+    float scaling[1];
 };
 
 struct ScaleBuffer
@@ -33,7 +33,7 @@ struct ScaleBuffer
 
 struct RotationBuffer
 {
-    float4 rotation[1];
+    float rotation[1];
 };
 
 struct RotateBuffer
@@ -85,25 +85,34 @@ float4x4 rotationMatrix(thread const float4& rotation)
     return result;
 }
 
-kernel void main0(constant UniFormBuffer& _155 [[buffer(0)]], device VelocityBuffer& _174 [[buffer(1)]], device ScaleBuffer& _207 [[buffer(2)]], device RotateBuffer& _239 [[buffer(3)]], device ModelMatrixBuffer& _266 [[buffer(4)]], device PositionBuffer& _168 [[buffer(5)]], device ScalingBuffer& _202 [[buffer(6)]], device RotationBuffer& _234 [[buffer(7)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
+kernel void main0(constant UniFormBuffer& _155 [[buffer(0)]], device VelocityBuffer& _174 [[buffer(1)]], device ScaleBuffer& _234 [[buffer(2)]], device RotateBuffer& _296 [[buffer(3)]], device ModelMatrixBuffer& _407 [[buffer(4)]], device PositionBuffer& _168 [[buffer(5)]], device ScalingBuffer& _229 [[buffer(6)]], device RotationBuffer& _288 [[buffer(7)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]])
 {
     uint entityIndex = gl_GlobalInvocationID.x;
     if (entityIndex >= _155.entityCount)
     {
         return;
     }
-    ((device float*)&_168.position[entityIndex])[0u] = _174.velocity[entityIndex];
-    ((device float*)&_168.position[entityIndex])[1u] = _174.velocity[entityIndex + _155.entityCount];
-    ((device float*)&_168.position[entityIndex])[2u] = _174.velocity[(entityIndex + _155.entityCount) + _155.entityCount];
-    ((device float*)&_202.scaling[entityIndex])[0u] = _207.scale[entityIndex];
-    ((device float*)&_202.scaling[entityIndex])[1u] = _207.scale[entityIndex + _155.entityCount];
-    ((device float*)&_202.scaling[entityIndex])[2u] = _207.scale[(entityIndex + _155.entityCount) + _155.entityCount];
-    ((device float*)&_234.rotation[entityIndex])[0u] = _239.rotate[entityIndex];
-    ((device float*)&_234.rotation[entityIndex])[1u] = _239.rotate[entityIndex + _155.entityCount];
-    ((device float*)&_234.rotation[entityIndex])[2u] = _239.rotate[(entityIndex + _155.entityCount) + _155.entityCount];
-    float4 param = _168.position[entityIndex];
-    float4 param_1 = _202.scaling[entityIndex];
-    float4 param_2 = _234.rotation[entityIndex];
-    _266.modelMat[entityIndex] = (translationMatrix(param) * scaleMatrix(param_1)) * rotationMatrix(param_2);
+    _168.position[entityIndex] += (_174.velocity[entityIndex] * _155.deltaTime);
+    uint _189 = entityIndex + _155.entityCount;
+    _168.position[_189] += (_174.velocity[entityIndex + _155.entityCount] * _155.deltaTime);
+    uint _209 = (entityIndex + _155.entityCount) + _155.entityCount;
+    _168.position[_209] += (_174.velocity[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    _229.scaling[entityIndex] += (_234.scale[entityIndex] * _155.deltaTime);
+    uint _248 = entityIndex + _155.entityCount;
+    _229.scaling[_248] += (_234.scale[entityIndex + _155.entityCount] * _155.deltaTime);
+    uint _268 = (entityIndex + _155.entityCount) + _155.entityCount;
+    _229.scaling[_268] += (_234.scale[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    uint _292 = entityIndex + _155.entityCount;
+    _288.rotation[_292] += (_296.rotate[entityIndex + _155.entityCount] * _155.deltaTime);
+    _288.rotation[entityIndex] += (_296.rotate[entityIndex] * _155.deltaTime);
+    uint _327 = (entityIndex + _155.entityCount) + _155.entityCount;
+    _288.rotation[_327] += (_296.rotate[(entityIndex + _155.entityCount) + _155.entityCount] * _155.deltaTime);
+    float4 tempPos = float4(_168.position[entityIndex], _168.position[entityIndex + _155.entityCount], _168.position[(entityIndex + _155.entityCount) + _155.entityCount], 1.0);
+    float4 tempScl = float4(_229.scaling[entityIndex], _229.scaling[entityIndex + _155.entityCount], _229.scaling[(entityIndex + _155.entityCount) + _155.entityCount], 1.0);
+    float4 tempRot = float4(_288.rotation[entityIndex], _288.rotation[entityIndex + _155.entityCount], _288.rotation[(entityIndex + _155.entityCount) + _155.entityCount], 1.0);
+    float4 param = tempPos;
+    float4 param_1 = tempScl;
+    float4 param_2 = tempRot;
+    _407.modelMat[entityIndex] = (translationMatrix(param) * scaleMatrix(param_1)) * rotationMatrix(param_2);
 }
 

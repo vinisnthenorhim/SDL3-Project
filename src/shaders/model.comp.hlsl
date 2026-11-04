@@ -8,11 +8,11 @@ cbuffer UniFormBuffer : register(b0, space2)
 
 RWByteAddressBuffer _168 : register(u1, space1);
 ByteAddressBuffer _174 : register(t0, space0);
-RWByteAddressBuffer _202 : register(u2, space1);
-ByteAddressBuffer _207 : register(t1, space0);
-RWByteAddressBuffer _234 : register(u3, space1);
-ByteAddressBuffer _239 : register(t2, space0);
-RWByteAddressBuffer _266 : register(u0, space1);
+RWByteAddressBuffer _229 : register(u2, space1);
+ByteAddressBuffer _234 : register(t1, space0);
+RWByteAddressBuffer _288 : register(u3, space1);
+ByteAddressBuffer _296 : register(t2, space0);
+RWByteAddressBuffer _407 : register(u0, space1);
 
 static uint3 gl_GlobalInvocationID;
 struct SPIRV_Cross_Input
@@ -61,23 +61,32 @@ void main_inner()
     {
         return;
     }
-    _168.Store(entityIndex * 16 + 0, asuint(asfloat(_174.Load(entityIndex * 4 + 0))));
-    _168.Store(entityIndex * 16 + 4, asuint(asfloat(_174.Load((entityIndex + _155_entityCount) * 4 + 0))));
-    _168.Store(entityIndex * 16 + 8, asuint(asfloat(_174.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
-    _202.Store(entityIndex * 16 + 0, asuint(asfloat(_207.Load(entityIndex * 4 + 0))));
-    _202.Store(entityIndex * 16 + 4, asuint(asfloat(_207.Load((entityIndex + _155_entityCount) * 4 + 0))));
-    _202.Store(entityIndex * 16 + 8, asuint(asfloat(_207.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
-    _234.Store(entityIndex * 16 + 0, asuint(asfloat(_239.Load(entityIndex * 4 + 0))));
-    _234.Store(entityIndex * 16 + 4, asuint(asfloat(_239.Load((entityIndex + _155_entityCount) * 4 + 0))));
-    _234.Store(entityIndex * 16 + 8, asuint(asfloat(_239.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0))));
-    float4 param = asfloat(_168.Load4(entityIndex * 16 + 0));
-    float4 param_1 = asfloat(_202.Load4(entityIndex * 16 + 0));
-    float4 param_2 = asfloat(_234.Load4(entityIndex * 16 + 0));
-    float4x4 _285 = mul(rotationMatrix(param_2), mul(scaleMatrix(param_1), translationMatrix(param)));
-    _266.Store4(entityIndex * 64 + 0, asuint(_285[0]));
-    _266.Store4(entityIndex * 64 + 16, asuint(_285[1]));
-    _266.Store4(entityIndex * 64 + 32, asuint(_285[2]));
-    _266.Store4(entityIndex * 64 + 48, asuint(_285[3]));
+    _168.Store(entityIndex * 4 + 0, asuint(asfloat(_168.Load(entityIndex * 4 + 0)) + (asfloat(_174.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
+    uint _189 = entityIndex + _155_entityCount;
+    _168.Store(_189 * 4 + 0, asuint(asfloat(_168.Load(_189 * 4 + 0)) + (asfloat(_174.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    uint _209 = (entityIndex + _155_entityCount) + _155_entityCount;
+    _168.Store(_209 * 4 + 0, asuint(asfloat(_168.Load(_209 * 4 + 0)) + (asfloat(_174.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    _229.Store(entityIndex * 4 + 0, asuint(asfloat(_229.Load(entityIndex * 4 + 0)) + (asfloat(_234.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
+    uint _248 = entityIndex + _155_entityCount;
+    _229.Store(_248 * 4 + 0, asuint(asfloat(_229.Load(_248 * 4 + 0)) + (asfloat(_234.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    uint _268 = (entityIndex + _155_entityCount) + _155_entityCount;
+    _229.Store(_268 * 4 + 0, asuint(asfloat(_229.Load(_268 * 4 + 0)) + (asfloat(_234.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    uint _292 = entityIndex + _155_entityCount;
+    _288.Store(_292 * 4 + 0, asuint(asfloat(_288.Load(_292 * 4 + 0)) + (asfloat(_296.Load((entityIndex + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    _288.Store(entityIndex * 4 + 0, asuint(asfloat(_288.Load(entityIndex * 4 + 0)) + (asfloat(_296.Load(entityIndex * 4 + 0)) * _155_deltaTime)));
+    uint _327 = (entityIndex + _155_entityCount) + _155_entityCount;
+    _288.Store(_327 * 4 + 0, asuint(asfloat(_288.Load(_327 * 4 + 0)) + (asfloat(_296.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)) * _155_deltaTime)));
+    float4 tempPos = float4(asfloat(_168.Load(entityIndex * 4 + 0)), asfloat(_168.Load((entityIndex + _155_entityCount) * 4 + 0)), asfloat(_168.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)), 1.0f);
+    float4 tempScl = float4(asfloat(_229.Load(entityIndex * 4 + 0)), asfloat(_229.Load((entityIndex + _155_entityCount) * 4 + 0)), asfloat(_229.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)), 1.0f);
+    float4 tempRot = float4(asfloat(_288.Load(entityIndex * 4 + 0)), asfloat(_288.Load((entityIndex + _155_entityCount) * 4 + 0)), asfloat(_288.Load(((entityIndex + _155_entityCount) + _155_entityCount) * 4 + 0)), 1.0f);
+    float4 param = tempPos;
+    float4 param_1 = tempScl;
+    float4 param_2 = tempRot;
+    float4x4 _419 = mul(rotationMatrix(param_2), mul(scaleMatrix(param_1), translationMatrix(param)));
+    _407.Store4(entityIndex * 64 + 0, asuint(_419[0]));
+    _407.Store4(entityIndex * 64 + 16, asuint(_419[1]));
+    _407.Store4(entityIndex * 64 + 32, asuint(_419[2]));
+    _407.Store4(entityIndex * 64 + 48, asuint(_419[3]));
 }
 
 [numthreads(64, 1, 1)]
