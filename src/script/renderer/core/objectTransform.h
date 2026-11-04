@@ -26,22 +26,28 @@ class ObjectTransform
 
     Buffer modelBuffer;
 
-    std::vector<float>* positionX    ;   std::vector<float>* scalingX    ;  std::vector<float>* rotationX    ;
-    std::vector<float>* positionY    ;   std::vector<float>* scalingY    ;  std::vector<float>* rotationY    ;
-    std::vector<float>* positionZ    ;   std::vector<float>* scalingZ    ;  std::vector<float>* rotationZ    ;
-
-    std::vector<bool>  *dirtyVelocity;  std::vector<bool>  *dirtyScale   ;  std::vector<bool>  *dirtyRotate  ;
-    std::vector<float> *velocityX    ;  std::vector<float> *scaleX       ;  std::vector<float> *rotateX      ;
-    std::vector<float> *velocityY    ;  std::vector<float> *scaleY       ;  std::vector<float> *rotateY      ;
-    std::vector<float> *velocityZ    ;  std::vector<float> *scaleZ       ;  std::vector<float> *rotateZ      ;
+    const std::vector<float>* positionX    ;   const std::vector<float>* scalingX    ;  const std::vector<float>* rotationX    ;
+    const std::vector<float>* positionY    ;   const std::vector<float>* scalingY    ;  const std::vector<float>* rotationY    ;
+    const std::vector<float>* positionZ    ;   const std::vector<float>* scalingZ    ;  const std::vector<float>* rotationZ    ;
+    const std::vector<float> *velocityX    ;   const std::vector<float> *scaleX      ;  const std::vector<float> *rotateX      ;
+    const std::vector<float> *velocityY    ;   const std::vector<float> *scaleY      ;  const std::vector<float> *rotateY      ;
+    const std::vector<float> *velocityZ    ;   const std::vector<float> *scaleZ      ;  const std::vector<float> *rotateZ      ;
 
     const std::vector<float> *speedX       ;  const std::vector<float> *speedY       ;
 
-    const std::vector<bool> *visible       ;  float *deltaTime                 ;
+    const std::vector<bool> *exist         ;  const float *secondPerFrame            ;
 
-    std::vector<glm::vec3> position;
-    std::vector<glm::vec3> scaling;
-    std::vector<glm::vec3> rotation;
+    std::vector<bool>*  dirtyPosition;
+    std::vector<bool>*  dirtyScaling ;
+    std::vector<bool>*  dirtyRotation;
+
+    std::vector<bool>*  dirtyVelocity;
+    std::vector<bool>*  dirtyScale   ;
+    std::vector<bool>*  dirtyRotate  ;
+
+    // std::vector<glm::vec3> position;
+    // std::vector<glm::vec3> scaling;
+    // std::vector<glm::vec3> rotation;
 
     Uint32 entityCount = 0;
 
@@ -49,9 +55,8 @@ class ObjectTransform
 
   public:
     void createObjectTransform(SDL_GPUDevice* device);
-    void loadData( ObjectData objectData, ObjectTransformData objectTransform);
+    void loadData( ObjectDataRO objectDataRO, DirtyData dirtyData);
     void updateDataSize( SDL_GPUCopyPass* copypass );
-    void updateData (  SDL_GPUCopyPass* copypass  );
     void updateTransform( SDL_GPUCopyPass* copypass );
     void bind( SDL_GPUCommandBuffer* cmd);
     void bindG(SDL_GPURenderPass* pass, uint32_t slot);

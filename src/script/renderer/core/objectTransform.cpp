@@ -39,135 +39,163 @@ void ObjectTransform::createObjectTransform(SDL_GPUDevice* device)
 }
 
 
-void ObjectTransform::loadData(ObjectData objectData, ObjectTransformData objectTransform)
+void ObjectTransform::loadData( ObjectDataRO objectDataRO, DirtyData dirtyData )
 {
-    this->positionX = objectData.positionX    ;  this->scalingX = objectData.scalingX    ;  this->rotationX = objectData.rotationX;
-    this->positionY = objectData.positionY    ;  this->scalingY = objectData.scalingY    ;  this->rotationY = objectData.rotationY;
-    this->positionZ = objectData.positionZ    ;  this->scalingZ = objectData.scalingZ    ;  this->rotationZ = objectData.rotationZ; 
+    this->positionX = objectDataRO.positionX    ;  this->scalingX = objectDataRO.scalingX    ;  this->rotationX = objectDataRO.rotationX;
+    this->positionY = objectDataRO.positionY    ;  this->scalingY = objectDataRO.scalingY    ;  this->rotationY = objectDataRO.rotationY;
+    this->positionZ = objectDataRO.positionZ    ;  this->scalingZ = objectDataRO.scalingZ    ;  this->rotationZ = objectDataRO.rotationZ; 
 
-    this->dirtyVelocity = objectTransform.dirtyVelocity;  this->dirtyScale  = objectTransform.dirtyScale;  this->dirtyRotate = objectTransform.dirtyRotate;
-    this->velocityX     = objectTransform.velocityX    ;  this->scaleX      = objectTransform.scaleX    ;  this->rotateX     = objectTransform.rotateX    ;
-    this->velocityY     = objectTransform.velocityY    ;  this->scaleY      = objectTransform.scaleY    ;  this->rotateY     = objectTransform.rotateY    ;
-    this->velocityZ     = objectTransform.velocityZ    ;  this->scaleZ      = objectTransform.scaleZ    ;  this->rotateZ     = objectTransform.rotateZ    ;
+    this->velocityX     = objectDataRO.velocityX    ;  this->scaleX      = objectDataRO.scaleX    ;  this->rotateX     = objectDataRO.rotateX    ;
+    this->velocityY     = objectDataRO.velocityY    ;  this->scaleY      = objectDataRO.scaleY    ;  this->rotateY     = objectDataRO.rotateY    ;
+    this->velocityZ     = objectDataRO.velocityZ    ;  this->scaleZ      = objectDataRO.scaleZ    ;  this->rotateZ     = objectDataRO.rotateZ    ;
 
-    this->speedX = objectData.speedX; this->speedY = objectData.speedY; this->visible = objectData.visible; this->deltaTime = objectTransform.secondPerFrame;
+    this->dirtyPosition  = dirtyData.dirtyPosition;
+    this->dirtyScaling   = dirtyData.dirtyScaling ;
+    this->dirtyRotation  = dirtyData.dirtyRotation;
+
+    this->dirtyVelocity = dirtyData.dirtyVelocity   ;  
+    this->dirtyScale    = dirtyData.dirtyScale      ;  
+    this->dirtyRotate   = dirtyData.dirtyRotate     ;
+
+
+    this->speedX = objectDataRO.speedX; 
+    this->speedY = objectDataRO.speedY; 
+    this->exist = objectDataRO.exist; 
+    this->secondPerFrame = objectDataRO.secondPerFrame;
 }
 
 void ObjectTransform::updateDataSize( SDL_GPUCopyPass* copypass)
 {
-  Uint32 currentCount = visible->size();
-  if(currentCount <= entityCount || currentCount <= 0) return;
+  Uint32 currentCount = exist->size();
 
-  Uint32 offset = entityCount * sizeof(glm::vec4);
-  Uint32 newCount = currentCount - entityCount;
-  Uint32 newBytes = newCount * sizeof(glm::vec4); 
+  size_t size = currentCount * 3 * sizeof(float); 
+  Uint32 offset = sizeof(float) * exist->size();
 
-  position.resize(currentCount);                              
-  scaling .resize(currentCount);
-  rotation.resize(currentCount);
 
-  std::vector<glm::vec4> tempPosData{};
-  std::vector<glm::vec4> tempSclData{};
-  std::vector<glm::vec4> tempRotData{};
+  if (!positionBuffer.buffer() ) positionBuffer.createBuffer(device, size, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+  else {positionBuffer.updateBufferSize( copypass, size , false );}
+  if (!scalingBuffer.buffer()  ) scalingBuffer .createBuffer(device, size,  SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+  else {scalingBuffer .updateBufferSize( copypass, size , false );}
+  if (!rotationBuffer.buffer() ) rotationBuffer.createBuffer(device, size, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+  else {rotationBuffer.updateBufferSize( copypass, size , false );}
+  if (!modelBuffer.buffer()    ) modelBuffer   .createBuffer(device, sizeof(glm::mat4) * exist->size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
+  else {modelBuffer   .updateBufferSize( copypass, sizeof(glm::mat4) * exist->size(), true );}
 
-  for( Uint32 a = entityCount; a < currentCount; a++)
+  bool posDirty = false;
+  bool sclDirty = false;
+  bool rotDirty = false;
+
+
+  for ( int a = 0; a < dirtyPosition->size(); a++ ) 
   {
-    position[a].x = (*positionX)[a];
-    position[a].y = (*positionY)[a];
-    position[a].z = (*positionZ)[a];
-
-    scaling[a].x  = (*scalingX)[a];
-    scaling[a].y  = (*scalingY)[a];
-    scaling[a].z  = (*scalingZ)[a];
-
-    rotation[a].x = (*rotationX)[a];
-    rotation[a].y = (*rotationY)[a];
-    rotation[a].z = (*rotationZ)[a];
-
-    tempPosData.emplace_back((*positionX)[a], (*positionY)[a], (*positionZ)[a], 1.0f);
-    tempSclData.emplace_back((*scalingX)[a] , (*scalingY)[a] , (*scalingZ)[a] , 1.0f);
-    tempRotData.emplace_back((*rotationX)[a], (*rotationY)[a], (*rotationZ)[a], 1.0f);
+    if((*dirtyPosition)[a] == true) 
+    {
+      posDirty = true;
+            for ( int a = 0; a < dirtyPosition->size(); a++ ) 
+        (*dirtyPosition)[a] == false;
+      break;
+    }
+  }
+  for ( int a = 0; a < dirtyScaling->size(); a++ ) 
+  {
+    if((*dirtyScaling)[a] == true) 
+    {
+      sclDirty = true;
+      for ( int a = 0; a < dirtyScaling->size(); a++ ) 
+        (*dirtyScaling)[a] == false;
+      break;
+    }
+  }  
+  for ( int a = 0; a < dirtyRotation->size(); a++ ) 
+  {
+    if((*dirtyRotation)[a] == true) 
+    {
+      rotDirty = true;
+      for ( int a = 0; a < dirtyRotation->size(); a++ ) 
+        (*dirtyRotation)[a] == false;
+      break;
+    }
   }
 
-  if (!positionBuffer.buffer() ) positionBuffer.createBuffer(device, sizeof(glm::vec4) * position.size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
-  else {positionBuffer.updateBufferSize( copypass, sizeof(glm::vec4) * position.size(), true );}
-  if (!scalingBuffer.buffer()  ) scalingBuffer .createBuffer(device, sizeof(glm::vec4) * scaling.size(),  SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
-  else {scalingBuffer .updateBufferSize( copypass, sizeof(glm::vec4) * scaling.size() , true );}
-  if (!rotationBuffer.buffer() ) rotationBuffer.createBuffer(device, sizeof(glm::vec4) * rotation.size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
-  else {rotationBuffer.updateBufferSize( copypass, sizeof(glm::vec4) * rotation.size(), true );}
-  if (!modelBuffer.buffer()    ) modelBuffer   .createBuffer(device, sizeof(glm::mat4) * visible->size(), SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ | SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE);
-  else {modelBuffer   .updateBufferSize( copypass, sizeof(glm::mat4) * rotation.size(), true );}
-
-  positionTransfer.createTransferBuffer(device, newBytes);
-  scalingTransfer .createTransferBuffer(device, newBytes);
-  rotationTransfer.createTransferBuffer(device, newBytes);
-  if(!tempPosData.empty())
+  if (posDirty)
   {
-    uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, positionTransfer.buffer(), false);
-    SDL_memcpy(positionMapped, tempPosData.data(), newBytes);
+    positionTransfer.createTransferBuffer(device, 3 * sizeof(float) * exist->size());
+    uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, positionTransfer.buffer(), false);
+    if (!mapped) return;
+    SDL_memcpy(mapped + 0 * offset , positionX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , positionY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , positionZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, positionTransfer.buffer());
 
-    SDL_GPUTransferBufferLocation possrc = {};
-    SDL_GPUBufferRegion           posdst = {};
 
-    possrc.transfer_buffer = positionTransfer.buffer();
-    possrc.offset = 0;
-    posdst.buffer = positionBuffer.buffer();
-    posdst.offset = offset;
-    posdst.size   = newBytes;
-    SDL_UploadToGPUBuffer(copypass, &possrc, &posdst, false);
+    SDL_GPUTransferBufferLocation src = {};
+    src.transfer_buffer = positionTransfer.buffer();
+    src.offset = 0                ;
+
+    SDL_GPUBufferRegion dst = {};
+    dst.buffer = positionBuffer.buffer();
+    dst.size   = 3 * sizeof(float) * exist->size();
+    dst.offset = 0         ; 
+    SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+
   }
-  if(!tempSclData.empty())
+
+  if (sclDirty)
   {
-    uint8_t* scalingMapped  = (uint8_t*)SDL_MapGPUTransferBuffer(device,  scalingTransfer.buffer(), false);
-    SDL_memcpy(scalingMapped  , tempSclData.data(), newBytes);
+    scalingTransfer.createTransferBuffer(device, 3 * sizeof(float) * exist->size());
+    uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, scalingTransfer.buffer(), false);
+    if (!mapped) return;
+    SDL_memcpy(mapped + 0 * offset , scalingX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , scalingY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , scalingZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, scalingTransfer.buffer());
 
-    SDL_GPUTransferBufferLocation sclsrc = {};
-    SDL_GPUBufferRegion           scldst = {};
+    SDL_GPUTransferBufferLocation src = {};
+    src.transfer_buffer = scalingTransfer.buffer();
+    src.offset = 0                ;
 
-    sclsrc.transfer_buffer = scalingTransfer.buffer();
-    sclsrc.offset = 0;
-    scldst.buffer = scalingBuffer.buffer();
-    scldst.offset = offset;
-    scldst.size   = newBytes;
-    SDL_UploadToGPUBuffer(copypass, &sclsrc, &scldst, false);
+    SDL_GPUBufferRegion dst = {};
+    dst.buffer = scalingBuffer.buffer();
+    dst.size   = 3 * sizeof(float) * exist->size();
+    dst.offset = 0         ; 
+
+    SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+
   }
-  if(!tempRotData.empty())
+
+  if (rotDirty)
   {
-    uint8_t* rotationMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, rotationTransfer.buffer(), false);
-    SDL_memcpy(rotationMapped , tempRotData.data(), newBytes);
+    rotationTransfer.createTransferBuffer(device,   3 * sizeof(float) * exist->size());
+
+    uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, rotationTransfer.buffer(), false);
+    if (!mapped) return;
+    SDL_memcpy(mapped + 0 * offset , rotationX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , rotationY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , rotationZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, rotationTransfer.buffer());
 
-    SDL_GPUTransferBufferLocation rotsrc = {};
-    SDL_GPUBufferRegion           rotdst = {};
+    SDL_GPUTransferBufferLocation src = {};
+    src.transfer_buffer = rotationTransfer.buffer();
+    src.offset = 0                ;
 
-    rotsrc.transfer_buffer = rotationTransfer.buffer();
-    rotsrc.offset = 0;
-    rotdst.buffer = rotationBuffer.buffer();
-    rotdst.offset = offset;
-    rotdst.size   = newBytes;
+    SDL_GPUBufferRegion dst = {};
+    dst.buffer = rotationBuffer.buffer();
+    dst.size   = 3 * sizeof(float) * exist->size();
+    dst.offset = 0         ; 
 
-    SDL_UploadToGPUBuffer(copypass, &rotsrc, &rotdst, false);
+    SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
+
   }
 }
 
-void ObjectTransform::updateData(  SDL_GPUCopyPass* copypass )
-{
-  Uint32 currentCount = visible->size();
-  if( currentCount <= 0 ) return;
-
-  Uint32 bufferSize = 3 * visible->size() * sizeof(float);
-  Uint32 offset = sizeof(float) * visible->size();
-}
 
 void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 {
-  Uint32 currentCount = visible->size();
+  Uint32 currentCount = exist->size();
   if( currentCount <= 0 ) return;
 
-  Uint32 bufferSize = 3 * visible->size() * sizeof(float);
-  Uint32 offset = sizeof(float) * visible->size();
+  Uint32 bufferSize = 3 * exist->size() * sizeof(float);
+  Uint32 offset = sizeof(float) * exist->size();
 
   if (!velocityBuffer.buffer() )  velocityBuffer.createBuffer(device, bufferSize, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
   else {velocityBuffer.updateBufferSize(copypass, bufferSize, false);}
@@ -179,7 +207,6 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
   bool velDirty = false;
   bool sclDirty = false;
   bool rotDirty = false;
-
 
 
   for ( int a = 0; a < dirtyVelocity->size(); a++ ) 
@@ -215,12 +242,12 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
   if (velDirty)
   {
-    veloTrans.createTransferBuffer(device, 3 * sizeof(float) * visible->size());
+    veloTrans.createTransferBuffer(device, 3 * sizeof(float) * exist->size());
     uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, veloTrans.buffer(), false);
     if (!mapped) return;
-    SDL_memcpy(mapped + 0 * offset , positionX->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 1 * offset , positionY->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 2 * offset , positionZ->data(), visible->size() * sizeof(float));
+    SDL_memcpy(mapped + 0 * offset , velocityX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , velocityY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , velocityZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, veloTrans.buffer());
 
 
@@ -230,7 +257,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
     SDL_GPUBufferRegion dst = {};
     dst.buffer = velocityBuffer.buffer();
-    dst.size   = 3 * sizeof(float) * visible->size();
+    dst.size   = 3 * sizeof(float) * exist->size();
     dst.offset = 0         ; 
     SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
 
@@ -238,12 +265,12 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
   if (sclDirty)
   {
-    scalTrans.createTransferBuffer(device, 3 * sizeof(float) * visible->size());
+    scalTrans.createTransferBuffer(device, 3 * sizeof(float) * exist->size());
     uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, scalTrans.buffer(), false);
     if (!mapped) return;
-    SDL_memcpy(mapped + 0 * offset , scalingX->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 1 * offset , scalingY->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 2 * offset , scalingZ->data(), visible->size() * sizeof(float));
+    SDL_memcpy(mapped + 0 * offset , scaleX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , scaleY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , scaleZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, scalTrans.buffer());
 
     SDL_GPUTransferBufferLocation src = {};
@@ -252,7 +279,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
     SDL_GPUBufferRegion dst = {};
     dst.buffer = scaleBuffer.buffer();
-    dst.size   = 3 * sizeof(float) * visible->size();
+    dst.size   = 3 * sizeof(float) * exist->size();
     dst.offset = 0         ; 
 
     SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
@@ -261,13 +288,13 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
   if (rotDirty)
   {
-    rotaTrans.createTransferBuffer(device,   3 * sizeof(float) * visible->size());
+    rotaTrans.createTransferBuffer(device,   3 * sizeof(float) * exist->size());
 
     uint8_t* mapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, rotaTrans.buffer(), false);
     if (!mapped) return;
-    SDL_memcpy(mapped + 0 * offset , rotationX->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 1 * offset , rotationY->data(), visible->size() * sizeof(float));
-    SDL_memcpy(mapped + 2 * offset , rotationZ->data(), visible->size() * sizeof(float));
+    SDL_memcpy(mapped + 0 * offset , rotateX->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 1 * offset , rotateY->data(), exist->size() * sizeof(float));
+    SDL_memcpy(mapped + 2 * offset , rotateZ->data(), exist->size() * sizeof(float));
     SDL_UnmapGPUTransferBuffer(device, rotaTrans.buffer());
 
     SDL_GPUTransferBufferLocation src = {};
@@ -276,7 +303,7 @@ void ObjectTransform::updateTransform( SDL_GPUCopyPass* copypass)
 
     SDL_GPUBufferRegion dst = {};
     dst.buffer = rotateBuffer.buffer();
-    dst.size   = 3 * sizeof(float) * visible->size();
+    dst.size   = 3 * sizeof(float) * exist->size();
     dst.offset = 0         ; 
 
     SDL_UploadToGPUBuffer(copypass, &src, &dst, false);
@@ -292,11 +319,11 @@ struct UniformData
 
 void ObjectTransform::bind(SDL_GPUCommandBuffer* cmd)
 {
-  entityCount = visible->size();
+  entityCount = exist->size();
   if (!computePipeline.pipeline() || entityCount == 0) return;
 
   Uint32 groupCount = (entityCount + 64 - 1) / 64;
-  UniformData uniformData = {*deltaTime, entityCount};
+  UniformData uniformData = {*secondPerFrame, entityCount};
 
   SDL_GPUStorageBufferReadWriteBinding rw[4] = {};
   rw[0].buffer = modelBuffer.buffer();
@@ -357,7 +384,7 @@ void ObjectTransform::release()
 
 void ObjectTransform::bindG(SDL_GPURenderPass* pass, uint32_t slot)
 {
-  if (visible->size() <= 0) return;
+  if (exist->size() <= 0) return;
   SDL_GPUBuffer* bufs[] = { modelBuffer.buffer() };
 
   SDL_BindGPUVertexStorageBuffers( pass, slot, bufs, 1);
