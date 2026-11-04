@@ -24,8 +24,8 @@ Renderer::Renderer(SDL_Window* window)
   target.clear_color = (SDL_FColor) {0.0f, 0.0f, 0.0f, 0.0f};
   target.load_op = SDL_GPU_LOADOP_CLEAR;
   target.store_op = SDL_GPU_STOREOP_STORE;
-
   renderpass = SDL_BeginGPURenderPass(cmdBuffer, &target, 1, nullptr);
+  
   SDL_EndGPURenderPass(renderpass);
   SDL_SubmitGPUCommandBuffer(cmdBuffer);
 
@@ -57,12 +57,12 @@ void Renderer::screenUpdate(const SDL_Event* event)
 }
 
 
-void Renderer::dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition)
+void Renderer::loadData( ObjectDataRO objectDataRO, DirtyData dirtyData, CameraData cameraData )
 {
-  texture.loadData(objectData);
-  objectTransform.loadData(objectData, objectTransformData);
-  objectRender.resourceLoad(objectData);
-  camera.loadData(objectData, cameraPosition);
+  texture        .loadData (objectDataRO);
+  objectTransform.loadData (objectDataRO, dirtyData);
+  objectRender   .laodData (objectDataRO);
+  camera         .loadData (objectDataRO, cameraData);
 }
 
 
@@ -73,10 +73,13 @@ void Renderer::render()
   if(!cmdBuffer) return;
   SDL_WaitAndAcquireGPUSwapchainTexture(cmdBuffer, window, &swap, nullptr, nullptr);
 
+  // SDL_Log("1\n");
   copypass = SDL_BeginGPUCopyPass(cmdBuffer);
+  // SDL_Log("2\n");
 
   objectTransform.updateDataSize(copypass);
   objectTransform.updateTransform(copypass);
+  // SDL_Log("3\n");
 
   camera.createCamera(copypass);
 
@@ -85,6 +88,7 @@ void Renderer::render()
   texture.updateTextureIdBUffer(copypass);
   texture.getAtlasData(copypass);
   texture.loadTexture(copypass);
+  // SDL_Log("4\n");
 
   SDL_EndGPUCopyPass(copypass);
   texture.setBinding();
@@ -92,6 +96,7 @@ void Renderer::render()
   objectTransform.bind(cmdBuffer);
   camera.bind(cmdBuffer, objectTransform.getPos());
 
+  // SDL_Log("5\n");
 
   SDL_GPUColorTargetInfo target {};
 

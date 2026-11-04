@@ -16,7 +16,7 @@ class Renderer
     public:
         Renderer(SDL_Window* window);
         ~Renderer();
-        void dataLoad(ObjectData objectData, ObjectTransformData objectTransformData, Position cameraPosition);
+        void loadData( ObjectDataRO objectDataRO, DirtyData dirtyData, CameraData cameraData );
 
         void screenUpdate(const SDL_Event* event);
 
@@ -36,8 +36,6 @@ class Renderer
       Projection      projection;
       CameraHandle    camera;
       Texture         texture;
-
-
 
 };
 
