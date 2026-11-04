@@ -11,10 +11,12 @@ class Game
     void render();
     void event(const SDL_Event* event);
     void update();
-    void loadData(Position cameraPosition);
+    void loadData(CameraDataRW cameraDataRW);
 
-    ObjectData readData() {return world.readData();};
-    ObjectTransformData getObjectTranform() {return world.getObjectTranform();};
+    ObjectDataRO readOnlyData() {return world.readOnlyData() ; }
+    ObjectDataRW readWriteData(){return world.readWriteData(); }
+    DirtyData    dirtyData()    {return world.dirtyData()    ; }
+
     ~Game()
     {
       world.saveData();
@@ -23,7 +25,7 @@ class Game
     SDL_Window* window = nullptr;
     const SDL_Event* eventH = nullptr;
     World world;
-    Movement movement;
+    ObjectSeparation separation;
 };
 
 #endif
