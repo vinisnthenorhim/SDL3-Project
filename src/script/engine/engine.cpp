@@ -10,8 +10,8 @@ Engine::Engine()
   game = new Game( window->getWindowFirst());
   renderer = new Renderer(window->getWindowFirst());
   camera = new Camera(window->getWindowFirst());
-  renderer->dataLoad(game->readData(), game->getObjectTranform(), camera->getCameraPosition());
-  game->loadData(camera->getCameraPosition());
+  renderer->loadData(game->readOnlyData(), game->dirtyData(), camera->cameraData());
+  game->loadData(camera->cameraDataRW());
 }
 
 
