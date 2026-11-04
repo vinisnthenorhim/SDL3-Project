@@ -7,30 +7,28 @@
 #include <logic/updaterate/rate.h>
 #include <RVO.h>
 
-class Movement
+class ObjectSeparation
 {
   private:
     float* deltaTime;
     std::vector<ObjectDimension> *dimension;
+
+    std::vector<bool>  *dirtyPosition;
     std::vector<float> *positionX    ;
     std::vector<float> *positionY    ;
     std::vector<float> *positionZ    ;
 
+    std::vector<bool>  *dirtyScaling ;
     std::vector<float> *scalingX     ;
     std::vector<float> *scalingY     ;
     std::vector<float> *scalingZ     ;
 
+    std::vector<bool>  *dirtyRotation ;
     std::vector<float> *rotationX    ;
     std::vector<float> *rotationY    ;
     std::vector<float> *rotationZ    ;
 
-    std::vector<bool>  *dirtyVelocity;
-    std::vector<float> *velocityX    ;
-    std::vector<float> *velocityY    ;
-    std::vector<float> *velocityZ    ;
 
-    std::vector<float> *speedX       ;
-    std::vector<float> *speedY       ;
 
     std::vector<glm::vec2> nn;
     std::vector<int> animatingCount;
@@ -46,7 +44,7 @@ class Movement
     const int step = 10;
     Grid cell;
 
-    uint32_t* playerId;
+    uint64_t* playerId;
     uint32_t* follow;
 
     uint32_t lastSize = 0;
@@ -54,7 +52,7 @@ class Movement
   public:
 
 
-    void loadData( ObjectData objectData, MovementStructData data , Position cameraPosition);
+    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW);
     void checkCollide();
     void updateCell();
     void doAnimate();

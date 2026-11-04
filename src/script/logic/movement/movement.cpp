@@ -4,9 +4,8 @@
 struct Box { float cx, cy, hw, hh, angle; };
 bool boxesCollide(const Box& A, const Box& B);
 
-void Movement::updateCell()
+void ObjectSeparation::updateCell()
 {
-
 
   size_t currentCount = positionX->size();
   if ( currentCount <= 0) return;
@@ -30,7 +29,7 @@ void Movement::updateCell()
   }
 }
 
-void Movement::checkCollide()
+void ObjectSeparation::checkCollide()
 {
 
   int currentCount = positionX->size();
@@ -69,7 +68,6 @@ void Movement::checkCollide()
 
               if (i > d && boxesCollide( A, B )) 
               {
-  
                 float difX = A.cx - B.cx;
                 float difY = A.cy - B.cy;
                 float len  = sqrtf(difX * difX + difY * difY);
@@ -88,11 +86,10 @@ void Movement::checkCollide()
     }
   }
 }
-void Movement::doAnimate()
+void ObjectSeparation::doAnimate()
 {
   int currentCount = positionX->size();
   if ( currentCount <= 0) return;
-
   for (int a = 0; a < positionX->size(); a++)
   {
     if (isAnimating[a] == false) continue;
@@ -105,7 +102,7 @@ void Movement::doAnimate()
     animatingCount[a]--;
     (*positionX)[a] += nn[a].x * 100 * *deltaTime;
     (*positionY)[a] += nn[a].y * 100 * *deltaTime; 
-    (*dirtyVelocity)[a] = true;
+    (*dirtyPosition)[a] = true;
   }
 }
 
@@ -137,42 +134,33 @@ bool boxesCollide(const Box& A, const Box& B)
   }
   return true;                                         // no gap on any axis
 }
-void Movement::loadData( ObjectData objectData, MovementStructData data, Position cameraPosition)
+void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW)
 {
-
-  this->playerId      = objectData.playerId  ;
-
-  this->positionX      = objectData.positionX;
-  this->positionY      = objectData.positionY;
-  this->positionZ      = objectData.positionZ;
-
-  this->scalingX       = objectData.scalingX;
-  this->scalingY       = objectData.scalingY;
-  this->scalingZ       = objectData.scalingZ;
-
-  this->rotationX      = objectData.rotationX;
-  this->rotationY      = objectData.rotationY;
-  this->rotationZ      = objectData.rotationZ;
-
-  this->deltaTime     = data.deltaTime;
-  this->dimension     = data.dimension;
-
-  this->dirtyVelocity = data.dirtyVelocity;
-  this->velocityX     = data.velocityX;
-  this->velocityY     = data.velocityY;
-  this->velocityZ     = data.velocityZ;
-  this->speedX        = data.speedX;
-  this->speedY        = data.speedY;
-
-  this->follow       = cameraPosition.follow;
-  this->camPositionX = cameraPosition.positionX;
-  this->camPositionY = cameraPosition.positionY;
-  this->camPositionZ = cameraPosition.positionZ;
+  this->playerId      = objectDataRW.playerId      ;
+  this->deltaTime     = objectDataRW.secondPerFrame;
+  this->dimension     = objectDataRW.dimension     ;
+  this->positionX     = objectDataRW.positionX     ;
+  this->positionY     = objectDataRW.positionY     ;
+  this->positionZ     = objectDataRW.positionZ     ;
+  this->scalingX      = objectDataRW.scalingX      ;
+  this->scalingY      = objectDataRW.scalingY      ;
+  this->scalingZ      = objectDataRW.scalingZ      ;
+  this->rotationX     = objectDataRW.rotationX     ;
+  this->rotationY     = objectDataRW.rotationY     ;
+  this->rotationZ     = objectDataRW.rotationZ     ;
+  this->dirtyPosition = dirtyData.dirtyPosition    ;
+  this->dirtyScaling  = dirtyData.dirtyScaling     ;
+  this->dirtyScaling  = dirtyData.dirtyRotation    ;
+  this->follow        = cameraDataRW.follow        ;
+  this->camPositionX  = cameraDataRW.positionX     ;
+  this->camPositionY  = cameraDataRW.positionY     ;
+  this->camPositionZ  = cameraDataRW.positionZ     ;
 }
 
-glm::vec3 Movement::getCenter()
+glm::vec3 ObjectSeparation::getCenter()
 {
-  if (*follow == 1u)
+
+  if (*follow == 1u && *playerId < positionX->size())
   {
     (*camPositionX)[0] = (*positionX)[*playerId];
     (*camPositionY)[0] = (*positionY)[*playerId];
