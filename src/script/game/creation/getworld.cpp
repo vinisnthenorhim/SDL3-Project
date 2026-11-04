@@ -2,63 +2,85 @@
 
 
 
-ObjectData World::readData()  
+ObjectDataRO World::readOnlyData()  
 { 
   return 
   { 
-    &playerID,
-    &type,
-    &visible,
-    &speedX, 
-    &speedY,
-    &positionX,
-    &positionY,
-    &positionZ,
-    &scalingX,
-    &scalingY,
-    &scalingZ,    
-    &rotationX,
-    &rotationY,
-    &rotationZ,
+    &secondPerFrame,
+    &playerId      ,
+    &type          ,
+    &imageId       ,
+    &transparency  ,
+    &exist         ,
+    &dimension,
+    &speedX   ,
+    &speedY   ,  
+    &positionX ,
+    &positionY ,
+    &positionZ , 
+    &scalingX  ,
+    &scalingY  ,
+    &scalingZ  ,
+    &rotationX ,
+    &rotationY ,
+    &rotationZ ,
+    &velocityX ,
+    &velocityY ,
+    &velocityZ ,
+    &scaleX    ,
+    &scaleY    ,
+    &scaleZ    ,
+    &rotateX   ,
+    &rotateY   ,
+    &rotateZ   
   }; 
 }; 
 
 
-ObjectTransformData World::getObjectTranform()
+ObjectDataRW World::readWriteData()
 {
   return
   {
-    &secondFrame,
-    &dirtyVelocity,
-    &velocityX,
-    &velocityY,
-    &velocityZ,
-    &dirtyScale,
-    &scaleY,
-    &scaleZ,
-    &scaleX,
-    &dirtyRotate,
-    &rotateX,
-    &rotateY,
-    &rotateZ
-  };
+    &secondPerFrame,
+    &playerId      ,
+    &type          ,
+    &imageId       ,
+    &transparency  ,
+    &exist         ,
+    &dimension,
+    &speedX   ,
+    &speedY   ,  
+    &positionX ,
+    &positionY ,
+    &positionZ , 
+    &scalingX  ,
+    &scalingY  ,
+    &scalingZ  ,
+    &rotationX ,
+    &rotationY ,
+    &rotationZ ,
+    &velocityX ,
+    &velocityY ,
+    &velocityZ ,
+    &scaleX    ,
+    &scaleY    ,
+    &scaleZ    ,
+    &rotateX   ,
+    &rotateY   ,
+    &rotateZ   
+    };
 }
 
-MovementStructData World::getMovementData()
+DirtyData World::dirtyData()
 {
   return
   {
-    &playerID     ,
-    &secondFrame  ,
-    &dimension    ,
-    &positionX    ,
-    &positionY    ,
-    &positionZ    ,
-    &dirtyVelocity,
-    &velocityX    ,
-    &velocityY    ,
-    &velocityZ    ,
-    &speedX       ,
-    &speedY       
+  &dirtyImage   ,
+  &dirtyPosition,
+  &dirtyScaling ,
+  &dirtyRotation,
+  &dirtyVelocity,
+  &dirtyScale   ,
+  &dirtyRotate  
   };
 }
