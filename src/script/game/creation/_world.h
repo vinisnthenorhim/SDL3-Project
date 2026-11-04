@@ -13,16 +13,16 @@ class World
 {
   public:
     World();
-    ObjectData readData();
-    ObjectTransformData getObjectTranform();
-    MovementStructData getMovementData();
+    ObjectDataRO readOnlyData();
+    ObjectDataRW readWriteData();
+    DirtyData    dirtyData();
     void loadSaveData();
     void createObject(CreateEntityLayout layout);
     void velocityUpdate();
     void updateData();
     void create(SDL_Window* window);
 
-    void secondPerFrame();
+    void frameCalculate();
 
     void saveData();
 
@@ -33,28 +33,35 @@ class World
     sol::state creationstate = nullptr;
 
     float lastFrame;
-    float secondFrame;
+    float secondPerFrame;
     
     int8_t lastAxisX = 0;
     int8_t lastAxisY = 0;
 
     float holdtime = 0.0f;
 
-    uint32_t playerID = 0;
+    uint64_t playerId = 0;
 
-    std::vector<int>   type         ;
     std::vector<ObjectDimension> dimension;
 
+    std::vector<int>   type          ;
 
+    std::vector<bool>  dirtyImage    ;
+    std::vector<int>   imageId       ;
+    std::vector<float> transparency  ;
+    std::vector<bool>  exist         ;
 
+    std::vector<bool>  dirtyPosition;
     std::vector<float> positionX    ;
     std::vector<float> positionY    ;
     std::vector<float> positionZ    ;
 
+    std::vector<bool>  dirtyScaling ;
     std::vector<float> scalingX     ;
     std::vector<float> scalingY     ;
     std::vector<float> scalingZ     ;
 
+    std::vector<bool>  dirtyRotation;
     std::vector<float> rotationX    ;
     std::vector<float> rotationY    ;
     std::vector<float> rotationZ    ;
@@ -76,8 +83,5 @@ class World
 
     std::vector<float> speedX       ;
     std::vector<float> speedY       ;
-
-    std::vector<bool> visible       ;
-    std::vector<bool> exist         ;
 
 };

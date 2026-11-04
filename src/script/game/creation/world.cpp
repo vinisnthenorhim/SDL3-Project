@@ -79,18 +79,20 @@ void World::create(SDL_Window* window)
 
   sol::protected_function function = creationstate["random_location_creation"];
 
-  float x = positionX.size() > playerID ? positionX[playerID] : 0 ;
-  float y = positionY.size() > playerID ? positionY[playerID] : 0 ;
+  float x = positionX.size() > playerId ? positionX[playerId] : 0 ;
+  float y = positionY.size() > playerId ? positionY[playerId] : 0 ;
 
   function( mode->w, mode->h, static_cast<int>(x), static_cast<int>(y));
 }
 
 void World::createObject(CreateEntityLayout layout)
 {
-  type.push_back(entityId->at("enemy"));
+  type.push_back(entityId->at("player"));
 
   dimension.push_back({60, 60});
-  
+  dirtyImage.push_back(true);
+
+  dirtyPosition.push_back(true)  ; dirtyScaling.push_back(true); dirtyRotation.push_back(true) ;
   dirtyVelocity.push_back(true)  ; dirtyScale.push_back(true)  ;  dirtyRotate.push_back(true)  ; 
 
   positionX.push_back(layout.posX) ; positionY.push_back(layout.posY) ; positionZ.push_back(layout.posZ)  ;
@@ -117,16 +119,16 @@ void World::createObject(CreateEntityLayout layout)
   }
 
 
-  visible.push_back(true)   ;
+  transparency.push_back(1)   ;
   exist.push_back(true)     ;
 
-  std::cout << "Object No: " << visible.size() << " entity type: " << type[visible.size()-1]<< '\n';
+  std::cout << "Object No: " << exist.size() << " entity type: " << type[exist.size()-1]<< '\n';
 }
-void World::secondPerFrame()
+void World::frameCalculate()
 {
   float currentFrame = SDL_GetTicksNS();
 
-  secondFrame = ( currentFrame - lastFrame)/1000000000;
+  secondPerFrame = ( currentFrame - lastFrame)/1000000000;
   lastFrame = currentFrame;
 }
 
@@ -134,7 +136,7 @@ void World::secondPerFrame()
 
 void World::velocityUpdate( )
 {
-  if (visible.size() <= 0) return;
+  if (exist.size() <= 0) return;
 
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
@@ -167,47 +169,41 @@ void World::velocityUpdate( )
   const float newVelocityX = length > 0 ? axisX / length : 0.0f;
   const float newVelocityY = length > 0 ? axisY / length : 0.0f;
 
-  const float dirX = newVelocityX * speedX[playerID];
-  const float dirY = newVelocityY * speedY[playerID];
+  const float dirX = newVelocityX * speedX[playerId];
+  const float dirY = newVelocityY * speedY[playerId];
 
-
-  if (velocityX[playerID] != newVelocityX || velocityY[playerID] != newVelocityY || velocityX[playerID] != 0 || velocityY[playerID] != 0)
+  if ( axisX != 0 || axisY != 0)
   {
-    velocityX[playerID] = dirX;
-    velocityY[playerID] = dirY;
 
+    positionX[playerId] += dirX * secondPerFrame;
+    positionY[playerId] += dirY * secondPerFrame;
+ 
+    dirtyPosition[playerId] = true;
 
-    dirtyVelocity[playerID] = true;
-  }
-  else if ( velocityX[playerID] != 0 || velocityY[playerID] != 0 )
-  {
-    velocityX[playerID] = 0;
-    velocityY[playerID] = 0;
-    dirtyVelocity[playerID] = true;
   }
 }
 
 void World::updateData()
 {
-  for (int a = 0; a < visible.size(); a++)
+  for (int a = 0; a < exist.size(); a++)
   {
     // if (dirtyVelocity[a] == true)
     // {
-      positionX[a] += velocityX[a] * secondFrame;
-      positionY[a] += velocityY[a] * secondFrame;
-      positionZ[a] += velocityZ[a] * secondFrame;
+      positionX[a] += velocityX[a] * secondPerFrame;
+      positionY[a] += velocityY[a] * secondPerFrame;
+      positionZ[a] += velocityZ[a] * secondPerFrame;
     // }
     // if (dirtyScale[a]   == true)
     // {
-      scalingX[a]  += scaleX[a]    * secondFrame;
-      scalingY[a]  += scaleY[a]    * secondFrame;
-      scalingZ[a]  += scaleZ[a]    * secondFrame;
+      scalingX[a]  += scaleX[a]    * secondPerFrame;
+      scalingY[a]  += scaleY[a]    * secondPerFrame;
+      scalingZ[a]  += scaleZ[a]    * secondPerFrame;
     // }
     // if (dirtyRotate[a]  == true)
     // {
-      rotationX[a] += rotateX[a]   * secondFrame;
-      rotationY[a] += rotateY[a]   * secondFrame;
-      rotationZ[a] += rotateZ[a]   * secondFrame;
+      rotationX[a] += rotateX[a]   * secondPerFrame;
+      rotationY[a] += rotateY[a]   * secondPerFrame;
+      rotationZ[a] += rotateZ[a]   * secondPerFrame;
     // }
   }
 }
@@ -233,7 +229,7 @@ void World::saveData()
   w.SetIndent(' ', 2);
   w.StartObject();
   w.Key("count");
-  w.Uint64(visible.size());
+  w.Uint64(exist.size());
   w.Key("position");
   w.StartObject();
   w.Key("x");
@@ -241,19 +237,19 @@ void World::saveData()
 
   w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
   w.SetMaxDecimalPlaces(1);
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(positionX[a]);
   w.EndArray();
 
   w.Key("y");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(positionY[a]);
   w.EndArray();
 
   w.Key("z");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(positionZ[a]);
   w.EndArray();
   w.EndObject();
@@ -266,19 +262,19 @@ void World::saveData()
   w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
   w.SetMaxDecimalPlaces(1);
 
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(scalingX[a]);
   w.EndArray();
 
   w.Key("y");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(scalingY[a]);
   w.EndArray();
 
   w.Key("z");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(scalingZ[a]);
   w.EndArray();
   w.EndObject();
@@ -290,19 +286,19 @@ void World::saveData()
   w.StartArray();
   w.SetFormatOptions(rapidjson::kFormatSingleLineArray);
   w.SetMaxDecimalPlaces(1);
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(rotationX[a]);
   w.EndArray();
 
   w.Key("y");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(rotationY[a]);
   w.EndArray();
 
   w.Key("z");
   w.StartArray();
-  for (int a = 0; a < visible.size(); a ++)
+  for (int a = 0; a < exist.size(); a ++)
     w.Double(rotationZ[a]);
   w.EndArray();
   w.EndObject();
