@@ -105,9 +105,9 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
 
 }
 
-void ObjectRender::resourceLoad(ObjectData objectData)
+void ObjectRender::laodData(ObjectDataRO objectDataRO)
 {
-  this->visible   = objectData.visible  ;
+  this->exist   = objectDataRO.exist  ;
 }
 
 void ObjectRender::uploadData( SDL_GPUCopyPass* copy )
@@ -128,7 +128,7 @@ void ObjectRender::endUpdate()
 
 void ObjectRender::startBind(SDL_GPURenderPass* pass)
 {
-  if (visible->size() <= 0) return;
+  if (exist->size() <= 0) return;
   gPipeline.bind(pass);
 
   SDL_GPUBufferBinding vertexBinding{};
@@ -145,6 +145,6 @@ void ObjectRender::startBind(SDL_GPURenderPass* pass)
 }
 void ObjectRender::endBind(SDL_GPURenderPass* pass)
 {
-  if (visible->size() <= 0) return;
-  SDL_DrawGPUIndexedPrimitives( pass, 6, visible->size(), 0, 0, 0 );
+  if (exist->size() <= 0) return;
+  SDL_DrawGPUIndexedPrimitives( pass, 6, exist->size(), 0, 0, 0 );
 }

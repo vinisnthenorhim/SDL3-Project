@@ -7,7 +7,7 @@ class ObjectRender
 {   
   public:
     void createObjectRender(SDL_Window* window, SDL_GPUDevice* device);
-    void resourceLoad(ObjectData objectData);
+    void laodData(ObjectDataRO objectDataRO);
     void uploadData(SDL_GPUCopyPass* copy);
     void endUpdate();
     void startBind(SDL_GPURenderPass* pass);
@@ -22,7 +22,5 @@ class ObjectRender
     Buffer vertBuff;
     Buffer indexBuff;
 
-    const std::vector<bool>* visible       ;
-   
-  
+    const std::vector<bool>* exist       ;
 };
