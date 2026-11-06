@@ -108,7 +108,7 @@ struct DirtyData
 };
 struct CameraData
 {
-  const Uint32*  follow;
+  const bool*  follow;
   const float*   deltaTime;
   bool*    dirty;
   const std::array<float, 4>* updateDataX ;
@@ -120,7 +120,7 @@ struct CameraData
 };
 struct CameraDataRW
 {
-  Uint32*  follow;
+  bool*  follow;
   float*   deltaTime;
   bool*    dirty;
   std::array<float, 4>* updateDataX ;
