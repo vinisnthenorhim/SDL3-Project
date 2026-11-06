@@ -28,19 +28,7 @@ void GridCell::updateCell()
 
 glm::vec3 GridCell::getCenter()
 {
-
-  if (*follow == 1u && *playerId < positionX->size())
-  {
-    (*camPositionX)[0] = (*positionX)[*playerId];
-    (*camPositionY)[0] = (*positionY)[*playerId];
-    (*camPositionZ)[0] = (*positionZ)[*playerId];
-    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
-  }
-  else if (*follow == 0u)
-  {
-    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
-  }
-  return {};
+  return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
 }
 
 void GridCell::loadData( ObjectDataRO objectDataRO, CameraDataRW cameraDataRW )

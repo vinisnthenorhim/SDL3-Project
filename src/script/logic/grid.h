@@ -6,7 +6,7 @@ class GridCell
   private:
     Grid cell;
     const int gridsize = 100;
-    const int updateSize = 20;
+    const int updateSize = 60;
     const int checksize = 1;
     const int step = 10;
 
@@ -19,7 +19,7 @@ class GridCell
     std::array<float, 4> *camPositionZ ;
 
     const uint64_t* playerId;
-    uint32_t* follow;
+    bool* follow;
 
     glm::vec3 getCenter();
 
