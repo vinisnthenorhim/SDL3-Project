@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include <game/creation/_world.h>
-#include <logic/movement/movement.h>
+#include <logic/separation/separation.h>
 
 class Game
 {
