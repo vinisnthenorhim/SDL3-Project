@@ -4,7 +4,6 @@ struct TimeRate
 {
   float acumulate = 0;
 
-
   float tick(float frequency, int frame)
   {
     acumulate += frequency;
