@@ -5,11 +5,11 @@
 class CameraHandle
 {
   private:
-    const uint32_t* follow;
+    const bool* follow;
     const uint64_t* entityId;
     const float* deltaTime;
     const bool* reset;
-    const bool* dirty;
+    bool* dirty;
     bool created = false;
 
     const std::array<float, 4>* camPositionX = nullptr;
