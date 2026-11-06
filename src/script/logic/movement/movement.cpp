@@ -45,6 +45,7 @@ void ObjectSeparation::checkCollide()
     }
     lastSize = currentCount;
   }
+  if ( cell.empty() ) return; // check if cell contain data or not
   for (auto& [gx, column] : cell)
   {
     for (auto& [gy, list] : column)
