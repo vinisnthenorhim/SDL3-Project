@@ -3,6 +3,9 @@
 #include <SDL3/SDL.h>
 #include <struct/struct.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 
 class Camera
@@ -36,7 +39,7 @@ class Camera
     float lastFrame = 0;
     float delta = 0;
 
-    Uint32 followPlayer = 1u;
+    bool followPlayer = true;
     bool dirty = false;
   public:
     Camera( SDL_Window* windowv);
@@ -50,7 +53,6 @@ class Camera
 
     bool movingWindow();
     void setSettings( const SDL_Event* event);
-    void updateData();
 
     void itterate();
     void cameraEvent(const SDL_Event* event);

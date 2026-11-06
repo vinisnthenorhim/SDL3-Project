@@ -3,6 +3,18 @@
 #include <loader/BW.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
+
+glm::mat4 rotationMatrix(glm::vec4 rotation)
+{
+    glm::mat4 result(1.0f);
+
+    result = glm::rotate(result, rotation.x, glm::vec3(1, 0, 0));
+    result = glm::rotate(result, rotation.y, glm::vec3(0, 1, 0));
+    result = glm::rotate(result, rotation.z, glm::vec3(0, 0, 1));
+
+    return result;
+}
+
 Camera::Camera(SDL_Window* window)
 {
   this->window = window;
@@ -36,9 +48,7 @@ Camera::Camera(SDL_Window* window)
   positionX[1] = 1;
   positionY[1] = 1;
   positionZ[1] = 1;
-  updateDataX[1] = 1;
-  updateDataY[1] = 1;
-  updateDataZ[1] = 1;
+
   int x, y, w, h, cw, ch;
 
 
@@ -57,17 +67,17 @@ Camera::Camera(SDL_Window* window)
 void Camera::cameraHandle()
 {
   if (!camera_enable) return;
+
   bool p = cameraPosition();
   bool z = cameraZoom();
   bool r = cameraRotate();
   bool w = movingWindow();
-  dirty = p || z || r || w;
+  dirty = dirty || p || z || r || w;
 
 }
 
 bool Camera::cameraPosition()
 {
-
   if (followPlayer) return false;
 
   int8_t axisX = 0;
@@ -104,18 +114,22 @@ bool Camera::cameraPosition()
 
   const float zoomSpeedRatio = 1 / positionX[1];
 
-  if ( updateDataX[0] != newVelocityX || updateDataY[0] != newVelocityY || updateDataZ[0] != 0 || updateDataZ[0] != 0)
+  if ( positionX[0] != newVelocityX || positionY[0] != newVelocityY || positionZ[0] != 0 || positionZ[0] != 0)
   {
-    updateDataX[0] = zoomSpeedRatio * newVelocityX * speedXYZ;
-    updateDataY[0] = zoomSpeedRatio * newVelocityY * speedXYZ;
+    float newX = zoomSpeedRatio * newVelocityX * speedXYZ * delta;
+    float newY = zoomSpeedRatio * newVelocityY * speedXYZ * delta;
+
+    glm::vec4 newPos( newX, newY, 0.0f, 0.0f );
+    glm::mat4 oldRotate = rotationMatrix({positionX[2], positionZ[2], positionZ[2], 1});
+
+    auto updatedata = glm::transpose(oldRotate) * newPos;
+
+    positionX[0] += updatedata.x;
+    positionY[0] += updatedata.y;
+    positionZ[0] += updatedata.z;
     return true;
   }
-  else
-  {
-    updateDataX[0] = 0;
-    updateDataY[0] = 0;
-    return false;
-  }
+  return false;
 }
 bool Camera::cameraZoom()
 {  
@@ -135,35 +149,17 @@ bool Camera::cameraZoom()
 
   if ((zoomSpeed != 1) && ( positionX[1] * zoomSpeed >= 0.2 || positionY[1] * zoomSpeed >= 0.2 || positionZ[1] * zoomSpeed >= 0.2) && ( positionX[1] * zoomSpeed <= 10.0 || positionY[1] * zoomSpeed <= 10.0 || positionZ[1] * zoomSpeed <= 10.0))
   {
-    updateDataX[1] = zoomSpeed;
-    updateDataY[1] = zoomSpeed;
-    updateDataZ[1] = zoomSpeed;
-    positionX[1]  *= zoomSpeed ;
-    positionY[1]  *= zoomSpeed ;
-    positionZ[1]  *= zoomSpeed ;
+
+    positionX[1]  *= zoomSpeed  ;
+    positionY[1]  *= zoomSpeed  ;
+    positionZ[1]  *= zoomSpeed  ;
 
     return true;
   }
-  else if( updateDataX[1] != 1 || updateDataY[1] != 1)
-  {
-    updateDataX[1] = 1 ;
-    updateDataY[1] = 1 ;
-    updateDataZ[1] = 1 ;
-
-    return true;
-  }
-  else
-  {
-    updateDataX[1] = 1 ;
-    updateDataY[1] = 1 ;
-    updateDataZ[1] = 1 ;
-    return false;
-  }
-
+  return false;
 }
 bool Camera::cameraRotate()
 {
-
   if (followPlayer) return false;
 
   const bool* keyboardState = SDL_GetKeyboardState(nullptr);
@@ -199,22 +195,12 @@ bool Camera::cameraRotate()
 
   if(x_direction != 0 || y_direction != 0 ||z_direction != 0)
   {
-    updateDataX[2] = rotate_x;
-    updateDataY[2] = rotate_y;
-    updateDataZ[2] = rotate_z;
+    positionX[2] += rotate_x * delta;
+    positionY[2] += rotate_y * delta;
+    positionZ[2] += rotate_z * delta;
     return true;
   }
-  else if (updateDataX[2] != 0 || updateDataY[2] != 0 || updateDataZ[2] != 0)
-  {
-    updateDataX[2] = 0;
-    updateDataY[2] = 0;
-    updateDataZ[2] = 0;
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 bool Camera::movingWindow()
 {
@@ -230,8 +216,8 @@ bool Camera::movingWindow()
   
   if (lastWinPosX != x ||lastWinPosY != y)
   {
-    updateDataX[3] = x;
-    updateDataY[3] = y;
+    positionX[3] = x;
+    positionY[3] = y;
     lastWinPosX = x;
     lastWinPosY = y;
     return true;
@@ -250,9 +236,7 @@ void Camera::setSettings(const SDL_Event* event)
   {
     if (followPlayer == 0u) followPlayer = 1u;
     else followPlayer = 0u;
-    positionX[1] = 1;
-    positionY[1] = 1;
-    positionZ[1] = 1;
+    std::cout << followPlayer;
   }
 }
 
@@ -275,9 +259,9 @@ CameraData Camera::cameraData()
     &followPlayer,
     &delta,
     &dirty,
-    &updateDataX,
-    &updateDataY,
-    &updateDataZ,
+    &positionX,
+    &positionY,
+    &positionZ,
     &positionX,
     &positionY,
     &positionZ
@@ -290,9 +274,9 @@ CameraDataRW Camera::cameraDataRW()
     &followPlayer,
     &delta,
     &dirty,
-    &updateDataX,
-    &updateDataY,
-    &updateDataZ,
+    &positionX,
+    &positionY,
+    &positionZ,
     &positionX,
     &positionY,
     &positionZ
@@ -302,23 +286,9 @@ void Camera::itterate()
 {
   deltaTime();
   cameraHandle();
-  updateData();
 }
 
 void Camera::cameraEvent(const SDL_Event* event)
 {
   setSettings(event);
-}
-void Camera::updateData()
-{
-  for (int a = 0; a < 4; a++)
-  {
-    if (a == 1)
-    {
-      continue;
-    }
-    positionX[a] += updateDataX[a] * delta;
-    positionY[a] += updateDataY[a] * delta;
-    positionZ[a] += updateDataZ[a] * delta;
-  }
 }
