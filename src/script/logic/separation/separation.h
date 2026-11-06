@@ -30,12 +30,7 @@ class ObjectSeparation
     std::vector<int> animatingCount;
     std::vector<bool> isAnimating;
 
-    std::array<float, 4> *camPositionX ;
-    std::array<float, 4> *camPositionY ;
-    std::array<float, 4> *camPositionZ ;
-
     const int gridsize = 100;
-    const int updateSize = 20;
     const int checksize = 1;
     const int step = 10;
     const Grid* cell;
@@ -47,7 +42,8 @@ class ObjectSeparation
 
   public:
 
-    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW, const Grid* cell);
+    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, const Grid* cell);
+    void updateSize();
     void checkCollide();
     void doAnimate();
 

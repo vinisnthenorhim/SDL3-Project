@@ -4,13 +4,11 @@
 struct Box { float cx, cy, hw, hh, angle; };
 bool boxesCollide(const Box& A, const Box& B);
 
-void ObjectSeparation::checkCollide()
+void ObjectSeparation::updateSize()
 {
-
   int currentCount = positionX->size();
   if ( currentCount <= 0) return;
-
-  if (currentCount > lastSize)
+  if ( currentCount > lastSize )
   {
     for (int a = lastSize; a < currentCount; a++)
     {
@@ -20,6 +18,13 @@ void ObjectSeparation::checkCollide()
     }
     lastSize = currentCount;
   }
+}
+void ObjectSeparation::checkCollide()
+{
+
+  int currentCount = positionX->size();
+  if ( currentCount <= 0) return;
+
   if ( cell->empty() ) return; // check if cell contain data or not
   for (auto& [gx, column] : *cell)
   {
@@ -110,7 +115,7 @@ bool boxesCollide(const Box& A, const Box& B)
   }
   return true;                                         // no gap on any axis
 }
-void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW, const Grid* cell)
+void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, const Grid* cell)
 {
   this->playerId      = objectDataRW.playerId      ;
   this->deltaTime     = objectDataRW.secondPerFrame;
@@ -127,11 +132,6 @@ void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData,
   this->dirtyPosition = dirtyData.dirtyPosition    ;
   this->dirtyScaling  = dirtyData.dirtyScaling     ;
   this->dirtyScaling  = dirtyData.dirtyRotation    ;
-  this->follow        = cameraDataRW.follow        ;
-  this->camPositionX  = cameraDataRW.positionX     ;
-  this->camPositionY  = cameraDataRW.positionY     ;
-  this->camPositionZ  = cameraDataRW.positionZ     ;
-
   this->cell = cell;
 }
 
