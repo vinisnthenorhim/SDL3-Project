@@ -4,8 +4,6 @@
 #include <array>
 #include <GLM/glm.hpp>
 #include <struct/struct.h>
-#include <logic/updaterate/rate.h>
-#include <RVO.h>
 
 class ObjectSeparation
 {
@@ -28,8 +26,6 @@ class ObjectSeparation
     std::vector<float> *rotationY    ;
     std::vector<float> *rotationZ    ;
 
-
-
     std::vector<glm::vec2> nn;
     std::vector<int> animatingCount;
     std::vector<bool> isAnimating;
@@ -42,7 +38,7 @@ class ObjectSeparation
     const int updateSize = 20;
     const int checksize = 1;
     const int step = 10;
-    Grid cell;
+    const Grid* cell;
 
     uint64_t* playerId;
     uint32_t* follow;
@@ -51,12 +47,8 @@ class ObjectSeparation
 
   public:
 
-
-    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW);
+    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW, const Grid* cell);
     void checkCollide();
-    void updateCell();
     void doAnimate();
-
-    glm::vec3 getCenter();
 
 };

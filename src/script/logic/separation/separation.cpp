@@ -4,31 +4,6 @@
 struct Box { float cx, cy, hw, hh, angle; };
 bool boxesCollide(const Box& A, const Box& B);
 
-void ObjectSeparation::updateCell()
-{
-
-  size_t currentCount = positionX->size();
-  if ( currentCount <= 0) return;
-
-  cell.clear();
-  glm::vec3 center = getCenter();
-
-  int camX = (int)floorf(center.x / gridsize);
-  int camY = (int)floorf(center.y / gridsize);
-
-  const float minX = (camX - updateSize)     * gridsize;
-  const float maxX = (camX + updateSize + 1) * gridsize;
-  const float minY = (camY - updateSize)     * gridsize;
-  const float maxY = (camY + updateSize + 1) * gridsize;
-
-  for (size_t i = 0; i < positionX->size(); i++)
-  {
-    float x = (*positionX)[i], y = (*positionY)[i];
-    if (x < minX || x >= maxX || y < minY || y >= maxY) continue;
-    cell[(int)floorf(x / gridsize)][(int)floorf(y / gridsize)].push_back((int)i);
-  }
-}
-
 void ObjectSeparation::checkCollide()
 {
 
@@ -45,8 +20,8 @@ void ObjectSeparation::checkCollide()
     }
     lastSize = currentCount;
   }
-  if ( cell.empty() ) return; // check if cell contain data or not
-  for (auto& [gx, column] : cell)
+  if ( cell->empty() ) return; // check if cell contain data or not
+  for (auto& [gx, column] : *cell)
   {
     for (auto& [gy, list] : column)
     {
@@ -56,8 +31,8 @@ void ObjectSeparation::checkCollide()
         int tempy = (int)floorf((*positionY)[i] / gridsize);
         for (int a = tempx - checksize; a <= tempx + checksize; a++)
         {
-          auto itX = cell.find(a);                 // look, never create
-          if (itX == cell.end()) continue;
+          auto itX = cell->find(a);                 // look, never create
+          if (itX == cell->end()) continue;
           for (int b = tempy - checksize; b <= tempy + checksize; b++)
           {
             auto itY = itX->second.find(b);
@@ -135,7 +110,7 @@ bool boxesCollide(const Box& A, const Box& B)
   }
   return true;                                         // no gap on any axis
 }
-void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW)
+void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, CameraDataRW cameraDataRW, const Grid* cell)
 {
   this->playerId      = objectDataRW.playerId      ;
   this->deltaTime     = objectDataRW.secondPerFrame;
@@ -156,21 +131,7 @@ void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData,
   this->camPositionX  = cameraDataRW.positionX     ;
   this->camPositionY  = cameraDataRW.positionY     ;
   this->camPositionZ  = cameraDataRW.positionZ     ;
+
+  this->cell = cell;
 }
 
-glm::vec3 ObjectSeparation::getCenter()
-{
-
-  if (*follow == 1u && *playerId < positionX->size())
-  {
-    (*camPositionX)[0] = (*positionX)[*playerId];
-    (*camPositionY)[0] = (*positionY)[*playerId];
-    (*camPositionZ)[0] = (*positionZ)[*playerId];
-    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
-  }
-  else if (*follow == 0u)
-  {
-    return {(*camPositionX)[0], (*camPositionY)[0], (*camPositionZ)[0]};
-  }
-  return {};
-}

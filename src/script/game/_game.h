@@ -3,9 +3,22 @@
 
 #include <game/creation/_world.h>
 #include <logic/separation/separation.h>
+#include <logic/updaterate/rate.h>
+#include <logic/grid.h>
 
 class Game
 {
+  private:
+    SDL_Window* window = nullptr;
+    const SDL_Event* eventH = nullptr;
+    
+    World world;
+    GridCell cell;
+    ObjectSeparation separation;
+    std::array<TimeRate, 3> rate;
+
+    bool run = false;
+
   public:
     Game(SDL_Window* window);
     void render();
@@ -21,13 +34,7 @@ class Game
     {
       world.saveData();
     }
-  private:
-    std::array<TimeRate, 3> rate;
-    SDL_Window* window = nullptr;
-    const SDL_Event* eventH = nullptr;
-    World world;
-    ObjectSeparation separation;
-    bool run = false;
+
 };
 
 #endif

@@ -6,7 +6,8 @@ Game::Game( SDL_Window* window)
 }
 void Game::loadData(CameraDataRW cameraDataRW)
 {
-  separation.loadData(world.readWriteData(), world.dirtyData(), cameraDataRW);
+  cell.loadData(world.readOnlyData(), cameraDataRW);
+  separation.loadData(world.readWriteData(), world.dirtyData(), cameraDataRW, cell.getCell());
 }
 void Game::render()
 {
@@ -15,7 +16,7 @@ void Game::render()
   world.frameCalculate();
   world.velocityUpdate();
 
-  if ( rate[0].tick(20, 60) )  separation.updateCell();
+  if ( rate[0].tick(20, 60) ) cell.updateCell();
 
   if ( rate[1].tick(20, 60) ) separation.checkCollide();
 
