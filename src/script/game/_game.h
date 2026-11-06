@@ -3,19 +3,20 @@
 
 #include <game/creation/_world.h>
 #include <logic/separation/separation.h>
-#include <logic/updaterate/rate.h>
 #include <logic/grid.h>
+#include <logic/grid.h>
+#include <logic/player.h>
 
 class Game
 {
   private:
     SDL_Window* window = nullptr;
     const SDL_Event* eventH = nullptr;
-    
+
     World world;
     GridCell cell;
     ObjectSeparation separation;
-    std::array<TimeRate, 3> rate;
+    Player player;
 
     bool run = false;
 

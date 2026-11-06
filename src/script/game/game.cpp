@@ -7,20 +7,23 @@ Game::Game( SDL_Window* window)
 void Game::loadData(CameraDataRW cameraDataRW)
 {
   cell.loadData(world.readOnlyData(), cameraDataRW);
-  separation.loadData(world.readWriteData(), world.dirtyData(), cameraDataRW, cell.getCell());
+  separation.loadData(world.readWriteData(), world.dirtyData(), cell.getCell());
+  player.loadData(world.readWriteData(), world.dirtyData(), window, cameraDataRW);
 }
 void Game::render()
 {
-  if(run) world.create(window);
+  if (run) world.create(window);
 
   world.frameCalculate();
-  world.velocityUpdate();
+  player.movement();
 
-  if ( rate[0].tick(20, 60) ) cell.updateCell();
+  cell.updateCell();
 
-  if ( rate[1].tick(20, 60) ) separation.checkCollide();
+  separation.updateSize();
 
-  if ( rate[2].tick(60, 60) ) separation.doAnimate();
+  separation.checkCollide();
+
+  separation.doAnimate();
 
 }
 
