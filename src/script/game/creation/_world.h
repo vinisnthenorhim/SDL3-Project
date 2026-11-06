@@ -18,7 +18,6 @@ class World
     DirtyData    dirtyData();
     void loadSaveData();
     void createObject(CreateEntityLayout layout);
-    void velocityUpdate();
     void updateData();
     void create(SDL_Window* window);
 

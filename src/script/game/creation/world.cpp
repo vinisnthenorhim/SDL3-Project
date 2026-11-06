@@ -88,6 +88,10 @@ void World::create(SDL_Window* window)
 void World::createObject(CreateEntityLayout layout)
 {
   type.push_back(entityId->at("player"));
+  imageId.push_back(entityId->at("player"));
+
+  transparency.push_back(1.0);
+  exist.push_back(true)      ;
 
   dimension.push_back({60, 60});
   dirtyImage.push_back(true);
@@ -118,10 +122,6 @@ void World::createObject(CreateEntityLayout layout)
     speedY.push_back(300.0f)  ;
   }
 
-
-  transparency.push_back(1)   ;
-  exist.push_back(true)     ;
-
   std::cout << "Object No: " << exist.size() << " entity type: " << type[exist.size()-1]<< '\n';
 }
 void World::frameCalculate()
@@ -133,55 +133,6 @@ void World::frameCalculate()
 }
 
 
-
-void World::velocityUpdate( )
-{
-  if (exist.size() <= 0) return;
-
-  const bool* keyboardState = SDL_GetKeyboardState(nullptr);
-
-  int8_t axisX = 0;
-  int8_t axisY = 0;
-
-  bool keyA = keyboardState[SDL_SCANCODE_A];
-  bool keyD = keyboardState[SDL_SCANCODE_D];
-  bool keyW = keyboardState[SDL_SCANCODE_W];
-  bool keyS = keyboardState[SDL_SCANCODE_S];
-
-  if      (keyA && !keyD) lastAxisX = -1;
-  else if (!keyA && keyD) lastAxisX =  1;
-
-  if      (keyS && !keyW) lastAxisY = -1;
-  else if (!keyS && keyW) lastAxisY =  1;
-
-  if (keyA && keyD)   axisX = -lastAxisX;
-  else if (keyA)      axisX = -1;
-  else if (keyD)      axisX =  1;
-  if (!keyA && !keyD) axisX =  0;
-
-  if (keyS && keyW)   axisY = -lastAxisY;
-  else if (keyS)      axisY = -1;
-  else if (keyW)      axisY =  1;
-  if (!keyS && !keyW) axisY =  0;
-
-  const float length = std::sqrt(float( axisX * axisX + axisY * axisY));
-
-  const float newVelocityX = length > 0 ? axisX / length : 0.0f;
-  const float newVelocityY = length > 0 ? axisY / length : 0.0f;
-
-  const float dirX = newVelocityX * speedX[playerId];
-  const float dirY = newVelocityY * speedY[playerId];
-
-  if ( axisX != 0 || axisY != 0)
-  {
-
-    positionX[playerId] += dirX * secondPerFrame;
-    positionY[playerId] += dirY * secondPerFrame;
- 
-    dirtyPosition[playerId] = true;
-
-  }
-}
 
 void World::updateData()
 {
