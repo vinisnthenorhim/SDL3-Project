@@ -22,10 +22,12 @@ class Game
       world.saveData();
     }
   private:
+    std::array<TimeRate, 3> rate;
     SDL_Window* window = nullptr;
     const SDL_Event* eventH = nullptr;
     World world;
     ObjectSeparation separation;
+    bool run = false;
 };
 
 #endif

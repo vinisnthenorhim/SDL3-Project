@@ -10,23 +10,24 @@ void Game::loadData(CameraDataRW cameraDataRW)
 }
 void Game::render()
 {
+  if(run) world.create(window);
 
   world.frameCalculate();
   world.velocityUpdate();
 
-  separation.updateCell();
+  if ( rate[0].tick(20, 60) )  separation.updateCell();
 
-  separation.checkCollide();
+  if ( rate[1].tick(20, 60) ) separation.checkCollide();
 
-  separation.doAnimate();
+  if ( rate[2].tick(60, 60) ) separation.doAnimate();
 
 }
 
 void Game::event( const SDL_Event* event)
 {
-  if (event->key.key == SDLK_Q )
+  if (event->key.key == SDLK_Q && !event->key.repeat && event->type == SDL_EVENT_KEY_DOWN)
   {
-    world.create(window);
+    run = !run;
   }
   if (event->key.key == SDLK_Y && !event->key.repeat && event->type == SDL_EVENT_KEY_DOWN)
   {
