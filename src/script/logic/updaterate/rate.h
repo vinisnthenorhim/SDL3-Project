@@ -3,24 +3,16 @@
 struct TimeRate
 {
   float acumulate = 0;
-  float interval;
 
-  TimeRate(float rate)
-  : interval(1 / rate)
-  {}
 
-  int tick(float deltaTime)
+  float tick(float frequency, int frame)
   {
-    acumulate += deltaTime;
-    int count = 0;
-    if (acumulate >= interval)
+    acumulate += frequency;
+    if (acumulate >= frame)
     {
-      while (acumulate > 0)
-      {
-        count++;
-        acumulate -= deltaTime;
-      }
+      acumulate = 0;
+      return true;
     }
-    return count;
+    return false;
   }
 };
