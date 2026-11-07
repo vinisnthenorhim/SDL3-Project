@@ -41,6 +41,8 @@ class Camera
 
     bool followPlayer = true;
     bool dirty = false;
+
+    glm::mat4 rotateTranpose {1.0f};
   public:
     Camera( SDL_Window* windowv);
     void cameraHandle();

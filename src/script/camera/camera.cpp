@@ -120,9 +120,7 @@ bool Camera::cameraPosition()
     float newY = zoomSpeedRatio * newVelocityY * speedXYZ * delta;
 
     glm::vec4 newPos( newX, newY, 0.0f, 0.0f );
-    glm::mat4 oldRotate = rotationMatrix({positionX[2], positionZ[2], positionZ[2], 1});
-
-    auto updatedata = glm::transpose(oldRotate) * newPos;
+    auto updatedata = rotateTranpose * newPos;
 
     positionX[0] += updatedata.x;
     positionY[0] += updatedata.y;
@@ -198,6 +196,8 @@ bool Camera::cameraRotate()
     positionX[2] += rotate_x * delta;
     positionY[2] += rotate_y * delta;
     positionZ[2] += rotate_z * delta;
+    glm::mat4 oldRotate = rotationMatrix({positionX[2], positionY[2], positionZ[2], 1});
+    rotateTranpose = glm::transpose(oldRotate);
     return true;
   }
   return false;
@@ -264,7 +264,8 @@ CameraData Camera::cameraData()
     &positionZ,
     &positionX,
     &positionY,
-    &positionZ
+    &positionZ,
+    &rotateTranpose
   };
 }
 CameraDataRW Camera::cameraDataRW()
@@ -279,7 +280,8 @@ CameraDataRW Camera::cameraDataRW()
     &positionZ,
     &positionX,
     &positionY,
-    &positionZ
+    &positionZ,
+    &rotateTranpose
   };
 }
 void Camera::itterate()
