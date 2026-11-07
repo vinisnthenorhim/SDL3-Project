@@ -7,7 +7,7 @@ void Player::movement()
   {
     targetX = (*positionX)[*playerId];
     targetY = (*positionY)[*playerId];
-    
+
     (*camPositionX)[0] = (*positionX)[*playerId];
     (*camPositionY)[0] = (*positionY)[*playerId];
     (*camPositionZ)[0] = (*positionZ)[*playerId];
@@ -102,12 +102,15 @@ void Player::mouseControl()
 
   SDL_MouseButtonFlags buttons = SDL_GetMouseState( &xm, &ym );
   bool isDown = (buttons & SDL_BUTTON_LMASK) != 0;
-  float offX =  (xm - cw / 2.f) / zoom ;
-  float offY = -(ym - ch / 2.f) / zoom ;     
+  float offX = ( (xm - cw / 2.f) / zoom)  ;
+  float offY = (-(ym - ch / 2.f) / zoom)  ;     
   if ( isDown && !wasDown)
   {
-    targetX = (*positionX)[*playerId] + offX;
-    targetY = (*positionY)[*playerId] + offY;
+    glm::vec4 tempVec( offX, offY, 0.0f, 0.0f );
+    auto temp = *rotateTranpose * tempVec;
+
+    targetX = (*positionX)[*playerId] + temp.x + posOffset.x;
+    targetY = (*positionY)[*playerId] + temp.y + posOffset.y;
   }
   wasDown = isDown;
 }
@@ -122,6 +125,7 @@ void Player::animate()
     const float directionX = length > 0 ? compX / length : 0.0f;
     const float directionY = length > 0 ? compY / length : 0.0f;
 
+
     const float dirX = directionX * (*speedX)[*playerId];
     const float dirY = directionY * (*speedY)[*playerId];
 
@@ -134,20 +138,34 @@ void Player::animate()
 
 void Player::camHandle()
 {
-  if ( *follow != true ) return;
-  (*camPositionX)[0] = (*positionX)[*playerId];
-  (*camPositionY)[0] = (*positionY)[*playerId];
-  (*camPositionZ)[0] = (*positionZ)[*playerId];
+  if ( *follow == true ) 
+  {
+    (*camPositionX)[0] = (*positionX)[*playerId];
+    (*camPositionY)[0] = (*positionY)[*playerId];
+    (*camPositionZ)[0] = (*positionZ)[*playerId];
 
-  (*camPositionX)[1] = zoom;
-  (*camPositionY)[1] = zoom;
-  (*camPositionZ)[1] = zoom;
+    (*camPositionX)[1] = 0.6;
+    (*camPositionY)[1] = 0.6;
+    (*camPositionZ)[1] = 0.6;
 
-  (*camPositionX)[2] = 0;
-  (*camPositionY)[2] = 0;
-  (*camPositionZ)[2] = 0;
+    (*camPositionX)[2] = 0;
+    (*camPositionY)[2] = 0;
+    (*camPositionZ)[2] = 0;
 
-  *camDirty = *camDirty || true;
+    *camDirty = *camDirty || true;
+  }
+  else
+  {
+    zoom = (*camPositionX)[1];
+    zoom = (*camPositionY)[1];
+    zoom = (*camPositionZ)[1];
+
+    posOffset.x =  (*camPositionX)[0] - (*positionX)[*playerId];
+    posOffset.y =  (*camPositionY)[0] - (*positionY)[*playerId];
+    posOffset.z =  (*camPositionZ)[0] - (*positionZ)[*playerId];
+
+  }
+
 }
 
 void Player::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Window* window, CameraDataRW cameraDataRW)
@@ -177,4 +195,5 @@ void Player::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Windo
   this->camPositionX  = cameraDataRW.positionX     ;
   this->camPositionY  = cameraDataRW.positionY     ;
   this->camPositionZ  = cameraDataRW.positionZ     ;
+  this->rotateTranpose= cameraDataRW.rotateTranpose;
 }

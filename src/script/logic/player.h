@@ -23,7 +23,8 @@ class Player
     bool init = false;
     bool wasDown = false;
 
-    const float zoom = 0.6;
+    float zoom = 0.6;
+    glm::vec3 posOffset {0};
 
     float *secondPerFrame;
 
@@ -53,6 +54,8 @@ class Player
     std::array<float, 4> *camPositionX ;
     std::array<float, 4> *camPositionY ;
     std::array<float, 4> *camPositionZ ;
+
+    glm::mat4* rotateTranpose;
 
     bool* follow;
     bool* camDirty;
