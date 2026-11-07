@@ -117,6 +117,8 @@ struct CameraData
   const std::array<float, 4>* positionX ;
   const std::array<float, 4>* positionY ;
   const std::array<float, 4>* positionZ ;
+
+  const glm::mat4* rotateTranpose;
 };
 struct CameraDataRW
 {
@@ -129,6 +131,8 @@ struct CameraDataRW
   std::array<float, 4>* positionX ;
   std::array<float, 4>* positionY ;
   std::array<float, 4>* positionZ ;
+
+  glm::mat4* rotateTranpose;
 };
 struct CreateEntityLayout
 {
