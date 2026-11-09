@@ -111,6 +111,7 @@ void Player::mouseControl()
 
     targetX = (*positionX)[*playerId] + temp.x + posOffset.x;
     targetY = (*positionY)[*playerId] + temp.y + posOffset.y;
+
   }
   wasDown = isDown;
 }
@@ -133,6 +134,8 @@ void Player::animate()
     (*positionY)[*playerId] += dirY * *secondPerFrame;
  
     (*dirtyPosition)[*playerId] = true;
+    *camDirty = *camDirty || true;
+
   }
 }
 
@@ -151,8 +154,6 @@ void Player::camHandle()
     (*camPositionX)[2] = 0;
     (*camPositionY)[2] = 0;
     (*camPositionZ)[2] = 0;
-
-    *camDirty = *camDirty || true;
   }
   else
   {
@@ -163,7 +164,6 @@ void Player::camHandle()
     posOffset.x =  (*camPositionX)[0] - (*positionX)[*playerId];
     posOffset.y =  (*camPositionY)[0] - (*positionY)[*playerId];
     posOffset.z =  (*camPositionZ)[0] - (*positionZ)[*playerId];
-
   }
 
 }
@@ -192,8 +192,8 @@ void Player::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Windo
   this->follow        = cameraDataRW.follow        ;
   this->camDirty      = cameraDataRW.dirty         ;
 
-  this->camPositionX  = cameraDataRW.positionX     ;
-  this->camPositionY  = cameraDataRW.positionY     ;
-  this->camPositionZ  = cameraDataRW.positionZ     ;
-  this->rotateTranpose= cameraDataRW.rotateTranpose;
+  this->camPositionX   = cameraDataRW.positionX     ;
+  this->camPositionY   = cameraDataRW.positionY     ;
+  this->camPositionZ   = cameraDataRW.positionZ     ;
+  this->rotateTranpose = cameraDataRW.rotateTranpose;
 }
