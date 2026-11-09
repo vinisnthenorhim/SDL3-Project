@@ -3,6 +3,11 @@
 
 using namespace metal;
 
+struct Alpha
+{
+    float alpha[1];
+};
+
 struct main0_out
 {
     float4 outColor [[color(0)]];
@@ -11,13 +16,14 @@ struct main0_out
 struct main0_in
 {
     float2 fragUV [[user(locn0)]];
+    uint objectIndex [[user(locn1)]];
 };
 
-fragment main0_out main0(main0_in in [[stage_in]], texture2d<float> tex [[texture(0)]], sampler texSmplr [[sampler(0)]])
+fragment main0_out main0(main0_in in [[stage_in]], const device Alpha& _23 [[buffer(0)]], texture2d<float> tex [[texture(0)]], sampler texSmplr [[sampler(0)]])
 {
     main0_out out = {};
     float4 color = tex.sample(texSmplr, in.fragUV);
-    color.w *= 0.699999988079071044921875;
+    color.w *= _23.alpha[in.objectIndex];
     out.outColor = color;
     return out;
 }

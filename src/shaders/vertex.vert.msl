@@ -3,6 +3,11 @@
 
 using namespace metal;
 
+struct Exist
+{
+    uint exist[1];
+};
+
 struct Projection
 {
     float4x4 projection;
@@ -20,7 +25,7 @@ struct ModelMatrixBuffer
 
 struct TextureId
 {
-    int textureID[1];
+    uint textureID[1];
 };
 
 struct UVLayout
@@ -31,6 +36,7 @@ struct UVLayout
 struct main0_out
 {
     float2 fragUV [[user(locn0)]];
+    uint objectIndex [[user(locn1)]];
     float4 gl_Position [[position]];
 };
 
@@ -40,14 +46,19 @@ struct main0_in
     float2 uv [[attribute(1)]];
 };
 
-vertex main0_out main0(main0_in in [[stage_in]], constant Projection& _25 [[buffer(0)]], const device ModelMatrixBuffer& _39 [[buffer(1)]], const device CameraMatrixBuffer& _32 [[buffer(2)]], const device UVLayout& _71 [[buffer(3)]], const device TextureId& _60 [[buffer(4)]], uint gl_InstanceIndex [[instance_id]])
+vertex main0_out main0(main0_in in [[stage_in]], constant Projection& _39 [[buffer(0)]], const device ModelMatrixBuffer& _53 [[buffer(1)]], const device CameraMatrixBuffer& _46 [[buffer(2)]], const device UVLayout& _83 [[buffer(3)]], const device TextureId& _74 [[buffer(4)]], const device Exist& _17 [[buffer(5)]], uint gl_InstanceIndex [[instance_id]])
 {
     main0_out out = {};
     uint entityIndex = uint(int(gl_InstanceIndex));
-    out.gl_Position = ((_25.projection * _32.camera[0]) * _39.modelMat[entityIndex]) * float4(in.position, 1.0);
-    uint tex = uint(_60.textureID[entityIndex]);
-    float4 rect = _71.UVlayout[tex];
+    if (_17.exist[entityIndex] == 0u)
+    {
+        return out;
+    }
+    out.gl_Position = ((_39.projection * _46.camera[0]) * _53.modelMat[entityIndex]) * float4(in.position, 1.0);
+    uint tex = _74.textureID[entityIndex];
+    float4 rect = _83.UVlayout[tex];
     out.fragUV = rect.xy + (in.uv * rect.zw);
+    out.objectIndex = entityIndex;
     return out;
 }
 
