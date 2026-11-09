@@ -26,13 +26,16 @@ class ObjectSeparation
     std::vector<float> *rotationY    ;
     std::vector<float> *rotationZ    ;
 
+  std::vector<float> *transparency  ;
+  std::vector<bool>*  dirtyImage    ;
+
     std::vector<glm::vec2> nn;
     std::vector<int> animatingCount;
     std::vector<bool> isAnimating;
 
     const int gridsize = 100;
     const int checksize = 1;
-    const int step = 10;
+    const int step = 13;
     const Grid* cell;
 
     uint64_t* playerId;

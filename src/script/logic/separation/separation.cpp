@@ -78,12 +78,16 @@ void ObjectSeparation::doAnimate()
     {
       animatingCount[a] = step;
       isAnimating[a] = false;
+      (*transparency)[a] = 1.0f;
+      (*dirtyImage)[a] = true;
       continue;
     }
     animatingCount[a]--;
-    (*positionX)[a] += nn[a].x * 100 * *deltaTime;
-    (*positionY)[a] += nn[a].y * 100 * *deltaTime; 
+    (*positionX)[a] += nn[a].x * 120 * *deltaTime;
+    (*positionY)[a] += nn[a].y * 120 * *deltaTime; 
     (*dirtyPosition)[a] = true;
+    (*transparency)[a] = 0.5f;
+    (*dirtyImage)[a] = true;
   }
 }
 
@@ -117,6 +121,7 @@ bool boxesCollide(const Box& A, const Box& B)
 }
 void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, const Grid* cell)
 {
+  this->transparency  = objectDataRW.transparency  ;
   this->playerId      = objectDataRW.playerId      ;
   this->deltaTime     = objectDataRW.secondPerFrame;
   this->dimension     = objectDataRW.dimension     ;
@@ -129,6 +134,7 @@ void ObjectSeparation::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData,
   this->rotationX     = objectDataRW.rotationX     ;
   this->rotationY     = objectDataRW.rotationY     ;
   this->rotationZ     = objectDataRW.rotationZ     ;
+  this->dirtyImage    = dirtyData.dirtyImage       ;
   this->dirtyPosition = dirtyData.dirtyPosition    ;
   this->dirtyScaling  = dirtyData.dirtyScaling     ;
   this->dirtyScaling  = dirtyData.dirtyRotation    ;
