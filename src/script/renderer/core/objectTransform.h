@@ -45,10 +45,6 @@ class ObjectTransform
     std::vector<bool>*  dirtyScale   ;
     std::vector<bool>*  dirtyRotate  ;
 
-    // std::vector<glm::vec3> position;
-    // std::vector<glm::vec3> scaling;
-    // std::vector<glm::vec3> rotation;
-
     Uint32 entityCount = 0;
 
     SDL_GPUDevice* device = nullptr;
@@ -61,7 +57,6 @@ class ObjectTransform
     void bind( SDL_GPUCommandBuffer* cmd);
     void bindG(SDL_GPURenderPass* pass, uint32_t slot);
     void release();
-    SDL_GPUBuffer* getModel() { return modelBuffer.buffer(); }
     SDL_GPUBuffer* getPos() { return positionBuffer.buffer(); }
 
 };
