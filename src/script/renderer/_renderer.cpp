@@ -86,7 +86,6 @@ void Renderer::render()
 
   camera.updateCameraData(copypass);
   objectRender.uploadData(copypass);
-  texture.updateTextureIdBUffer(copypass);
   texture.getAtlasData(copypass);
   texture.loadTexture(copypass);
   visible.update( device, copypass );

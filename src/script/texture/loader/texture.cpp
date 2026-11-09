@@ -24,7 +24,7 @@ void Texture::createTexture( SDL_GPUDevice* device )
 
 void Texture::loadData(ObjectDataRO objectDataRO)
 {
-  this->type = objectDataRO.type;
+  this->imageId = objectDataRO.imageId;
 }
 
 void Texture::loadTexture( SDL_GPUCopyPass* copypass)
@@ -98,44 +98,6 @@ Texture::~Texture()
   if (texture) { SDL_ReleaseGPUTexture(device, texture); texture = nullptr; }
 }
 
-void Texture::updateTextureIdBUffer( SDL_GPUCopyPass* copypass )
-{
-  if (type->size() <= 0) return;
-
-  Uint32 currentCount = type->size();
-  Uint32 difference = currentCount - lastCount;
-  Uint32 offset = lastCount * sizeof(int);
-  std::vector<int> tempIdUpload{};
-
-  for (int a = lastCount; a < currentCount; a++)
-  {
-    tempIdUpload.push_back((*type)[a]);
-  }
-
-  if (!textureIDBuffer.buffer()) textureIDBuffer.createBuffer(device, sizeof(int) * currentCount, SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ);
-  else textureIDBuffer.updateBufferSize(copypass, sizeof(int) * currentCount, true);
-
-  if( !tempIdUpload.empty())
-  {
-    lastCount = currentCount;
-    transferBuffer.createTransferBuffer(device, difference * sizeof(int) );
-    uint8_t* positionMapped = (uint8_t*)SDL_MapGPUTransferBuffer(device, transferBuffer.buffer(), false);
-    SDL_memcpy(positionMapped, tempIdUpload.data(), difference * sizeof(int));
-    SDL_UnmapGPUTransferBuffer(device, transferBuffer.buffer());
-
-    SDL_GPUTransferBufferLocation possrc = {};
-    SDL_GPUBufferRegion           posdst = {};
-
-    possrc.transfer_buffer = transferBuffer.buffer();
-    possrc.offset = 0;
-    posdst.buffer = textureIDBuffer.buffer();
-    posdst.offset = offset;
-    posdst.size   = difference * sizeof(int);
-    SDL_UploadToGPUBuffer(copypass, &possrc, &posdst, false);
-  }
-  lastCount = currentCount;
-}
-
 
 void Texture::getAtlasData(SDL_GPUCopyPass* copypass)
 {
@@ -185,8 +147,8 @@ void Texture::bindSamplers(SDL_GPURenderPass* pass, uint32_t slot)
 }
 void Texture::bindLayout(SDL_GPURenderPass* pass, uint32_t slot)
 {
-  if (type->size() <= 0 ) return;
-  SDL_GPUBuffer* bufs[] = { layout.buffer(), textureIDBuffer.buffer() };
+  if (imageId->size() <= 0 ) return;
+  SDL_GPUBuffer* bufs[] = { layout.buffer()};
 
-  SDL_BindGPUVertexStorageBuffers( pass, slot, bufs, 2);
+  SDL_BindGPUVertexStorageBuffers( pass, slot, bufs, 1);
 }
