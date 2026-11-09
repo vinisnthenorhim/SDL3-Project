@@ -63,6 +63,7 @@ void Renderer::loadData( ObjectDataRO objectDataRO, DirtyData dirtyData, CameraD
   objectTransform.loadData (objectDataRO, dirtyData);
   objectRender   .laodData (objectDataRO);
   camera         .loadData (objectDataRO, cameraData);
+  visible        .loadData (objectDataRO, dirtyData);
 }
 
 
@@ -88,6 +89,7 @@ void Renderer::render()
   texture.updateTextureIdBUffer(copypass);
   texture.getAtlasData(copypass);
   texture.loadTexture(copypass);
+  visible.update( device, copypass );
   // SDL_Log("4\n");
 
   SDL_EndGPUCopyPass(copypass);
@@ -112,8 +114,9 @@ void Renderer::render()
   objectTransform.bindG(renderpass, 0);
   camera.bindG(renderpass, 1);
   texture.bindLayout(renderpass, 2);
+  visible.bindG( renderpass, 3, 0);
 
-  texture.bindSamplers(renderpass, 0);
+  texture.bindSamplers( renderpass, 0 );
 
   objectRender.endBind(renderpass);
 
@@ -127,5 +130,5 @@ void Renderer::render()
   objectRender.endUpdate();
   camera.releaseOld();
   texture.release();
-
+  visible.release();
 }

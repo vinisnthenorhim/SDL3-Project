@@ -9,7 +9,7 @@
 #include <renderer/core/ObjectTransform.h>
 #include <renderer/core/camera.h>
 #include <texture/loader/texture.h>
-
+#include <renderer/core/visible.h>
 
 class Renderer
 {
@@ -36,6 +36,7 @@ class Renderer
       Projection      projection;
       CameraHandle    camera;
       Texture         texture;
+      Visible         visible;
 
 };
 
