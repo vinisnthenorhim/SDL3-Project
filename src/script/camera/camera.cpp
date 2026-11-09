@@ -145,7 +145,7 @@ bool Camera::cameraZoom()
   else if (!zoomIn && zoomOut ) zoomSpeed = 0.98;
   else if (!zoomIn && !zoomOut) zoomSpeed = 1.0;
 
-  if ((zoomSpeed != 1) && ( positionX[1] * zoomSpeed >= 0.2 || positionY[1] * zoomSpeed >= 0.2 || positionZ[1] * zoomSpeed >= 0.2) && ( positionX[1] * zoomSpeed <= 10.0 || positionY[1] * zoomSpeed <= 10.0 || positionZ[1] * zoomSpeed <= 10.0))
+  if ((zoomSpeed != 1) && ( positionX[1] * zoomSpeed >= 0.2 || positionY[1] * zoomSpeed >= 0.2 || positionZ[1] * zoomSpeed >= 0.2) && ( positionX[1] * zoomSpeed <= 20.0 || positionY[1] * zoomSpeed <= 20.0 || positionZ[1] * zoomSpeed <= 20.0))
   {
 
     positionX[1]  *= zoomSpeed  ;
@@ -236,7 +236,6 @@ void Camera::setSettings(const SDL_Event* event)
   {
     if (followPlayer == 0u) followPlayer = 1u;
     else followPlayer = 0u;
-    std::cout << followPlayer;
   }
 }
 
