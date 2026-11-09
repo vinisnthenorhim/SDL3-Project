@@ -40,11 +40,12 @@ void ObjectRender::createObjectRender(SDL_Window* window, SDL_GPUDevice* device)
   SDL_GPUShaderCreateInfo vertInfo{};
   vertInfo.stage      = SDL_GPU_SHADERSTAGE_VERTEX;
   vertInfo.num_uniform_buffers = 1;
-  vertInfo.num_storage_buffers = 4;
+  vertInfo.num_storage_buffers = 5;
 
   SDL_GPUShaderCreateInfo fragInfo{};
   fragInfo.stage      =  SDL_GPU_SHADERSTAGE_FRAGMENT;
   fragInfo.num_samplers = 1;
+  fragInfo.num_storage_buffers = 1;
 
 
   Shader vert(device, vertexShaderLocation, vertInfo);
