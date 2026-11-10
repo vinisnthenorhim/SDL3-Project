@@ -236,6 +236,11 @@ void Camera::setSettings(const SDL_Event* event)
   {
     if (followPlayer == 0u) followPlayer = 1u;
     else followPlayer = 0u;
+    positionX[2] = 0;
+    positionY[2] = 0;
+    positionZ[2] = 0;
+    glm::mat4 oldRotate = rotationMatrix({positionX[2], positionY[2], positionZ[2], 1});
+    rotateTranpose = glm::transpose(oldRotate);
   }
 }
 
