@@ -5,8 +5,7 @@
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
-typedef std::unordered_map<int64_t, std::unordered_map<int64_t, std::vector<int>>> Grid;
-typedef const std::unordered_map<std::string, int>* typeIDsData;
+
 
 struct ObjectDimension
 {
@@ -156,4 +155,35 @@ struct RotateAxis
 };
 
 
+struct Node
+{
+  int x, y;
+  
+  static inline const float w = 100.0f;
+  static inline const float h = 100.0f;
+  
+  bool walkable = true;
+  bool closed = false;
 
+  float gx = std::numeric_limits<float>::infinity();
+  float hx = 0;
+
+  Node* parent = nullptr;
+
+  float f() const 
+  {
+    return gx + hx;
+  }
+};
+
+struct CompareNode
+{
+  bool operator()(const Node* A, const Node* B) const
+  {
+    return A->f() > B->f();
+  }
+};
+
+typedef std::unordered_map<int64_t, std::unordered_map<int64_t, Node>> Nodes;
+typedef std::unordered_map<int64_t, std::unordered_map<int64_t, std::vector<int>>> Grid;
+typedef const std::unordered_map<std::string, int>* typeIDsData;
