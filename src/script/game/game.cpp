@@ -8,7 +8,13 @@ void Game::loadData(CameraDataRW cameraDataRW)
 {
   cell.loadData(world.readOnlyData(), cameraDataRW);
   separation.loadData(world.readWriteData(), world.dirtyData(), cell.getCell());
-  player.loadData(world.readWriteData(), world.dirtyData(), window, cameraDataRW);
+  pathFinding.loadData(world.readWriteData(), world.dirtyData());
+
+  auto func = [this](float x, float y, float targetX, float targetY, uint64_t id)
+  {
+    pathFinding.findPath(x, y, targetX, targetY, id);
+  };
+  player.loadData(world.readWriteData(), world.dirtyData(), window, cameraDataRW, func);
 }
 void Game::render()
 {
@@ -17,6 +23,7 @@ void Game::render()
   world.frameCalculate();
   player.movement();
 
+  pathFinding.animate();
   cell.updateCell();
 
   separation.updateSize();

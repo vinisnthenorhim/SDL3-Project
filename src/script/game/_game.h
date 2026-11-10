@@ -6,7 +6,7 @@
 #include <logic/grid.h>
 #include <logic/grid.h>
 #include <logic/player.h>
-
+#include <logic/pathfinding.h>
 class Game
 {
   private:
@@ -16,6 +16,7 @@ class Game
     World world;
     GridCell cell;
     ObjectSeparation separation;
+    PathFinding pathFinding;
     Player player;
 
     bool run = false;
