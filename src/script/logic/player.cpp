@@ -31,7 +31,7 @@ void Player::movement()
       break;
     case ControlType::MOUSE :
       mouseControl();
-      animate();
+      // animate();
       break;
     default:
       keyboardControl();
@@ -102,8 +102,8 @@ void Player::mouseControl()
 
   SDL_MouseButtonFlags buttons = SDL_GetMouseState( &xm, &ym );
   bool isDown = (buttons & SDL_BUTTON_LMASK) != 0;
-  float offX = ( (xm - cw / 2.f) / zoom)  ;
-  float offY = (-(ym - ch / 2.f) / zoom)  ;     
+  float offX = (( (xm - cw / 2.f) + (*camPositionX)[3]) / zoom)  ;
+  float offY = ((-(ym - ch / 2.f) + (*camPositionY)[3]) / zoom)  ;     
   if ( isDown && !wasDown)
   {
     glm::vec4 tempVec( offX, offY, 0.0f, 0.0f );
@@ -111,7 +111,10 @@ void Player::mouseControl()
 
     targetX = (*positionX)[*playerId] + temp.x + posOffset.x;
     targetY = (*positionY)[*playerId] + temp.y + posOffset.y;
+    // std::cout << offX << '\t' <<  temp.x << '\t' << offY << '\t' << temp.y << '\n';
+    // std::cout << (*camPositionX)[3] << '\t' <<  (*camPositionY)[3] << '\n';
 
+    move((*positionX)[*playerId], (*positionY)[*playerId], targetX, targetY, *playerId);
   }
   wasDown = isDown;
 }
@@ -119,8 +122,10 @@ void Player::animate()
 {
   float compX = targetX - (*positionX)[*playerId];
   float compY = targetY - (*positionY)[*playerId];
-  if (fabsf(compX) > 10 || fabsf(compY) > 10)
+  if (fabsf(compX) > 20 || fabsf(compY) > 20)
   {
+    std::cout << (*positionX)[*playerId]  << '\t' <<  targetX << '\t' << (*positionY)[*playerId] << '\t' << targetY<< '\n';
+
     const float length = std::sqrt(float( compX * compX + compY * compY));
 
     const float directionX = length > 0 ? compX / length : 0.0f;
@@ -134,7 +139,6 @@ void Player::animate()
     (*positionY)[*playerId] += dirY * *secondPerFrame;
  
     (*dirtyPosition)[*playerId] = true;
-    *camDirty = *camDirty || true;
 
   }
 }
@@ -143,17 +147,25 @@ void Player::camHandle()
 {
   if ( *follow == true ) 
   {
+    zoom = 0.6;
+
     (*camPositionX)[0] = (*positionX)[*playerId];
     (*camPositionY)[0] = (*positionY)[*playerId];
     (*camPositionZ)[0] = (*positionZ)[*playerId];
 
-    (*camPositionX)[1] = 0.6;
-    (*camPositionY)[1] = 0.6;
-    (*camPositionZ)[1] = 0.6;
+    (*camPositionX)[1] = zoom;
+    (*camPositionY)[1] = zoom;
+    (*camPositionZ)[1] = zoom;
 
     (*camPositionX)[2] = 0;
     (*camPositionY)[2] = 0;
     (*camPositionZ)[2] = 0;
+
+    posOffset.x =  0;
+    posOffset.y =  0;
+    posOffset.z =  0;
+
+    *camDirty = *camDirty || true;
   }
   else
   {
@@ -161,15 +173,16 @@ void Player::camHandle()
     zoom = (*camPositionY)[1];
     zoom = (*camPositionZ)[1];
 
-    posOffset.x =  (*camPositionX)[0] - (*positionX)[*playerId];
-    posOffset.y =  (*camPositionY)[0] - (*positionY)[*playerId];
-    posOffset.z =  (*camPositionZ)[0] - (*positionZ)[*playerId];
+    posOffset.x =  (*camPositionX)[0] - (*positionX)[*playerId] ;
+    posOffset.y =  (*camPositionY)[0] - (*positionY)[*playerId] ;
+    posOffset.z =  (*camPositionZ)[0] - (*positionZ)[*playerId] ;
   }
 
 }
 
-void Player::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Window* window, CameraDataRW cameraDataRW)
+void Player::loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Window* window, CameraDataRW cameraDataRW, std::function<void(float, float, float, float, uint64_t)> func)
 {
+  move = func;
   this->window         = window                     ;
   this->playerId       = objectDataRW.playerId      ;
   this->exist          = objectDataRW.exist         ;

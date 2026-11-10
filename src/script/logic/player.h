@@ -1,7 +1,7 @@
 #pragma once
 
 #include <struct/struct.h>
-
+#include <functional>
 enum class ControlType
 {
   KEYBOARD,
@@ -64,8 +64,10 @@ class Player
     void animate();
     void camHandle();
 
+    std::function<void(float, float, float, float, uint64_t)> move;
+
     SDL_Window* window = nullptr;
   public:
     void movement();
-    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Window* window, CameraDataRW cameraDataRW);
+    void loadData( ObjectDataRW objectDataRW, DirtyData dirtyData, SDL_Window* window, CameraDataRW cameraDataRW, std::function<void(float, float, float, float, uint64_t)> func);
 };
